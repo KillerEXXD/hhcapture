@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Stack History - Visual Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-down {
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+      }
+    }
+
+    .pulse-ring {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Enhanced Stack History - Visual Prototype</h1>
+    <p class="text-gray-600 mb-8">This shows improved card-like modal designs for the stack history feature with better visual hierarchy and aesthetics.</p>
+
+    <!-- Scenario 1: BASE Round - Compact Card Design -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Scenario 1: BASE Round - Enhanced Card Design</h2>
+
+      <div class="border border-gray-300 rounded">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700">Position</th>
+              <th class="border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700">Player</th>
+              <th class="border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700">Stack</th>
+              <th class="border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border border-gray-300 px-4 py-2 text-center font-medium">UTG</td>
+              <td class="border border-gray-300 px-4 py-2 text-center">Alice</td>
+              <td class="border border-gray-300 px-4 py-2">
+                <!-- Stack Column Content -->
+                <div class="space-y-2">
+                  <!-- Starting Stack -->
+                  <div class="flex items-center justify-between bg-blue-50 rounded-lg px-3 py-2 border border-blue-200">
+                    <span class="text-xs font-medium text-blue-700">Starting:</span>
+                    <span class="text-sm font-bold text-blue-900">10K</span>
+                  </div>
+
+                  <!-- Current Stack with Toggle -->
+                  <div class="flex items-center gap-2">
+                    <div class="flex-1 flex items-center justify-between bg-green-50 rounded-lg px-3 py-2 border border-green-200">
+                      <span class="text-xs font-medium text-green-700">Current:</span>
+                      <span class="text-sm font-bold text-green-900">9.5K</span>
+                    </div>
+                    <button
+                      onclick="toggleHistory('history1')"
+                      class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-xs font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-1"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                      <span>Details</span>
+                    </button>
+                  </div>
+
+                  <!-- Enhanced History Card (Hidden by default) -->
+                  <div id="history1" class="hidden slide-down">
+                    <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl shadow-lg border-2 border-blue-200 overflow-hidden">
+                      <!-- Card Header -->
+                      <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                          <h3 class="text-white font-bold text-sm">Stack History - PREFLOP</h3>
+                        </div>
+                        <button
+                          onclick="toggleHistory('history1')"
+                          class="text-white hover:text-blue-200 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <!-- Card Body -->
+                      <div class="p-4 space-y-3">
+                        <!-- BASE Round -->
+                        <div class="bg-yellow-50 rounded-lg p-3 border-l-4 border-yellow-400 shadow-sm">
+                          <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-yellow-800 uppercase tracking-wide">BASE Round</span>
+                            <span class="px-2 py-1 bg-yellow-200 text-yellow-800 text-xs font-semibold rounded-full">Active</span>
+                          </div>
+                          <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-2">
+                              <span class="text-gray-600">10K</span>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                              <span class="font-bold text-gray-800">9.5K</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                              <span class="text-gray-500 text-xs">-500</span>
+                              <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-md">raise</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Summary Section -->
+                        <div class="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                          <div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 pb-2 border-b border-gray-200">Summary</div>
+                          <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                              <span class="text-xs text-gray-600">Total Contributed:</span>
+                              <span class="text-sm font-bold text-red-600">500</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                              <span class="text-xs text-gray-600">Remaining Stack:</span>
+                              <span class="text-sm font-bold text-green-600">9.5K</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                <span class="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-semibold rounded-md">raise 500</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Scenario 2: More Action 1 - Multiple Rounds -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Scenario 2: More Action 1 - Multiple Rounds Display</h2>
+
+      <div class="border border-gray-300 rounded">
+        <table class="w-full">
+          <thead class="bg-orange-50">
+            <tr>
+              <th class="border border-orange-300 px-4 py-2 text-sm font-semibold text-gray-700">Position</th>
+              <th class="border border-orange-300 px-4 py-2 text-sm font-semibold text-gray-700">Player</th>
+              <th class="border border-orange-300 px-4 py-2 text-sm font-semibold text-gray-700">Stack</th>
+              <th class="border border-orange-300 px-4 py-2 text-sm font-semibold text-gray-700">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border border-orange-300 px-4 py-2 text-center font-medium">BB</td>
+              <td class="border border-orange-300 px-4 py-2 text-center">David</td>
+              <td class="border border-orange-300 px-4 py-2">
+                <!-- Stack Column Content -->
+                <div class="space-y-2">
+                  <!-- Starting Stack -->
+                  <div class="flex items-center justify-between bg-blue-50 rounded-lg px-3 py-2 border border-blue-200">
+                    <span class="text-xs font-medium text-blue-700">Starting:</span>
+                    <span class="text-sm font-bold text-blue-900">10K</span>
+                  </div>
+
+                  <!-- Current Stack with Toggle -->
+                  <div class="flex items-center gap-2">
+                    <div class="flex-1 flex items-center justify-between bg-green-50 rounded-lg px-3 py-2 border border-green-200">
+                      <span class="text-xs font-medium text-green-700">Current:</span>
+                      <span class="text-sm font-bold text-green-900">8K</span>
+                    </div>
+                    <button
+                      onclick="toggleHistory('history2')"
+                      class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-xs font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-1"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                      <span>Details</span>
+                    </button>
+                  </div>
+
+                  <!-- Enhanced History Card -->
+                  <div id="history2" class="hidden slide-down">
+                    <div class="bg-gradient-to-br from-gray-50 to-orange-50 rounded-xl shadow-lg border-2 border-orange-200 overflow-hidden">
+                      <!-- Card Header -->
+                      <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-4 py-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                          <h3 class="text-white font-bold text-sm">Stack History - PREFLOP</h3>
+                        </div>
+                        <button
+                          onclick="toggleHistory('history2')"
+                          class="text-white hover:text-orange-200 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <!-- Card Body -->
+                      <div class="p-4 space-y-3">
+                        <!-- BASE Round -->
+                        <div class="bg-white rounded-lg p-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                          <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">BASE Round</span>
+                            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">Completed</span>
+                          </div>
+                          <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-2">
+                              <span class="text-gray-600">10K</span>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                              <span class="font-bold text-gray-800">9K</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                              <span class="text-gray-500 text-xs">-1K</span>
+                              <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-md">raise</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- More Action 1 Round -->
+                        <div class="bg-yellow-50 rounded-lg p-3 border-l-4 border-yellow-400 shadow-sm">
+                          <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-yellow-800 uppercase tracking-wide">More Action 1</span>
+                            <span class="px-2 py-1 bg-yellow-200 text-yellow-800 text-xs font-semibold rounded-full">Active</span>
+                          </div>
+                          <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-2">
+                              <span class="text-gray-600">9K</span>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                              <span class="font-bold text-gray-800">8K</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                              <span class="text-gray-500 text-xs">-1K</span>
+                              <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-md">call</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Summary Section -->
+                        <div class="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                          <div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 pb-2 border-b border-gray-200">Summary</div>
+                          <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                              <span class="text-xs text-gray-600">Total Contributed:</span>
+                              <span class="text-sm font-bold text-red-600">2K</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                              <span class="text-xs text-gray-600">Remaining Stack:</span>
+                              <span class="text-sm font-bold text-green-600">8K</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="border border-orange-300 px-4 py-2 text-center">
+                <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-md">call 1K</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Scenario 3: All-in Player - Red Highlight -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Scenario 3: All-in Player - Red Accent</h2>
+
+      <div class="border border-gray-300 rounded">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700">Position</th>
+              <th class="border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700">Player</th>
+              <th class="border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700">Stack</th>
+              <th class="border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border border-gray-300 px-4 py-2 text-center font-medium">BTN</td>
+              <td class="border border-gray-300 px-4 py-2 text-center">Emma</td>
+              <td class="border border-gray-300 px-4 py-2">
+                <!-- Stack Column Content -->
+                <div class="space-y-2">
+                  <!-- Starting Stack -->
+                  <div class="flex items-center justify-between bg-blue-50 rounded-lg px-3 py-2 border border-blue-200">
+                    <span class="text-xs font-medium text-blue-700">Starting:</span>
+                    <span class="text-sm font-bold text-blue-900">10K</span>
+                  </div>
+
+                  <!-- Current Stack with Toggle -->
+                  <div class="flex items-center gap-2">
+                    <div class="flex-1 flex items-center justify-between bg-red-50 rounded-lg px-3 py-2 border-2 border-red-300">
+                      <span class="text-xs font-medium text-red-700">Current:</span>
+                      <span class="text-sm font-bold text-red-900">0</span>
+                    </div>
+                    <button
+                      onclick="toggleHistory('history3')"
+                      class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-xs font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-1"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                      <span>Details</span>
+                    </button>
+                  </div>
+
+                  <!-- Enhanced History Card -->
+                  <div id="history3" class="hidden slide-down">
+                    <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl shadow-lg border-2 border-red-300 overflow-hidden">
+                      <!-- Card Header -->
+                      <div class="bg-gradient-to-r from-red-600 to-red-700 px-4 py-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                          <h3 class="text-white font-bold text-sm">Stack History - ALL-IN</h3>
+                        </div>
+                        <button
+                          onclick="toggleHistory('history3')"
+                          class="text-white hover:text-red-200 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <!-- Card Body -->
+                      <div class="p-4 space-y-3">
+                        <!-- BASE Round with All-in -->
+                        <div class="bg-red-100 rounded-lg p-3 border-l-4 border-red-500 shadow-sm">
+                          <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-red-800 uppercase tracking-wide">BASE Round</span>
+                            <span class="px-2 py-1 bg-red-200 text-red-800 text-xs font-semibold rounded-full flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                              </svg>
+                              All-in
+                            </span>
+                          </div>
+                          <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-2">
+                              <span class="text-gray-600">10K</span>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                              <span class="font-bold text-red-800">0</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                              <span class="text-gray-600 text-xs">-10K</span>
+                              <span class="px-2 py-1 bg-red-600 text-white text-xs font-bold rounded-md">all-in</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Summary Section -->
+                        <div class="bg-white rounded-lg p-3 border border-red-200 shadow-sm">
+                          <div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 pb-2 border-b border-gray-200">Summary</div>
+                          <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                              <span class="text-xs text-gray-600">Total Contributed:</span>
+                              <span class="text-sm font-bold text-red-600">10K</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                              <span class="text-xs text-gray-600">Remaining Stack:</span>
+                              <span class="text-sm font-bold text-red-600">0</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                <span class="px-3 py-1 bg-red-600 text-white text-sm font-bold rounded-md">all-in 10K</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Key Features Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
+      <h2 class="text-2xl font-bold mb-4">Enhanced Design Features</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-white bg-opacity-20 rounded-lg p-4">
+          <h3 class="font-bold mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+            Color-Coded Status
+          </h3>
+          <p class="text-sm text-blue-100">Active rounds: Yellow highlight, Completed rounds: White, All-in: Red accent</p>
+        </div>
+
+        <div class="bg-white bg-opacity-20 rounded-lg p-4">
+          <h3 class="font-bold mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+            Status Badges
+          </h3>
+          <p class="text-sm text-blue-100">Pill-shaped badges show "Active", "Completed", or "All-in" status clearly</p>
+        </div>
+
+        <div class="bg-white bg-opacity-20 rounded-lg p-4">
+          <h3 class="font-bold mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Smooth Animations
+          </h3>
+          <p class="text-sm text-blue-100">Slide-down animation when opening, hover effects on cards and buttons</p>
+        </div>
+
+        <div class="bg-white bg-opacity-20 rounded-lg p-4">
+          <h3 class="font-bold mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+            </svg>
+            Visual Hierarchy
+          </h3>
+          <p class="text-sm text-blue-100">Gradient headers, bordered sections, and clear typography guide the eye</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleHistory(id) {
+      const element = document.getElementById(id);
+      if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+      } else {
+        element.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

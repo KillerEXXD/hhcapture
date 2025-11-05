@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stack History Prototype</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+    }
+
+    .scenario {
+      margin-bottom: 40px;
+      padding: 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+    }
+
+    .scenario-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2563eb;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .stack-cell {
+      min-width: 200px;
+    }
+
+    .stack-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stack-label {
+      font-size: 11px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .stack-value {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .starting-stack {
+      color: #2563eb;
+    }
+
+    .current-stack-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .current-stack {
+      color: #059669;
+    }
+
+    .toggle-btn {
+      padding: 2px 8px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .toggle-btn:hover {
+      background: #2563eb;
+    }
+
+    .toggle-btn.expanded {
+      background: #dc2626;
+    }
+
+    .toggle-btn.expanded:hover {
+      background: #b91c1c;
+    }
+
+    .history-panel {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .history-section {
+      margin-bottom: 12px;
+    }
+
+    .history-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .history-section-title {
+      font-weight: bold;
+      color: #1e40af;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+
+    .history-row {
+      padding: 4px 0;
+      display: flex;
+      justify-content: space-between;
+      color: #334155;
+    }
+
+    .history-row.current-round {
+      background: #fef3c7;
+      padding: 4px 8px;
+      margin: 0 -8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .history-arrow {
+      color: #10b981;
+      font-weight: bold;
+    }
+
+    .history-action {
+      color: #64748b;
+      font-size: 11px;
+    }
+
+    .history-summary {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 2px solid #cbd5e1;
+      font-weight: bold;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+    }
+
+    .summary-label {
+      color: #475569;
+    }
+
+    .summary-value {
+      color: #059669;
+    }
+
+    .not-available {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .note {
+      margin-top: 15px;
+      padding: 10px;
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      font-size: 12px;
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Stack History Prototype - Single Column Design</h1>
+
+    <!-- Scenario 1: Before Process Stack -->
+    <div class="scenario">
+      <div class="scenario-title">Scenario 1: Before "Process Stack" is clicked (Preflop BASE)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Position</th>
+            <th>Action</th>
+            <th>Stack</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alice</td>
+            <td>UTG</td>
+            <td>call 1K</td>
+            <td class="stack-cell">
+              <div class="stack-row">
+                <div>
+                  <div class="stack-label">Starting Stack:</div>
+                  <div class="stack-value starting-stack">10.0K</div>
+                </div>
+                <div>
+                  <div class="stack-label">Current Stack:</div>
+                  <div class="stack-value not-available">-</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Charlie</td>
+            <td>UTG+1</td>
+            <td>raise to 2K</td>
+            <td class="stack-cell">
+              <div class="stack-row">
+                <div>
+                  <div class="stack-label">Starting Stack:</div>
+                  <div class="stack-value starting-stack">11.0K</div>
+                </div>
+                <div>
+                  <div class="stack-label">Current Stack:</div>
+                  <div class="stack-value not-available">-</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note">
+        Note: Current Stack and history are not available until "Process Stack" is clicked.
+      </div>
+    </div>
+
+    <!-- Scenario 2: After Process Stack - Preflop BASE -->
+    <div class="scenario">
+      <div class="scenario-title">Scenario 2: After "Process Stack" is clicked (Preflop BASE)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Position</th>
+            <th>Action</th>
+            <th>Stack</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alice</td>
+            <td>UTG</td>
+            <td>call 1K</td>
+            <td class="stack-cell">
+              <div class="stack-row">
+                <div>
+                  <div class="stack-label">Starting Stack:</div>
+                  <div class="stack-value starting-stack">10.0K</div>
+                </div>
+                <div class="current-stack-row">
+                  <div>
+                    <div class="stack-label">Current Stack:</div>
+                    <div class="stack-value current-stack">9.0K</div>
+                  </div>
+                  <button class="toggle-btn" onclick="toggleHistory(this, 'alice-base')">▼ Show</button>
+                </div>
+                <div id="alice-base" class="history-panel" style="display: none;">
+                  <div class="history-section">
+                    <div class="history-section-title">PREFLOP</div>
+                    <div class="history-row current-round">
+                      <span>BASE: 10.0K <span class="history-arrow">→</span> 9.0K</span>
+                      <span class="history-action">(-1.0K call)</span>
+                    </div>
+                  </div>
+                  <div class="history-summary">
+                    <div class="summary-row">
+                      <span class="summary-label">Total Contributed:</span>
+                      <span class="summary-value">1.0K</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="summary-label">Remaining Stack:</span>
+                      <span class="summary-value">9.0K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Charlie</td>
+            <td>UTG+1</td>
+            <td>raise to 2K</td>
+            <td class="stack-cell">
+              <div class="stack-row">
+                <div>
+                  <div class="stack-label">Starting Stack:</div>
+                  <div class="stack-value starting-stack">11.0K</div>
+                </div>
+                <div class="current-stack-row">
+                  <div>
+                    <div class="stack-label">Current Stack:</div>
+                    <div class="stack-value current-stack">9.0K</div>
+                  </div>
+                  <button class="toggle-btn" onclick="toggleHistory(this, 'charlie-base')">▼ Show</button>
+                </div>
+                <div id="charlie-base" class="history-panel" style="display: none;">
+                  <div class="history-section">
+                    <div class="history-section-title">PREFLOP</div>
+                    <div class="history-row current-round">
+                      <span>BASE: 11.0K <span class="history-arrow">→</span> 9.0K</span>
+                      <span class="history-action">(-2.0K raise)</span>
+                    </div>
+                  </div>
+                  <div class="history-summary">
+                    <div class="summary-row">
+                      <span class="summary-label">Total Contributed:</span>
+                      <span class="summary-value">2.0K</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="summary-label">Remaining Stack:</span>
+                      <span class="summary-value">9.0K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Scenario 3: Preflop More Action 1 -->
+    <div class="scenario">
+      <div class="scenario-title">Scenario 3: Preflop More Action 1 (After Process Stack)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Position</th>
+            <th>Action</th>
+            <th>Stack</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alice</td>
+            <td>UTG</td>
+            <td>call 2K (total 3K)</td>
+            <td class="stack-cell">
+              <div class="stack-row">
+                <div>
+                  <div class="stack-label">Starting Stack:</div>
+                  <div class="stack-value starting-stack">10.0K</div>
+                </div>
+                <div class="current-stack-row">
+                  <div>
+                    <div class="stack-label">Current Stack:</div>
+                    <div class="stack-value current-stack">7.0K</div>
+                  </div>
+                  <button class="toggle-btn" onclick="toggleHistory(this, 'alice-ma1')">▼ Show</button>
+                </div>
+                <div id="alice-ma1" class="history-panel" style="display: none;">
+                  <div class="history-section">
+                    <div class="history-section-title">PREFLOP</div>
+                    <div class="history-row">
+                      <span>BASE: 10.0K <span class="history-arrow">→</span> 9.0K</span>
+                      <span class="history-action">(-1.0K call)</span>
+                    </div>
+                    <div class="history-row current-round">
+                      <span>More Action 1: 9.0K <span class="history-arrow">→</span> 7.0K</span>
+                      <span class="history-action">(-2.0K call)</span>
+                    </div>
+                  </div>
+                  <div class="history-summary">
+                    <div class="summary-row">
+                      <span class="summary-label">Total Contributed:</span>
+                      <span class="summary-value">3.0K</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="summary-label">Remaining Stack:</span>
+                      <span class="summary-value">7.0K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>David</td>
+            <td>UTG+2</td>
+            <td>all-in 7.5K</td>
+            <td class="stack-cell">
+              <div class="stack-row">
+                <div>
+                  <div class="stack-label">Starting Stack:</div>
+                  <div class="stack-value starting-stack">10.0K</div>
+                </div>
+                <div class="current-stack-row">
+                  <div>
+                    <div class="stack-label">Current Stack:</div>
+                    <div class="stack-value current-stack">0.0K (All-in)</div>
+                  </div>
+                  <button class="toggle-btn" onclick="toggleHistory(this, 'david-ma1')">▼ Show</button>
+                </div>
+                <div id="david-ma1" class="history-panel" style="display: none;">
+                  <div class="history-section">
+                    <div class="history-section-title">PREFLOP</div>
+                    <div class="history-row">
+                      <span>BASE: 10.0K <span class="history-arrow">→</span> 8.0K</span>
+                      <span class="history-action">(-2.0K call)</span>
+                    </div>
+                    <div class="history-row current-round">
+                      <span>More Action 1: 8.0K <span class="history-arrow">→</span> 0.0K</span>
+                      <span class="history-action">(-8.0K all-in) [Total: 10.0K]</span>
+                    </div>
+                  </div>
+                  <div class="history-summary">
+                    <div class="summary-row">
+                      <span class="summary-label">Total Contributed:</span>
+                      <span class="summary-value">10.0K</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="summary-label">Remaining Stack:</span>
+                      <span class="summary-value">0.0K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Scenario 4: Flop More Action 2 (Complex Example) -->
+    <div class="scenario">
+      <div class="scenario-title">Scenario 4: Flop More Action 2 (Full History Example)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Position</th>
+            <th>Action</th>
+            <th>Stack</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alice</td>
+            <td>UTG</td>
+            <td>call 0.5K</td>
+            <td class="stack-cell">
+              <div class="stack-row">
+                <div>
+                  <div class="stack-label">Starting Stack:</div>
+                  <div class="stack-value starting-stack">10.0K</div>
+                </div>
+                <div class="current-stack-row">
+                  <div>
+                    <div class="stack-label">Current Stack:</div>
+                    <div class="stack-value current-stack">4.5K</div>
+                  </div>
+                  <button class="toggle-btn" onclick="toggleHistory(this, 'alice-flop-ma2')">▼ Show</button>
+                </div>
+                <div id="alice-flop-ma2" class="history-panel" style="display: none;">
+                  <div class="history-section">
+                    <div class="history-section-title">PREFLOP</div>
+                    <div class="history-row">
+                      <span>BASE: 10.0K <span class="history-arrow">→</span> 9.0K</span>
+                      <span class="history-action">(-1.0K call)</span>
+                    </div>
+                    <div class="history-row">
+                      <span>More Action 1: 9.0K <span class="history-arrow">→</span> 7.0K</span>
+                      <span class="history-action">(-2.0K call)</span>
+                    </div>
+                    <div class="history-row">
+                      <span>More Action 2: 7.0K <span class="history-arrow">→</span> 7.0K</span>
+                      <span class="history-action">(fold)</span>
+                    </div>
+                  </div>
+                  <div class="history-section">
+                    <div class="history-section-title">FLOP</div>
+                    <div class="history-row">
+                      <span>BASE: 7.0K <span class="history-arrow">→</span> 6.0K</span>
+                      <span class="history-action">(-1.0K bet)</span>
+                    </div>
+                    <div class="history-row">
+                      <span>More Action 1: 6.0K <span class="history-arrow">→</span> 5.0K</span>
+                      <span class="history-action">(-1.0K call)</span>
+                    </div>
+                    <div class="history-row current-round">
+                      <span>More Action 2: 5.0K <span class="history-arrow">→</span> 4.5K</span>
+                      <span class="history-action">(-0.5K call)</span>
+                    </div>
+                  </div>
+                  <div class="history-summary">
+                    <div class="summary-row">
+                      <span class="summary-label">Total Contributed:</span>
+                      <span class="summary-value">5.5K</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="summary-label">Remaining Stack:</span>
+                      <span class="summary-value">4.5K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Charlie</td>
+            <td>UTG+1</td>
+            <td>raise to 1K</td>
+            <td class="stack-cell">
+              <div class="stack-row">
+                <div>
+                  <div class="stack-label">Starting Stack:</div>
+                  <div class="stack-value starting-stack">11.0K</div>
+                </div>
+                <div class="current-stack-row">
+                  <div>
+                    <div class="stack-label">Current Stack:</div>
+                    <div class="stack-value current-stack">6.0K</div>
+                  </div>
+                  <button class="toggle-btn" onclick="toggleHistory(this, 'charlie-flop-ma2')">▼ Show</button>
+                </div>
+                <div id="charlie-flop-ma2" class="history-panel" style="display: none;">
+                  <div class="history-section">
+                    <div class="history-section-title">PREFLOP</div>
+                    <div class="history-row">
+                      <span>BASE: 11.0K <span class="history-arrow">→</span> 9.0K</span>
+                      <span class="history-action">(-2.0K raise)</span>
+                    </div>
+                    <div class="history-row">
+                      <span>More Action 1: 9.0K <span class="history-arrow">→</span> 9.0K</span>
+                      <span class="history-action">(check)</span>
+                    </div>
+                  </div>
+                  <div class="history-section">
+                    <div class="history-section-title">FLOP</div>
+                    <div class="history-row">
+                      <span>BASE: 9.0K <span class="history-arrow">→</span> 8.0K</span>
+                      <span class="history-action">(-1.0K call)</span>
+                    </div>
+                    <div class="history-row">
+                      <span>More Action 1: 8.0K <span class="history-arrow">→</span> 7.0K</span>
+                      <span class="history-action">(-1.0K call)</span>
+                    </div>
+                    <div class="history-row current-round">
+                      <span>More Action 2: 7.0K <span class="history-arrow">→</span> 6.0K</span>
+                      <span class="history-action">(-1.0K raise)</span>
+                    </div>
+                  </div>
+                  <div class="history-summary">
+                    <div class="summary-row">
+                      <span class="summary-label">Total Contributed:</span>
+                      <span class="summary-value">5.0K</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="summary-label">Remaining Stack:</span>
+                      <span class="summary-value">6.0K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleHistory(button, historyId) {
+      const historyPanel = document.getElementById(historyId);
+      const isVisible = historyPanel.style.display !== 'none';
+
+      if (isVisible) {
+        historyPanel.style.display = 'none';
+        button.textContent = '▼ Show';
+        button.classList.remove('expanded');
+      } else {
+        historyPanel.style.display = 'block';
+        button.textContent = '▲ Hide';
+        button.classList.add('expanded');
+      }
+    }
+  </script>
+</body>
+</html>

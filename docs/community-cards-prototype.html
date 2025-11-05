@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Cards Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-6xl mx-auto space-y-8">
+    <!-- Title -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Community Cards Design Prototype</h1>
+      <p class="text-gray-600">Medium-sized cards with colored suits consistent across all streets</p>
+    </div>
+
+    <!-- FLOP - 3 Cards -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="mb-4">
+        <h2 class="text-xl font-bold text-green-700 mb-1">FLOP</h2>
+        <p class="text-sm text-gray-600">3 community cards</p>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium text-gray-700">Community Cards:</span>
+
+        <!-- Card 1: Ace of Spades -->
+        <div class="relative group">
+          <div class="w-20 h-28 bg-white rounded-lg border-2 border-gray-300 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500">
+            <div class="text-4xl font-bold text-gray-900">A</div>
+            <div class="text-4xl text-gray-900">♠</div>
+          </div>
+          <div class="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full shadow">Flop 1</span>
+          </div>
+        </div>
+
+        <!-- Card 2: King of Hearts -->
+        <div class="relative group">
+          <div class="w-20 h-28 bg-white rounded-lg border-2 border-gray-300 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500">
+            <div class="text-4xl font-bold text-red-600">K</div>
+            <div class="text-4xl text-red-600">♥</div>
+          </div>
+          <div class="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full shadow">Flop 2</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Queen of Diamonds -->
+        <div class="relative group">
+          <div class="w-20 h-28 bg-white rounded-lg border-2 border-gray-300 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500">
+            <div class="text-4xl font-bold text-blue-600">Q</div>
+            <div class="text-4xl text-blue-600">♦</div>
+          </div>
+          <div class="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full shadow">Flop 3</span>
+          </div>
+        </div>
+
+        <!-- Card Selectors (same design as hole cards) -->
+        <div class="ml-6 flex items-center gap-3">
+          <div class="text-xs text-gray-600 font-medium">Or manually select:</div>
+
+          <!-- Flop Card 1 Selector -->
+          <div class="flex flex-col items-center gap-1">
+            <span class="text-[10px] text-gray-500 font-medium">Flop 1</span>
+            <div class="flex gap-1">
+              <select class="border border-gray-300 rounded px-2 py-1 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Rank</option>
+                <option value="A">A</option>
+                <option value="K">K</option>
+                <option value="Q">Q</option>
+                <option value="J">J</option>
+                <option value="T">T</option>
+                <option value="9">9</option>
+                <option value="8">8</option>
+                <option value="7">7</option>
+                <option value="6">6</option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+              </select>
+              <select class="border border-gray-300 rounded px-2 py-1 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Suit</option>
+                <option value="♠">♠</option>
+                <option value="♥">♥</option>
+                <option value="♦">♦</option>
+                <option value="♣">♣</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Flop Card 2 Selector -->
+          <div class="flex flex-col items-center gap-1">
+            <span class="text-[10px] text-gray-500 font-medium">Flop 2</span>
+            <div class="flex gap-1">
+              <select class="border border-gray-300 rounded px-2 py-1 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Rank</option>
+                <option value="A">A</option>
+                <option value="K">K</option>
+                <option value="Q">Q</option>
+                <option value="J">J</option>
+                <option value="T">T</option>
+                <option value="9">9</option>
+                <option value="8">8</option>
+                <option value="7">7</option>
+                <option value="6">6</option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+              </select>
+              <select class="border border-gray-300 rounded px-2 py-1 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Suit</option>
+                <option value="♠">♠</option>
+                <option value="♥">♥</option>
+                <option value="♦">♦</option>
+                <option value="♣">♣</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Flop Card 3 Selector -->
+          <div class="flex flex-col items-center gap-1">
+            <span class="text-[10px] text-gray-500 font-medium">Flop 3</span>
+            <div class="flex gap-1">
+              <select class="border border-gray-300 rounded px-2 py-1 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Rank</option>
+                <option value="A">A</option>
+                <option value="K">K</option>
+                <option value="Q">Q</option>
+                <option value="J">J</option>
+                <option value="T">T</option>
+                <option value="9">9</option>
+                <option value="8">8</option>
+                <option value="7">7</option>
+                <option value="6">6</option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+              </select>
+              <select class="border border-gray-300 rounded px-2 py-1 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <option value="">Suit</option>
+                <option value="♠">♠</option>
+                <option value="♥">♥</option>
+                <option value="♦">♦</option>
+                <option value="♣">♣</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-select indicator -->
+      <div class="mt-4 flex items-center gap-2 text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="text-gray-600">Auto-select enabled: Cards will be randomly selected when Flop is created</span>
+      </div>
+    </div>
+
+    <!-- TURN - 1 Additional Card -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="mb-4">
+        <h2 class="text-xl font-bold text-orange-600 mb-1">TURN</h2>
+        <p class="text-sm text-gray-600">1 additional community card (total: 4 cards)</p>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium text-gray-700">All Community Cards:</span>
+
+        <!-- Previous Flop Cards (Grayed out) -->
+        <div class="flex gap-2 opacity-60">
+          <div class="w-16 h-24 bg-gray-50 rounded-lg border-2 border-gray-300 flex flex-col items-center justify-center">
+            <div class="text-3xl font-bold text-gray-900">A</div>
+            <div class="text-3xl text-gray-900">♠</div>
+          </div>
+          <div class="w-16 h-24 bg-gray-50 rounded-lg border-2 border-gray-300 flex flex-col items-center justify-center">
+            <div class="text-3xl font-bold text-red-600">K</div>
+            <div class="text-3xl text-red-600">♥</div>
+          </div>
+          <div class="w-16 h-24 bg-gray-50 rounded-lg border-2 border-gray-300 flex flex-col items-center justify-center">
+            <div class="text-3xl font-bold text-blue-600">Q</div>
+            <div class="text-3xl text-blue-600">♦</div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="w-px h-24 bg-gray-300"></div>
+
+        <!-- Turn Card (Highlighted) -->
+        <div class="relative group">
+          <div class="w-20 h-28 bg-white rounded-lg border-2 border-orange-400 shadow-lg hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer ring-2 ring-orange-300">
+            <div class="text-4xl font-bold text-green-700">J</div>
+            <div class="text-4xl text-green-700">♣</div>
+          </div>
+          <div class="absolute -top-2 -right-2">
+            <span class="bg-orange-500 text-white text-xs px-2 py-1 rounded-full shadow font-bold">TURN</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 text-xs text-gray-500">
+        <span class="font-semibold text-orange-600">Note:</span> Previous street cards (Flop) are shown in reduced size/opacity for context
+      </div>
+    </div>
+
+    <!-- RIVER - 1 Additional Card -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="mb-4">
+        <h2 class="text-xl font-bold text-purple-600 mb-1">RIVER</h2>
+        <p class="text-sm text-gray-600">1 additional community card (total: 5 cards)</p>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium text-gray-700">All Community Cards:</span>
+
+        <!-- Previous Cards (Grayed out) -->
+        <div class="flex gap-2 opacity-60">
+          <div class="w-16 h-24 bg-gray-50 rounded-lg border-2 border-gray-300 flex flex-col items-center justify-center">
+            <div class="text-3xl font-bold text-gray-900">A</div>
+            <div class="text-3xl text-gray-900">♠</div>
+          </div>
+          <div class="w-16 h-24 bg-gray-50 rounded-lg border-2 border-gray-300 flex flex-col items-center justify-center">
+            <div class="text-3xl font-bold text-red-600">K</div>
+            <div class="text-3xl text-red-600">♥</div>
+          </div>
+          <div class="w-16 h-24 bg-gray-50 rounded-lg border-2 border-gray-300 flex flex-col items-center justify-center">
+            <div class="text-3xl font-bold text-blue-600">Q</div>
+            <div class="text-3xl text-blue-600">♦</div>
+          </div>
+          <div class="w-16 h-24 bg-gray-50 rounded-lg border-2 border-gray-300 flex flex-col items-center justify-center">
+            <div class="text-3xl font-bold text-green-700">J</div>
+            <div class="text-3xl text-green-700">♣</div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="w-px h-24 bg-gray-300"></div>
+
+        <!-- River Card (Highlighted) -->
+        <div class="relative group">
+          <div class="w-20 h-28 bg-white rounded-lg border-2 border-purple-400 shadow-lg hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer ring-2 ring-purple-300">
+            <div class="text-4xl font-bold text-gray-900">T</div>
+            <div class="text-4xl text-gray-900">♠</div>
+          </div>
+          <div class="absolute -top-2 -right-2">
+            <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full shadow font-bold">RIVER</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 text-xs text-gray-500">
+        <span class="font-semibold text-purple-600">Note:</span> All previous street cards are shown for complete board visibility
+      </div>
+    </div>
+
+    <!-- Card Size Legend -->
+    <div class="bg-blue-50 rounded-lg border-2 border-blue-200 p-6">
+      <h3 class="text-lg font-bold text-blue-900 mb-3">Card Size & Color Guidelines</h3>
+
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <h4 class="font-semibold text-blue-800 mb-2">Card Dimensions:</h4>
+          <ul class="space-y-1 text-gray-700">
+            <li>• <strong>Active card:</strong> 80px × 112px (w-20 h-28)</li>
+            <li>• <strong>Previous cards:</strong> 64px × 96px (w-16 h-24)</li>
+            <li>• <strong>Rank size:</strong> text-4xl (2.25rem)</li>
+            <li>• <strong>Suit size:</strong> text-4xl (2.25rem)</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-blue-800 mb-2">Suit Colors (Consistent):</h4>
+          <ul class="space-y-1">
+            <li class="flex items-center gap-2">
+              <span class="text-3xl text-gray-900">♠</span>
+              <span class="text-gray-700">Spades: <code class="bg-gray-200 px-2 py-0.5 rounded">text-gray-900</code></span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-3xl text-red-600">♥</span>
+              <span class="text-gray-700">Hearts: <code class="bg-gray-200 px-2 py-0.5 rounded">text-red-600</code></span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-3xl text-blue-600">♦</span>
+              <span class="text-gray-700">Diamonds: <code class="bg-gray-200 px-2 py-0.5 rounded">text-blue-600</code></span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-3xl text-green-700">♣</span>
+              <span class="text-gray-700">Clubs: <code class="bg-gray-200 px-2 py-0.5 rounded">text-green-700</code></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-t border-blue-300">
+        <h4 class="font-semibold text-blue-800 mb-2">Implementation Notes:</h4>
+        <ul class="space-y-1 text-sm text-gray-700">
+          <li>✓ Cards are clickable for manual selection (if auto-select is disabled)</li>
+          <li>✓ Hover effect shows card label (Flop 1, Turn, River, etc.)</li>
+          <li>✓ Active card has highlighted border matching street color (Green=Flop, Orange=Turn, Purple=River)</li>
+          <li>✓ Previous street cards shown at 80% size with reduced opacity for context</li>
+          <li>✓ Auto-select: When "Auto-select cards" is enabled in setup, community cards are randomly generated</li>
+          <li>✓ Consistent suit colors across all streets and player hole cards</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Interactive Example with Same Design as Hole Cards -->
+    <div class="bg-gray-50 rounded-lg border-2 border-gray-300 p-6">
+      <h3 class="text-lg font-bold text-gray-800 mb-3">Card Selector - Matching Hole Card Design</h3>
+      <p class="text-sm text-gray-600 mb-4">Same dropdown design as used for player Card 1 and Card 2 in Preflop BASE</p>
+
+      <div class="space-y-6">
+        <!-- Example 1: Empty State -->
+        <div class="flex items-center gap-4">
+          <div class="text-sm font-medium text-gray-700 w-24">Empty State:</div>
+          <div class="flex gap-2">
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] text-gray-500 font-medium">Turn Card</span>
+              <div class="flex gap-1">
+                <select class="border-2 border-gray-300 rounded px-2 py-1 text-sm bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
+                  <option value="">-</option>
+                  <option value="A">A</option>
+                  <option value="K">K</option>
+                  <option value="Q">Q</option>
+                  <option value="J">J</option>
+                  <option value="T">T</option>
+                  <option value="9">9</option>
+                  <option value="8">8</option>
+                  <option value="7">7</option>
+                  <option value="6">6</option>
+                  <option value="5">5</option>
+                  <option value="4">4</option>
+                  <option value="3">3</option>
+                  <option value="2">2</option>
+                </select>
+                <select class="border-2 border-gray-300 rounded px-2 py-1 text-sm bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
+                  <option value="">-</option>
+                  <option value="♠">♠</option>
+                  <option value="♥">♥</option>
+                  <option value="♦">♦</option>
+                  <option value="♣">♣</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="text-xs text-gray-500">← No card selected yet (manual selection mode)</div>
+        </div>
+
+        <!-- Example 2: Card Selected (Auto-selected) -->
+        <div class="flex items-center gap-4">
+          <div class="text-sm font-medium text-gray-700 w-24">Selected:</div>
+          <div class="flex gap-2">
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] text-green-600 font-bold">Turn Card ✓</span>
+              <div class="flex gap-1">
+                <select class="border-2 border-green-400 rounded px-2 py-1 text-sm bg-green-50 font-bold focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all">
+                  <option value="">-</option>
+                  <option value="A" selected>A</option>
+                  <option value="K">K</option>
+                  <option value="Q">Q</option>
+                  <option value="J">J</option>
+                  <option value="T">T</option>
+                  <option value="9">9</option>
+                  <option value="8">8</option>
+                  <option value="7">7</option>
+                  <option value="6">6</option>
+                  <option value="5">5</option>
+                  <option value="4">4</option>
+                  <option value="3">3</option>
+                  <option value="2">2</option>
+                </select>
+                <select class="border-2 border-green-400 rounded px-2 py-1 text-sm bg-green-50 text-gray-900 text-2xl font-bold focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all">
+                  <option value="">-</option>
+                  <option value="♠" selected>♠</option>
+                  <option value="♥">♥</option>
+                  <option value="♦">♦</option>
+                  <option value="♣">♣</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="text-xs text-gray-500">← Card auto-selected (or manually changed)</div>
+        </div>
+
+        <!-- Example 3: Multiple Cards (Flop) -->
+        <div class="flex items-center gap-4">
+          <div class="text-sm font-medium text-gray-700 w-24">Flop (3 cards):</div>
+          <div class="flex gap-3">
+            <!-- Flop Card 1 -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] text-green-600 font-bold">Flop 1 ✓</span>
+              <div class="flex gap-1">
+                <select class="border-2 border-green-400 rounded px-2 py-1 text-xs bg-green-50 font-bold w-12">
+                  <option value="A" selected>A</option>
+                </select>
+                <select class="border-2 border-green-400 rounded px-2 py-1 text-xs bg-green-50 text-gray-900 text-xl font-bold w-12">
+                  <option value="♠" selected>♠</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Flop Card 2 -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] text-green-600 font-bold">Flop 2 ✓</span>
+              <div class="flex gap-1">
+                <select class="border-2 border-green-400 rounded px-2 py-1 text-xs bg-green-50 font-bold w-12">
+                  <option value="K" selected>K</option>
+                </select>
+                <select class="border-2 border-green-400 rounded px-2 py-1 text-xs bg-green-50 text-red-600 text-xl font-bold w-12">
+                  <option value="♥" selected>♥</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Flop Card 3 -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] text-green-600 font-bold">Flop 3 ✓</span>
+              <div class="flex gap-1">
+                <select class="border-2 border-green-400 rounded px-2 py-1 text-xs bg-green-50 font-bold w-12">
+                  <option value="Q" selected>Q</option>
+                </select>
+                <select class="border-2 border-green-400 rounded px-2 py-1 text-xs bg-green-50 text-blue-600 text-xl font-bold w-12">
+                  <option value="♦" selected>♦</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Design Notes -->
+        <div class="mt-4 pt-4 border-t border-gray-300">
+          <h4 class="font-semibold text-gray-800 mb-2 text-sm">Design Consistency with Hole Cards:</h4>
+          <ul class="space-y-1 text-xs text-gray-700">
+            <li>✓ Same dropdown style and size as player Card 1 and Card 2</li>
+            <li>✓ Label above showing card identifier (Flop 1/2/3, Turn, River)</li>
+            <li>✓ Two dropdowns: Rank (left) and Suit (right)</li>
+            <li>✓ Green border + green background when card is selected</li>
+            <li>✓ Suit dropdown displays colored suit symbol (♠ ♥ ♦ ♣)</li>
+            <li>✓ Empty state shows "-" placeholder</li>
+            <li>✓ Auto-select feature works same as hole cards</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

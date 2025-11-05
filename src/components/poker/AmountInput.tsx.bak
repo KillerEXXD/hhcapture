@@ -1,0 +1,214 @@
+/**
+ * AmountInput Component
+ *
+ * Specialized input field for entering bet/raise amounts with:
+ * - Unit conversion support (K, Mil, actual)
+ * - Smart value persistence (Fix #3A: prevents clearing on re-render)
+ * - Tab key handling (Fix #3B: avoids double validation)
+ * - Unit "None" support (Fix #3C: no multiplier for "None" unit)
+ */
+
+import React, { useState, useEffect, useRef } from 'react';
+import type { ChipUnit } from '../../types/poker';
+
+interface AmountInputProps {
+  playerId: number;
+  selectedAmount?: string;
+  selectedAction?: string;
+  selectedUnit?: ChipUnit;
+  suffix?: string;
+  isForcedAllIn?: boolean;
+  isDisabled?: boolean;
+  defaultUnit?: ChipUnit;
+  onAmountChange?: (playerId: number, amount: string, suffix?: string) => void;
+  onUnitChange?: (playerId: number, unit: ChipUnit) => void;
+}
+
+export function AmountInput({
+  playerId,
+  selectedAmount,
+  selectedAction,
+  selectedUnit,
+  suffix = '',
+  isForcedAllIn = false,
+  isDisabled = false,
+  defaultUnit = 'K',
+  onAmountChange,
+  onUnitChange
+}: AmountInputProps): React.ReactElement {
+  const [localAmount, setLocalAmount] = useState(selectedAmount || '');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 🔍 DEBUG: Log every render
+  console.log(`🎨 AmountInput RENDER - Player: ${playerId}, Amount: ${localAmount}, Action: ${selectedAction}, Suffix: ${suffix}`);
+
+  // FIX #3A: Only update if selectedAmount is defined and truthy
+  // This prevents clearing the input when playerData hasn't been updated yet
+  useEffect(() => {
+    console.log(`🔄 useEffect triggered - Player: ${playerId}, selectedAmount: ${selectedAmount}`);
+
+    if (selectedAmount !== undefined && selectedAmount !== null && selectedAmount !== '') {
+      console.log(`  → Setting local amount to: ${selectedAmount}`);
+      setLocalAmount(selectedAmount);
+    } else {
+      console.log(`  → selectedAmount is empty/undefined, keeping current localAmount: ${localAmount}`);
+    }
+  }, [selectedAmount, playerId, suffix]);
+
+  // Auto-focus when Bet or Raise is selected
+  useEffect(() => {
+    if ((selectedAction === 'bet' || selectedAction === 'raise') && inputRef.current && !isForcedAllIn) {
+      console.log(`🎯 AUTO-FOCUS: ${selectedAction} selected for player ${playerId}, focusing input`);
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          inputRef.current.select();
+          console.log(`   ✅ Focus applied to input`);
+        }
+      });
+    }
+  }, [selectedAction, isForcedAllIn, playerId]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9.]/g, '');
+    console.log(`✏️ CHANGE event - Player: ${playerId}, New value: "${value}"`);
+    setLocalAmount(value);
+
+    // Notify parent
+    if (onAmountChange) {
+      onAmountChange(playerId, value, suffix);
+    }
+  };
+
+  const validateAndSave = () => {
+    console.log('══════════════════════════════════════════════════');
+    console.log('🔍 validateAndSave CALLED');
+    console.log('Player ID:', playerId);
+    console.log('Local Amount:', localAmount);
+    console.log('Suffix:', suffix);
+    console.log('isForcedAllIn:', isForcedAllIn);
+
+    if (!localAmount) {
+      console.log('  → Local amount is empty, just saving empty value');
+      if (onAmountChange) {
+        onAmountChange(playerId, localAmount, suffix);
+      }
+      console.log('══════════════════════════════════════════════════');
+      return;
+    }
+
+    const enteredValue = parseFloat(localAmount) || 0;
+    const unit = selectedUnit || defaultUnit;
+
+    console.log('Unit:', unit);
+    console.log('Entered Value:', enteredValue);
+
+    // FIX #3C: Handle unit "None" - no multiplier
+    let actualAmount = enteredValue;
+
+    if (unit === 'K') {
+      actualAmount = enteredValue * 1000;
+      console.log(`  → Converting ${enteredValue}K to ${actualAmount}`);
+    } else if (unit === 'Mil') {
+      actualAmount = enteredValue * 1000000;
+      console.log(`  → Converting ${enteredValue}Mil to ${actualAmount}`);
+    } else {
+      // Unit is "None" or "actual" - use actual value (no multiplier)
+      actualAmount = enteredValue;
+      console.log(`  → Unit is "${unit}" - using actual amount: ${actualAmount}`);
+    }
+
+    console.log(`  → Final actual amount: ${actualAmount}`);
+
+    if (onAmountChange) {
+      onAmountChange(playerId, actualAmount.toString(), suffix);
+    }
+
+    console.log('══════════════════════════════════════════════════');
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // FIX #3B: Skip blur validation if Tab already validated
+    if (e.currentTarget.dataset.skipBlur === 'true') {
+      console.log('⏭️ Skipping blur validation (Tab already validated)');
+      delete e.currentTarget.dataset.skipBlur;
+      return;
+    }
+
+    console.log(`🔄 BLUR event - Player: ${playerId}`);
+    validateAndSave();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // FIX #3B: Tab key handling - validate but don't preventDefault
+    if (e.key === 'Tab') {
+      console.log('⇥ TAB key pressed - validating before tab');
+      validateAndSave();
+
+      // Mark to skip blur validation since we already validated
+      e.currentTarget.dataset.skipBlur = 'true';
+    }
+
+    // Enter key - validate and move to next field
+    if (e.key === 'Enter') {
+      console.log('↵ ENTER key pressed - validating');
+      validateAndSave();
+    }
+  };
+
+  const inputId = `amount-input-${playerId}${suffix || ''}`;
+
+  console.log(`  → Rendering input with ID: ${inputId}`);
+
+  const units: ChipUnit[] = ['actual', 'K', 'Mil'];
+  const currentUnit = selectedUnit || defaultUnit;
+
+  const handleUnitChange = (unit: ChipUnit) => {
+    if (onUnitChange) {
+      onUnitChange(playerId, unit);
+    }
+  };
+
+  const isInputDisabled = isDisabled || isForcedAllIn;
+
+  return (
+    <div className="flex flex-col items-center gap-1">
+      {/* Amount Input */}
+      <input
+        ref={inputRef}
+        id={inputId}
+        type="text"
+        placeholder="000"
+        value={localAmount}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        readOnly={isInputDisabled}
+        disabled={isInputDisabled}
+        onKeyDown={handleKeyDown}
+        className={`w-16 px-2 py-1 border border-gray-300 rounded text-xs text-center focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+          isInputDisabled ? 'bg-gray-100 cursor-not-allowed text-gray-600' : ''
+        }`}
+      />
+
+      {/* Unit Selector Buttons - Vertical Stack */}
+      <div className="flex gap-0.5">
+        {units.map((unit) => (
+          <button
+            key={unit}
+            type="button"
+            onClick={() => handleUnitChange(unit)}
+            disabled={isInputDisabled}
+            className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+              currentUnit === unit
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            } ${isInputDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {unit}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

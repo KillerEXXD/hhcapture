@@ -1,0 +1,169 @@
+/**
+ * ActionButtons Component
+ *
+ * Interactive component for selecting poker actions
+ * Features:
+ * - Action types: fold, check, call, bet, raise, all-in, no action
+ * - Color-coded buttons with hover effects
+ * - Keyboard shortcuts (F, X, C, B, R, A, N)
+ * - Selected state with ring highlight
+ * - Disabled state for unavailable actions
+ * - Auto-focus amount input for bet/raise actions
+ * - Support for forced all-in scenarios
+ */
+
+import React from 'react';
+import type { ActionType } from '../../types/poker';
+
+interface ActionButtonsProps {
+  playerId: number;
+  selectedAction: ActionType | undefined;
+  onActionClick: (action: ActionType) => void;
+  availableActions: ActionType[];
+  isAllInLocked?: boolean;
+}
+
+interface ActionDefinition {
+  value: ActionType;
+  label: string;
+  shortcut: string;
+}
+
+export const ActionButtons: React.FC<ActionButtonsProps> = ({
+  playerId,
+  selectedAction,
+  onActionClick,
+  availableActions,
+  isAllInLocked = false,
+}) => {
+  // Define all actions with their labels and keyboard shortcuts
+  const actions: ActionDefinition[] = [
+    { value: 'check', label: 'check', shortcut: 'x' },
+    { value: 'call', label: 'call', shortcut: 'c' },
+    { value: 'bet', label: 'bet', shortcut: 'b' },
+    { value: 'raise', label: 'raise', shortcut: 'r' },
+    { value: 'fold', label: 'fold', shortcut: 'f' },
+    { value: 'all-in', label: 'all-in', shortcut: 'a' },
+    { value: 'no action', label: 'none', shortcut: 'n' },
+  ];
+
+  /**
+   * Get button color classes based on action type and selected state
+   */
+  const getActionColor = (action: ActionType, isSelected: boolean): string => {
+    // Non-selected state - gray background
+    if (!isSelected) {
+      return 'bg-gray-200 text-gray-700 hover:bg-gray-300';
+    }
+
+    // Selected state - action-specific colors
+    switch (action) {
+      case 'fold':
+        return 'bg-red-500 hover:bg-red-600 text-white';
+      case 'check':
+        return 'bg-gray-500 hover:bg-gray-600 text-white';
+      case 'call':
+        return 'bg-blue-500 hover:bg-blue-600 text-white';
+      case 'bet':
+        return 'bg-green-500 hover:bg-green-600 text-white';
+      case 'raise':
+        return 'bg-purple-500 hover:bg-purple-600 text-white';
+      case 'all-in':
+        return 'bg-orange-500 hover:bg-orange-600 text-white';
+      case 'no action':
+        return 'bg-gray-300 hover:bg-gray-400 text-gray-700';
+      default:
+        return 'bg-gray-200 text-gray-700 hover:bg-gray-300';
+    }
+  };
+
+  /**
+   * Handle action button click
+   * Emits custom event to focus amount input for bet/raise actions
+   */
+  const handleActionClick = (action: ActionType) => {
+    // Special handling for all-in when locked
+    if (action === 'all-in' && isAllInLocked) {
+      // Allow clicking to show it's selected but don't trigger action change
+      return;
+    }
+
+    // Call the parent's action handler
+    onActionClick(action);
+
+    // Fix #2: Emit custom event to focus amount input for bet/raise
+    if (action === 'bet' || action === 'raise') {
+      setTimeout(() => {
+        const event = new CustomEvent('focusAmountInput', {
+          detail: { playerId },
+        });
+        window.dispatchEvent(event);
+      }, 200);
+    }
+  };
+
+  /**
+   * Render individual action button
+   */
+  const renderButton = (action: ActionDefinition) => {
+    const isAvailable = availableActions.includes(action.value);
+    const isSelected = selectedAction === action.value;
+
+    // Determine if button is disabled
+    const isDisabled =
+      (!isAvailable || (isAllInLocked && action.value !== 'all-in')) &&
+      !(action.value === 'all-in' && isAllInLocked);
+
+    // Build button classes
+    let buttonClasses = 'px-2 py-1 rounded text-xs font-medium transition-all flex-1 relative outline-none ';
+
+    if (action.value === 'all-in' && isAllInLocked) {
+      // Special case: all-in button when locked - show as selected
+      buttonClasses += `${getActionColor('all-in', true)} ring-2 ring-blue-400`;
+    } else if (isDisabled) {
+      // Disabled state
+      buttonClasses += 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50';
+    } else if (isSelected) {
+      // Selected action - add ring highlight
+      buttonClasses += `${getActionColor(action.value, true)} ring-2 ring-blue-400`;
+    } else {
+      // Normal state
+      buttonClasses += getActionColor(action.value, false);
+    }
+
+    return (
+      <button
+        key={action.value}
+        type="button"
+        disabled={isDisabled}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => handleActionClick(action.value)}
+        title={`${action.label} (${action.shortcut})`}
+        tabIndex={-1}
+        className={buttonClasses}
+      >
+        <div className="text-xs">{action.label}</div>
+        <div className="text-xs opacity-70">{action.shortcut}</div>
+      </button>
+    );
+  };
+
+  return (
+    <div className="space-y-0.5">
+      {/* Keyboard Shortcuts Guide - More compact */}
+      <div className="text-xs text-gray-500 mb-0.5">
+        x | c | b | r | f | a | n
+      </div>
+
+      {/* Action Buttons - Row 1: Check, Call, Bet, Raise */}
+      <div className="flex gap-0.5">
+        {actions.slice(0, 4).map((action) => renderButton(action))}
+      </div>
+
+      {/* Action Buttons - Row 2: Fold, All-In, No Action */}
+      <div className="flex gap-0.5">
+        {actions.slice(4).map((action) => renderButton(action))}
+      </div>
+    </div>
+  );
+};

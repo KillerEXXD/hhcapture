@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Floating Stack History - Compact Design</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-down {
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    /* Floating card positioning */
+    .floating-card {
+      position: absolute;
+      z-index: 50;
+      min-width: 320px;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Floating Stack History - Compact Design</h1>
+    <p class="text-gray-600 mb-8">The stack column is now narrow, and clicking "Details" shows a floating card overlay that doesn't expand the table column.</p>
+
+    <!-- Scenario 1: BASE Round - Compact with Floating Card -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Scenario 1: BASE Round - Narrow Stack Column with Floating Card</h2>
+
+      <div class="border border-gray-300 rounded overflow-visible relative">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 w-20">Pos</th>
+              <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 w-28">Player</th>
+              <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 w-32">Stack</th>
+              <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border border-gray-300 px-3 py-2 text-center text-xs font-medium">UTG</td>
+              <td class="border border-gray-300 px-3 py-2 text-center text-sm">Alice</td>
+              <td class="border border-gray-300 px-3 py-2 text-xs relative">
+                <!-- Compact Stack Display -->
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between bg-blue-50 rounded px-2 py-1 border border-blue-200">
+                    <span class="text-[10px] text-blue-600">Start:</span>
+                    <span class="text-xs font-bold text-blue-900">10K</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <div class="flex-1 flex items-center justify-between bg-green-50 rounded px-2 py-1 border border-green-200">
+                      <span class="text-[10px] text-green-600">Now:</span>
+                      <span class="text-xs font-bold text-green-900">9.5K</span>
+                    </div>
+                    <button
+                      onclick="toggleFloatingCard('card1', this)"
+                      class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-[10px] font-semibold rounded shadow-md hover:shadow-lg transition-all duration-200"
+                      title="Show stack history"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Floating Card (positioned absolutely) -->
+                <div id="card1" class="hidden floating-card slide-down" style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 8px;">
+                  <div class="bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-2xl border-2 border-blue-300 overflow-hidden">
+                    <!-- Card Header -->
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-2 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <h3 class="text-white font-bold text-xs">Stack History - Alice</h3>
+                      </div>
+                      <button
+                        onclick="toggleFloatingCard('card1', null)"
+                        class="text-white hover:text-blue-200 transition-colors"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-3 space-y-2 max-h-96 overflow-y-auto">
+                      <!-- BASE Round -->
+                      <div class="bg-yellow-50 rounded-lg p-2 border-l-4 border-yellow-400 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                          <span class="text-[10px] font-bold text-yellow-800 uppercase tracking-wide">BASE Round</span>
+                          <span class="px-2 py-0.5 bg-yellow-200 text-yellow-800 text-[9px] font-semibold rounded-full">Active</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                          <div class="flex items-center gap-1">
+                            <span class="text-gray-600">10K</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                            <span class="font-bold text-gray-800">9.5K</span>
+                          </div>
+                          <div class="flex items-center gap-1">
+                            <span class="text-gray-500 text-[10px]">-500</span>
+                            <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-semibold rounded">raise</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Summary Section -->
+                      <div class="bg-white rounded-lg p-2 border border-gray-200 shadow-sm">
+                        <div class="text-[9px] font-bold text-gray-500 uppercase tracking-wide mb-1 pb-1 border-b border-gray-200">Summary</div>
+                        <div class="space-y-1 text-xs">
+                          <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-gray-600">Total Contributed:</span>
+                            <span class="text-xs font-bold text-red-600">500</span>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-gray-600">Remaining Stack:</span>
+                            <span class="text-xs font-bold text-green-600">9.5K</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="border border-gray-300 px-3 py-2 text-center text-sm">
+                <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-md">raise 500</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Scenario 2: More Action 1 - Multiple Rounds in Floating Card -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Scenario 2: More Action 1 - Floating Card with Multiple Rounds</h2>
+
+      <div class="border border-orange-300 rounded overflow-visible relative">
+        <table class="w-full">
+          <thead class="bg-orange-50">
+            <tr>
+              <th class="border border-orange-300 px-3 py-2 text-sm font-semibold text-gray-700 w-20">Pos</th>
+              <th class="border border-orange-300 px-3 py-2 text-sm font-semibold text-gray-700 w-28">Player</th>
+              <th class="border border-orange-300 px-3 py-2 text-sm font-semibold text-gray-700 w-32">Stack</th>
+              <th class="border border-orange-300 px-3 py-2 text-sm font-semibold text-gray-700">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border border-orange-300 px-3 py-2 text-center text-xs font-medium">BB</td>
+              <td class="border border-orange-300 px-3 py-2 text-center text-sm">David</td>
+              <td class="border border-orange-300 px-3 py-2 text-xs relative">
+                <!-- Compact Stack Display -->
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between bg-blue-50 rounded px-2 py-1 border border-blue-200">
+                    <span class="text-[10px] text-blue-600">Start:</span>
+                    <span class="text-xs font-bold text-blue-900">10K</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <div class="flex-1 flex items-center justify-between bg-green-50 rounded px-2 py-1 border border-green-200">
+                      <span class="text-[10px] text-green-600">Now:</span>
+                      <span class="text-xs font-bold text-green-900">8K</span>
+                    </div>
+                    <button
+                      onclick="toggleFloatingCard('card2', this)"
+                      class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-[10px] font-semibold rounded shadow-md hover:shadow-lg transition-all duration-200"
+                      title="Show stack history"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Floating Card -->
+                <div id="card2" class="hidden floating-card slide-down" style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 8px;">
+                  <div class="bg-gradient-to-br from-white to-orange-50 rounded-xl shadow-2xl border-2 border-orange-300 overflow-hidden">
+                    <!-- Card Header -->
+                    <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-3 py-2 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <h3 class="text-white font-bold text-xs">Stack History - David</h3>
+                      </div>
+                      <button
+                        onclick="toggleFloatingCard('card2', null)"
+                        class="text-white hover:text-orange-200 transition-colors"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-3 space-y-2 max-h-96 overflow-y-auto">
+                      <!-- BASE Round -->
+                      <div class="bg-white rounded-lg p-2 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between mb-1">
+                          <span class="text-[10px] font-bold text-gray-600 uppercase tracking-wide">BASE Round</span>
+                          <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[9px] font-semibold rounded-full">Complete</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                          <div class="flex items-center gap-1">
+                            <span class="text-gray-600">10K</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                            <span class="font-bold text-gray-800">9K</span>
+                          </div>
+                          <div class="flex items-center gap-1">
+                            <span class="text-gray-500 text-[10px]">-1K</span>
+                            <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-semibold rounded">raise</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- More Action 1 Round -->
+                      <div class="bg-yellow-50 rounded-lg p-2 border-l-4 border-yellow-400 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                          <span class="text-[10px] font-bold text-yellow-800 uppercase tracking-wide">More Action 1</span>
+                          <span class="px-2 py-0.5 bg-yellow-200 text-yellow-800 text-[9px] font-semibold rounded-full">Active</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                          <div class="flex items-center gap-1">
+                            <span class="text-gray-600">9K</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                            <span class="font-bold text-gray-800">8K</span>
+                          </div>
+                          <div class="flex items-center gap-1">
+                            <span class="text-gray-500 text-[10px]">-1K</span>
+                            <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-semibold rounded">call</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Summary Section -->
+                      <div class="bg-white rounded-lg p-2 border border-gray-200 shadow-sm">
+                        <div class="text-[9px] font-bold text-gray-500 uppercase tracking-wide mb-1 pb-1 border-b border-gray-200">Summary</div>
+                        <div class="space-y-1 text-xs">
+                          <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-gray-600">Total Contributed:</span>
+                            <span class="text-xs font-bold text-red-600">2K</span>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-gray-600">Remaining Stack:</span>
+                            <span class="text-xs font-bold text-green-600">8K</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="border border-orange-300 px-3 py-2 text-center text-sm">
+                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-md">call 1K</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Scenario 3: All-in Player - Red Theme -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Scenario 3: All-in Player - Red Accent Floating Card</h2>
+
+      <div class="border border-gray-300 rounded overflow-visible relative">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 w-20">Pos</th>
+              <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 w-28">Player</th>
+              <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 w-32">Stack</th>
+              <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border border-gray-300 px-3 py-2 text-center text-xs font-medium">BTN</td>
+              <td class="border border-gray-300 px-3 py-2 text-center text-sm">Emma</td>
+              <td class="border border-gray-300 px-3 py-2 text-xs relative">
+                <!-- Compact Stack Display - All-in Red Theme -->
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between bg-blue-50 rounded px-2 py-1 border border-blue-200">
+                    <span class="text-[10px] text-blue-600">Start:</span>
+                    <span class="text-xs font-bold text-blue-900">10K</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <div class="flex-1 flex items-center justify-between bg-red-50 rounded px-2 py-1 border-2 border-red-400">
+                      <span class="text-[10px] text-red-700 font-bold">Now:</span>
+                      <span class="text-xs font-bold text-red-900">0</span>
+                    </div>
+                    <button
+                      onclick="toggleFloatingCard('card3', this)"
+                      class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-[10px] font-semibold rounded shadow-md hover:shadow-lg transition-all duration-200"
+                      title="Show stack history"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Floating Card - All-in Theme -->
+                <div id="card3" class="hidden floating-card slide-down" style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 8px;">
+                  <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl shadow-2xl border-2 border-red-400 overflow-hidden">
+                    <!-- Card Header -->
+                    <div class="bg-gradient-to-r from-red-600 to-red-700 px-3 py-2 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <h3 class="text-white font-bold text-xs">Stack History - Emma (ALL-IN)</h3>
+                      </div>
+                      <button
+                        onclick="toggleFloatingCard('card3', null)"
+                        class="text-white hover:text-red-200 transition-colors"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-3 space-y-2 max-h-96 overflow-y-auto">
+                      <!-- BASE Round with All-in -->
+                      <div class="bg-red-100 rounded-lg p-2 border-l-4 border-red-500 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                          <span class="text-[10px] font-bold text-red-800 uppercase tracking-wide">BASE Round</span>
+                          <span class="px-2 py-0.5 bg-red-200 text-red-800 text-[9px] font-bold rounded-full flex items-center gap-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            All-in
+                          </span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                          <div class="flex items-center gap-1">
+                            <span class="text-gray-600">10K</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                            <span class="font-bold text-red-900">0</span>
+                          </div>
+                          <div class="flex items-center gap-1">
+                            <span class="text-gray-600 text-[10px]">-10K</span>
+                            <span class="px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-bold rounded">all-in</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Summary Section -->
+                      <div class="bg-white rounded-lg p-2 border border-red-200 shadow-sm">
+                        <div class="text-[9px] font-bold text-gray-500 uppercase tracking-wide mb-1 pb-1 border-b border-gray-200">Summary</div>
+                        <div class="space-y-1 text-xs">
+                          <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-gray-600">Total Contributed:</span>
+                            <span class="text-xs font-bold text-red-600">10K</span>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-gray-600">Remaining Stack:</span>
+                            <span class="text-xs font-bold text-red-600">0</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="border border-gray-300 px-3 py-2 text-center text-sm">
+                <span class="px-2 py-1 bg-red-600 text-white text-xs font-bold rounded-md">all-in 10K</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Key Features Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
+      <h2 class="text-2xl font-bold mb-4">Enhanced Compact Design Features</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-white bg-opacity-20 rounded-lg p-4">
+          <h3 class="font-bold mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Narrow Stack Column
+          </h3>
+          <p class="text-sm text-blue-100">Stack column width reduced to ~130px with compact "Start" and "Now" labels</p>
+        </div>
+
+        <div class="bg-white bg-opacity-20 rounded-lg p-4">
+          <h3 class="font-bold mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+            </svg>
+            Floating Card Design
+          </h3>
+          <p class="text-sm text-blue-100">Card appears as overlay (position: absolute), doesn't expand table column width</p>
+        </div>
+
+        <div class="bg-white bg-opacity-20 rounded-lg p-4">
+          <h3 class="font-bold mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Info Icon Button
+          </h3>
+          <p class="text-sm text-blue-100">Small info icon (ℹ️) button instead of text, saves space</p>
+        </div>
+
+        <div class="bg-white bg-opacity-20 rounded-lg p-4">
+          <h3 class="font-bold mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+            Fixed Width Card
+          </h3>
+          <p class="text-sm text-blue-100">Card width: 320-400px, positioned centered below stack cell with shadow</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Track currently open card to ensure only one is open at a time
+    let currentOpenCard = null;
+
+    function toggleFloatingCard(cardId, buttonElement) {
+      const card = document.getElementById(cardId);
+
+      // Close currently open card if different from this one
+      if (currentOpenCard && currentOpenCard !== cardId) {
+        const prevCard = document.getElementById(currentOpenCard);
+        if (prevCard) {
+          prevCard.classList.add('hidden');
+        }
+      }
+
+      // Toggle this card
+      if (card.classList.contains('hidden')) {
+        card.classList.remove('hidden');
+        currentOpenCard = cardId;
+      } else {
+        card.classList.add('hidden');
+        currentOpenCard = null;
+      }
+    }
+
+    // Close card when clicking outside
+    document.addEventListener('click', function(event) {
+      if (currentOpenCard) {
+        const card = document.getElementById(currentOpenCard);
+        const clickedInsideCard = card && card.contains(event.target);
+        const clickedButton = event.target.closest('button[onclick*="toggleFloatingCard"]');
+
+        if (!clickedInsideCard && !clickedButton) {
+          card.classList.add('hidden');
+          currentOpenCard = null;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

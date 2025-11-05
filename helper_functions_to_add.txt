@@ -1,0 +1,75 @@
+// ==============================================================================
+// HELPER FUNCTIONS TO ADD TO PreFlopView.tsx
+// ==============================================================================
+// Add these two helper functions after the handleCreateFlop function (around line 180)
+// Place them right before the "return (" statement
+// ==============================================================================
+
+  /**
+   * Calculate updated stack after all contributions up to current action level
+   */
+  const calculateUpdatedStack = (player: Player, currentActionLevel: ActionLevel): number => {
+    const data = playerData[player.id] || {};
+    let totalContributions = 0;
+
+    // Helper to convert amount based on unit
+    const convertAmount = (amount: string | undefined, unit: ChipUnit | undefined): number => {
+      if (!amount || amount === '') return 0;
+      const numAmount = parseFloat(amount);
+      if (isNaN(numAmount)) return 0;
+
+      const effectiveUnit = unit || defaultUnit;
+      if (effectiveUnit === 'K') return numAmount * 1000;
+      if (effectiveUnit === 'Mil') return numAmount * 1000000;
+      return numAmount; // 'actual' or 'None'
+    };
+
+    // Add base level contributions
+    const baseAction = data.preflopAction as ActionType | undefined;
+    if (baseAction && baseAction !== 'fold' && baseAction !== 'check' && baseAction !== 'no action') {
+      const baseAmount = convertAmount(data.preflopAmount as string | undefined, data.preflopUnit as ChipUnit | undefined);
+      totalContributions += baseAmount;
+    }
+
+    // Add more action contributions if we're at that level or beyond
+    if (currentActionLevel === 'more' || currentActionLevel === 'more2') {
+      const moreAction = data.preflop_moreActionAction as ActionType | undefined;
+      if (moreAction && moreAction !== 'fold' && moreAction !== 'check' && moreAction !== 'no action') {
+        const moreAmount = convertAmount(data.preflop_moreActionAmount as string | undefined, data.preflop_moreActionUnit as ChipUnit | undefined);
+        totalContributions += moreAmount;
+      }
+    }
+
+    // Add more2 action contributions if we're at that level
+    if (currentActionLevel === 'more2') {
+      const more2Action = data.preflop_moreAction2Action as ActionType | undefined;
+      if (more2Action && more2Action !== 'fold' && more2Action !== 'check' && more2Action !== 'no action') {
+        const more2Amount = convertAmount(data.preflop_moreAction2Amount as string | undefined, data.preflop_moreAction2Unit as ChipUnit | undefined);
+        totalContributions += more2Amount;
+      }
+    }
+
+    // Also include posted blinds/antes
+    totalContributions += (data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0);
+
+    return player.stack - totalContributions;
+  };
+
+  /**
+   * Handle deleting a more action level
+   */
+  const handleDeleteMoreAction = () => {
+    const currentLevels = visibleActionLevels.preflop || ['base'];
+    if (currentLevels.length === 1) return; // Can't delete base level
+
+    // Remove the last level
+    const updatedLevels = currentLevels.slice(0, -1);
+    actions.setVisibleActionLevels({
+      ...visibleActionLevels,
+      preflop: updatedLevels,
+    });
+  };
+
+// ==============================================================================
+// END OF HELPER FUNCTIONS
+// ==============================================================================
