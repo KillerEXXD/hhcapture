@@ -15,7 +15,7 @@ interface ValidationModalProps {
   title: string;
   message: string;
   onClose: () => void;
-  inputRef?: React.RefObject<HTMLInputElement>;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 export const ValidationModal: React.FC<ValidationModalProps> = ({

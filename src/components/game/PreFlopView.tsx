@@ -1335,7 +1335,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
                                             {/* BASE Round */}
                                             {(() => {
-                                              const baseAction = data.preflopAction;
+                                              const baseAction = (typeof data.preflopAction === 'string' ? data.preflopAction : '') as string;
                                               const baseStackBefore = player.stack;
                                               const baseStackAfter = sectionStacks['preflop_base']?.updated?.[player.id] ?? baseStackBefore;
                                               const contribution = baseStackBefore - baseStackAfter;
@@ -1376,7 +1376,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
                                             {/* More Action 1 Round */}
                                             {(actionLevel === 'more' || actionLevel === 'more2') && (() => {
-                                              const moreAction = data.preflop_moreActionAction;
+                                              const moreAction = (typeof data.preflop_moreActionAction === 'string' ? data.preflop_moreActionAction : '') as string;
                                               const stackBefore = sectionStacks['preflop_base']?.updated?.[player.id] ?? player.stack;
                                               const stackAfter = sectionStacks['preflop_more']?.updated?.[player.id] ?? stackBefore;
                                               const contribution = stackBefore - stackAfter;
@@ -1417,7 +1417,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
                                             {/* More Action 2 Round */}
                                             {actionLevel === 'more2' && (() => {
-                                              const more2Action = data.preflop_moreAction2Action;
+                                              const more2Action = (typeof data.preflop_moreAction2Action === 'string' ? data.preflop_moreAction2Action : '') as string;
                                               const stackBefore = sectionStacks['preflop_more']?.updated?.[player.id] ?? player.stack;
                                               const stackAfter = sectionStacks['preflop_more2']?.updated?.[player.id] ?? stackBefore;
                                               const contribution = stackBefore - stackAfter;

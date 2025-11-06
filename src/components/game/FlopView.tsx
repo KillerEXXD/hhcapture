@@ -730,7 +730,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
                                   <div className="p-3 space-y-2">
                                     {/* PreFlop BASE Round */}
                                     {(() => {
-                                      const preflopAction = data.preflopAction;
+                                      const preflopAction = (typeof data.preflopAction === 'string' ? data.preflopAction : '') as string;
                                       const preflopInitialStack = player.stack - (data.postedSB || 0) - (data.postedBB || 0);
                                       const stackBefore = preflopInitialStack;
                                       const stackAfter = sectionStacks['preflop_base']?.updated?.[player.id] ?? stackBefore;
@@ -768,7 +768,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
 
                                     {/* PreFlop MORE Action 1 Round */}
                                     {sectionStacks['preflop_more'] && (() => {
-                                      const preflopMoreAction = data.preflop_moreActionAction;
+                                      const preflopMoreAction = (typeof data.preflop_moreActionAction === 'string' ? data.preflop_moreActionAction : '') as string;
                                       const stackBefore = sectionStacks['preflop_base']?.updated?.[player.id] ?? player.stack;
                                       const stackAfter = sectionStacks['preflop_more']?.updated?.[player.id] ?? stackBefore;
                                       const contribution = stackBefore - stackAfter;
@@ -805,7 +805,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
 
                                     {/* PreFlop MORE Action 2 Round */}
                                     {sectionStacks['preflop_more2'] && (() => {
-                                      const preflopMore2Action = data.preflop_moreAction2Action;
+                                      const preflopMore2Action = (typeof data.preflop_moreAction2Action === 'string' ? data.preflop_moreAction2Action : '') as string;
                                       const stackBefore = sectionStacks['preflop_more']?.updated?.[player.id] ?? player.stack;
                                       const stackAfter = sectionStacks['preflop_more2']?.updated?.[player.id] ?? stackBefore;
                                       const contribution = stackBefore - stackAfter;
@@ -842,7 +842,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
 
                                     {/* FLOP BASE Round */}
                                     {(() => {
-                                      const baseAction = data.flopAction;
+                                      const baseAction = (typeof data.flopAction === 'string' ? data.flopAction : '') as string;
                                       const stackBefore = calculateStartingStack(player, 'base');
                                       const stackAfter = sectionStacks['flop_base']?.updated?.[player.id] ?? stackBefore;
                                       const contribution = stackBefore - stackAfter;
@@ -879,7 +879,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
 
                                     {/* MORE Action 1 Round */}
                                     {visibleActionLevels.flop.includes('more') && (() => {
-                                      const moreAction = data.flop_moreActionAction;
+                                      const moreAction = (typeof data.flop_moreActionAction === 'string' ? data.flop_moreActionAction : '') as string;
                                       const stackBefore = sectionStacks['flop_base']?.updated?.[player.id] ?? calculateStartingStack(player, 'base');
                                       const stackAfter = sectionStacks['flop_more']?.updated?.[player.id] ?? stackBefore;
                                       const contribution = stackBefore - stackAfter;
@@ -916,7 +916,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
 
                                     {/* MORE Action 2 Round */}
                                     {visibleActionLevels.flop.includes('more2') && (() => {
-                                      const more2Action = data.flop_moreAction2Action;
+                                      const more2Action = (typeof data.flop_moreAction2Action === 'string' ? data.flop_moreAction2Action : '') as string;
                                       const stackBefore = sectionStacks['flop_more']?.updated?.[player.id] ?? player.stack;
                                       const stackAfter = sectionStacks['flop_more2']?.updated?.[player.id] ?? stackBefore;
                                       const contribution = stackBefore - stackAfter;
@@ -986,7 +986,6 @@ export const FlopView: React.FC<FlopViewProps> = ({
                               playerId={player.id}
                               selectedAction={action}
                               suffix={suffix}
-                              dataActionFocus={`${player.id}-flop${suffix}`}
                               onActionClick={(selectedAction) => {
                                 actions.setPlayerData({
                                   ...playerData,
