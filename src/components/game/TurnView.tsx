@@ -5,15 +5,20 @@
  * Simplified version without player card selectors.
  */
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { GameState, GameStateActions } from '../../hooks/useGameState';
 import type { Player, PlayerData, ActionLevel, ChipUnit, ActionType } from '../../types/poker';
 import type { UseCardManagementReturn } from '../../hooks/useCardManagement';
 import type { UsePotCalculationReturn } from '../../hooks/usePotCalculation';
 import { ActionButtons } from '../poker/ActionButtons';
 import { AmountInput } from '../poker/AmountInput';
+import { CommunityCardSelector } from '../poker/CommunityCardSelector';
 import { processStackSynchronous } from '../../lib/poker/engine/processStack';
 import { calculatePotsForBettingRound } from '../../lib/poker/engine/potCalculationEngine';
+import { checkBettingRoundComplete } from '../../lib/poker/validators/roundCompletionValidator';
+import { checkPlayerNeedsToAct } from '../../lib/poker/validators/playerActionStatus';
+import { returnFocusAfterProcessStack } from '../../lib/poker/utils/focusManagement';
+import { validateRaiseAmount } from '../../lib/poker/validators/raiseValidator';
 
 interface TurnViewProps {
   state: GameState;
@@ -44,7 +49,9 @@ export const TurnView: React.FC<TurnViewProps> = ({
     processedSections,
     sectionStacks,
     contributedAmounts,
-    potsByStage
+    potsByStage,
+    communityCards,
+    autoSelectCards
   } = state;
   const {
     setCurrentView,
@@ -53,10 +60,100 @@ export const TurnView: React.FC<TurnViewProps> = ({
     setProcessedSections,
     setSectionStacks,
     setContributedAmounts,
-    setPotsByStage
+    setPotsByStage,
+    addActionLevel
   } = actions;
 
   const units: ChipUnit[] = ['actual', 'K', 'Mil'];
+
+  // State for stack history expansion
+  const [expandedStackHistories, setExpandedStackHistories] = useState<Record<string, boolean>>({});
+
+  // State for tracking pop-up position (above or below) for each player
+  const [popupPositions, setPopupPositions] = useState<Record<string, 'above' | 'below'>>({});
+
+  // State for disabling "Add More Action" button when betting round is complete
+  const [isAddMoreActionDisabled, setIsAddMoreActionDisabled] = useState(false);
+
+  // State for disabling "Create Next Street" button when betting round is incomplete
+  const [isCreateNextStreetDisabled, setIsCreateNextStreetDisabled] = useState(true);
+
+  // State for tracking if current section has been processed
+  const [hasProcessedCurrentState, setHasProcessedCurrentState] = useState(false);
+
+  // State for tracking last processed playerData to detect changes
+  const [lastProcessedPlayerDataHash, setLastProcessedPlayerDataHash] = useState<string>('');
+
+  // Detect playerData changes and invalidate processed state
+  React.useEffect(() => {
+    const currentLevels = visibleActionLevels.turn || ['base'];
+
+    // Create hash of current turn playerData to detect changes
+    const turnDataHash = JSON.stringify(
+      players.map(p => {
+        const data = playerData[p.id] || {};
+        return {
+          id: p.id,
+          turnAction: data.turnAction,
+          turnAmount: data.turnAmount,
+          turnUnit: data.turnUnit,
+          turn_moreActionAction: data.turn_moreActionAction,
+          turn_moreActionAmount: data.turn_moreActionAmount,
+          turn_moreActionUnit: data.turn_moreActionUnit,
+          turn_moreAction2Action: data.turn_moreAction2Action,
+          turn_moreAction2Amount: data.turn_moreAction2Amount,
+          turn_moreAction2Unit: data.turn_moreAction2Unit,
+        };
+      })
+    );
+
+    // If playerData changed, invalidate processed state
+    if (lastProcessedPlayerDataHash && turnDataHash !== lastProcessedPlayerDataHash) {
+      console.log('🔄 [TurnView] PlayerData changed, invalidating processed state');
+      setHasProcessedCurrentState(false);
+    }
+  }, [playerData, players, lastProcessedPlayerDataHash]);
+
+  // Update button states when playerData or processed state changes
+  React.useEffect(() => {
+    const currentLevels = visibleActionLevels.turn || ['base'];
+    const currentLevel = currentLevels[currentLevels.length - 1];
+    const isRoundComplete = checkBettingRoundComplete('turn', currentLevel, players, playerData);
+
+    console.log(`🔄 [TurnView useEffect] Current level: ${currentLevel}, Round complete: ${isRoundComplete.isComplete}, Reason: ${isRoundComplete.reason}, Processed: ${hasProcessedCurrentState}`);
+
+    // "Add More Action" is disabled when round is complete OR when state hasn't been processed
+    setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
+
+    // "Create Next Street" is disabled when round is incomplete OR when state hasn't been processed
+    setIsCreateNextStreetDisabled(!isRoundComplete.isComplete || !hasProcessedCurrentState);
+  }, [playerData, visibleActionLevels.turn, players, hasProcessedCurrentState]);
+
+  // Refs for card selectors
+  const card4Ref = useRef<HTMLDivElement>(null);
+
+  // Utility function for suit colors
+  const suitColors: Record<string, string> = {
+    '♠': 'text-gray-900',
+    '♣': 'text-green-700',
+    '♥': 'text-red-600',
+    '♦': 'text-blue-600',
+  };
+
+  // Auto-select turn card on mount if enabled
+  useEffect(() => {
+    const hasNoTurnCard = !communityCards.turn.card1;
+    if (autoSelectCards && hasNoTurnCard) {
+      cardManagement.autoSelectCommunityCards('turn');
+    }
+  }, []);
+
+  // Set focus to turn card selector on mount
+  useEffect(() => {
+    if (card4Ref.current) {
+      card4Ref.current.focus();
+    }
+  }, []);
 
   const getViewTitle = () => {
     if (currentView.includes('-more2')) {
@@ -82,7 +179,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
           ← Flop
         </button>
         <button
-          onClick={() => setCurrentView('river')}
+          onClick={handleCreateRiver}
           className="px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition-colors"
         >
           Create River →
@@ -91,53 +188,107 @@ export const TurnView: React.FC<TurnViewProps> = ({
     );
   };
 
-  // Get players who are still active (not folded)
-  const getActivePlayers = (): Player[] => {
-    return players.filter((p: Player) => {
-      if (!p.name) return false;
-      const data = playerData[p.id];
-      if (!data) return true;
-
-      // Check if player folded in preflop
-      if (data.preflopAction === 'fold') return false;
-      if (data.preflop_moreActionAction === 'fold') return false;
-      if (data.preflop_moreAction2Action === 'fold') return false;
-
-      // Check if player folded in flop
-      if (data.flopAction === 'fold') return false;
-      if (data.flop_moreActionAction === 'fold') return false;
-      if (data.flop_moreAction2Action === 'fold') return false;
-
-      // Check if player folded in turn
-      if (data.turnAction === 'fold') return false;
-      if (data.turn_moreActionAction === 'fold') return false;
-      if (data.turn_moreAction2Action === 'fold') return false;
-
-      return true;
-    });
+  // Define position order for postflop (action order)
+  // Postflop: SB acts first, then BB, then UTG, etc.
+  const positionOrder: Record<string, number> = {
+    'SB': 1,
+    'BB': 2,
+    'UTG': 3,
+    'UTG+1': 4,
+    'UTG+2': 5,
+    'MP': 6,
+    'HJ': 7,
+    'MP+1': 8,
+    'MP+2': 9,
+    'CO': 10,
+    'Dealer': 11,
+    '': 999
   };
 
+  // Get players who are still active (not folded in previous streets)
+  // NOTE: Players who fold in current street (turn) BASE should still be shown in BASE view
+  // They will be filtered out in More Action views by the playersToShow filter
+  const getActivePlayers = (): Player[] => {
+    return players
+      .filter((p: Player) => {
+        if (!p.name) return false;
+        const data = playerData[p.id];
+        if (!data) return true;
+
+        // Check if player folded in preflop (previous street)
+        if (data.preflopAction === 'fold') return false;
+        if (data.preflop_moreActionAction === 'fold') return false;
+        if (data.preflop_moreAction2Action === 'fold') return false;
+
+        // Check if player folded in flop (previous street)
+        if (data.flopAction === 'fold') return false;
+        if (data.flop_moreActionAction === 'fold') return false;
+        if (data.flop_moreAction2Action === 'fold') return false;
+
+        // DO NOT filter out players who folded in turn BASE
+        // They should remain visible in BASE view with fold button highlighted
+        // Only filter them out in More Action views (handled by playersToShow filter)
+
+        return true;
+      })
+      .sort((a, b) => {
+        const orderA = positionOrder[a.position] || 999;
+        const orderB = positionOrder[b.position] || 999;
+        return orderA - orderB;
+      });
+  };
+
+  // Get players who folded in previous streets (preflop, flop)
+  // This is used for display purposes to show who folded before turn
   const getFoldedPlayers = (): Player[] => {
     return players.filter((p: Player) => {
       if (!p.name) return false;
       const data = playerData[p.id];
       if (!data) return false;
 
-      // Check if player folded in preflop or flop
+      // Check if player folded in preflop (previous street)
       if (data.preflopAction === 'fold') return true;
       if (data.preflop_moreActionAction === 'fold') return true;
       if (data.preflop_moreAction2Action === 'fold') return true;
+
+      // Check if player folded in flop (previous street)
       if (data.flopAction === 'fold') return true;
       if (data.flop_moreActionAction === 'fold') return true;
       if (data.flop_moreAction2Action === 'fold') return true;
 
-      // Check if player folded in turn
-      if (data.turnAction === 'fold') return true;
-      if (data.turn_moreActionAction === 'fold') return true;
-      if (data.turn_moreAction2Action === 'fold') return true;
-
+      // Don't include players who folded in current street (turn)
+      // They are still active in BASE view
       return false;
     });
+  };
+
+  /**
+   * Calculate the starting stack for the current action level
+   * - For BASE: Stack from flop's final round (more2 -> more -> base)
+   * - For MORE/MORE2: Stack from previous turn round's "updated" value
+   */
+  const calculateStartingStack = (player: Player, currentActionLevel: ActionLevel): number => {
+    if (currentActionLevel === 'base') {
+      // For BASE: Get the final stack from flop
+      // Check flop rounds in reverse order: more2 -> more -> base
+      if (sectionStacks['flop_more2']?.updated?.[player.id] !== undefined) {
+        return sectionStacks['flop_more2'].updated[player.id];
+      }
+      if (sectionStacks['flop_more']?.updated?.[player.id] !== undefined) {
+        return sectionStacks['flop_more'].updated[player.id];
+      }
+      if (sectionStacks['flop_base']?.updated?.[player.id] !== undefined) {
+        return sectionStacks['flop_base'].updated[player.id];
+      }
+      // Fallback to initial stack minus posted blinds/antes
+      return player.stack - (playerData[player.id]?.postedSB || 0) - (playerData[player.id]?.postedBB || 0) - (playerData[player.id]?.postedAnte || 0);
+    } else if (currentActionLevel === 'more') {
+      // For MORE: Start from turn BASE's updated value
+      return sectionStacks['turn_base']?.updated?.[player.id] ?? player.stack;
+    } else {
+      // For MORE2: Start from turn MORE's updated value
+      return sectionStacks['turn_more']?.updated?.[player.id] ?? player.stack;
+    }
   };
 
   /**
@@ -171,6 +322,70 @@ export const TurnView: React.FC<TurnViewProps> = ({
     // Calculate previousStreetPot from flop
     const previousStreetPot = getPreviousStreetPot();
     console.log(`💰 Previous street pot (from flop): ${previousStreetPot}`);
+
+    // FR-12 VALIDATION: Comprehensive raise/bet validation
+    // Run full FR-12 validation for all players with bet/raise actions
+    console.log('🔍 [ProcessStack] Running FR-12 validation for all raise/bet amounts...');
+    const validationErrors: string[] = [];
+
+    currentLevels.forEach((actionLevel) => {
+      const suffix = actionLevel === 'base' ? '' : actionLevel === 'more' ? '_moreAction' : '_moreAction2';
+
+      players.forEach((player) => {
+        if (!player.name) return;
+
+        const data = playerData[player.id] || {};
+        const actionKey = `turn${suffix}Action` as keyof typeof data;
+        const amountKey = `turn${suffix}Amount` as keyof typeof data;
+        const unitKey = `turn${suffix}Unit` as keyof typeof data;
+
+        const action = data[actionKey] as string;
+        const amount = data[amountKey] as string;
+        const unit = data[unitKey] as ChipUnit;
+
+        // Only validate if action is bet or raise
+        if (action === 'bet' || action === 'raise') {
+          const raiseToAmount = parseFloat(amount);
+
+          // Basic validation: check if amount is a valid number > 0
+          if (!amount || amount.trim() === '' || isNaN(raiseToAmount) || raiseToAmount <= 0) {
+            validationErrors.push(`${player.name} (Turn ${actionLevel.toUpperCase()}): Missing or invalid raise amount`);
+            return; // Skip FR-12 validation if basic validation fails
+          }
+
+          // Run FR-12 validation
+          const validationResult = validateRaiseAmount(
+            player.id,
+            raiseToAmount,
+            'turn',
+            actionLevel,
+            players,
+            playerData,
+            sectionStacks,
+            unit || defaultUnit
+          );
+
+          if (!validationResult.isValid) {
+            validationErrors.push(
+              `${player.name} (Turn ${actionLevel.toUpperCase()}): ${validationResult.errorMessage}`
+            );
+          }
+        }
+      });
+    });
+
+    // If there are validation errors, show them and abort processing
+    if (validationErrors.length > 0) {
+      alert(
+        `Cannot Process Stack - Raise/Bet Validation Failed:\n\n` +
+        validationErrors.join('\n\n') +
+        `\n\nPlease correct the amounts and try again.`
+      );
+      console.error('❌ [ProcessStack] FR-12 Validation errors:', validationErrors);
+      return;
+    }
+
+    console.log('✅ [ProcessStack] All raise/bet amounts passed FR-12 validation');
 
     try {
       // Normalize playerData: for base level, set undefined actions to 'fold'
@@ -281,6 +496,28 @@ export const TurnView: React.FC<TurnViewProps> = ({
       // Display final results
       console.log(`\n✅ Process Stack Complete - Total Pot: ${finalPotInfo.totalPot}`);
 
+      // Set processed state flag and save hash
+      const turnDataHash = JSON.stringify(
+        players.map(p => {
+          const data = latestPlayerData[p.id] || {};
+          return {
+            id: p.id,
+            turnAction: data.turnAction,
+            turnAmount: data.turnAmount,
+            turnUnit: data.turnUnit,
+            turn_moreActionAction: data.turn_moreActionAction,
+            turn_moreActionAmount: data.turn_moreActionAmount,
+            turn_moreActionUnit: data.turn_moreActionUnit,
+            turn_moreAction2Action: data.turn_moreAction2Action,
+            turn_moreAction2Amount: data.turn_moreAction2Amount,
+            turn_moreAction2Unit: data.turn_moreAction2Unit,
+          };
+        })
+      );
+      setHasProcessedCurrentState(true);
+      setLastProcessedPlayerDataHash(turnDataHash);
+      console.log('✅ [TurnView] Set hasProcessedCurrentState to true');
+
       // Show alert to user
       alert(
         `Process Stack Complete!\n\n` +
@@ -291,10 +528,400 @@ export const TurnView: React.FC<TurnViewProps> = ({
         `Previous Street Pot: ${previousStreetPot}`
       );
 
+      // Check if betting round is complete after processing
+      const currentLevel = currentLevels[currentLevels.length - 1]; // Last processed level
+      const isRoundComplete = checkBettingRoundComplete(
+        'turn',
+        currentLevel,
+        players,
+        latestPlayerData
+      );
+
+      // Disable "Add More Action" button if round is complete
+      setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
+      console.log(`🎯 [Turn] Betting round complete: ${isRoundComplete.isComplete}, Add More Action disabled: ${isRoundComplete.isComplete || !hasProcessedCurrentState}`);
+
+      // FR-13.4: Return focus after Process Stack completes
+      const hasMoreActionButton = (currentLevel === 'base' || currentLevel === 'more') && !isRoundComplete.isComplete;
+      const hasCreateNextStreetButton = true; // "Create River" button is always available
+
+      returnFocusAfterProcessStack({
+        stage: 'turn',
+        actionLevel: currentLevel,
+        players,
+        playerData: latestPlayerData,
+        hasMoreActionButton,
+        hasCreateNextStreetButton,
+      });
+
     } catch (error) {
       console.error('❌ Error processing stack:', error);
       alert(`Error processing stack: ${error instanceof Error ? error.message : String(error)}`);
     }
+  };
+
+  /**
+   * Handle Create River button click - FR-14.5
+   * Copy "Now" stacks from turn's last round to river_base
+   */
+  const handleCreateRiver = () => {
+    actions.setCurrentView('river');
+
+    // Initialize river action levels if not exists
+    if (!visibleActionLevels.river) {
+      actions.setVisibleActionLevels({
+        ...visibleActionLevels,
+        river: ['base'],
+      });
+    }
+
+    // FR-14.5: Copy "Now" stacks from turn's last round to river_base
+    const updatedSectionStacks = { ...sectionStacks };
+    updatedSectionStacks['river_base'] = {
+      initial: {},
+      current: {},
+      updated: {}
+    };
+
+    getActivePlayers().forEach(player => {
+      // Get the final stack from turn (check more2 -> more -> base)
+      let turnFinalStack = player.stack;
+      if (sectionStacks['turn_more2']?.updated?.[player.id] !== undefined) {
+        turnFinalStack = sectionStacks['turn_more2'].updated[player.id];
+      } else if (sectionStacks['turn_more']?.updated?.[player.id] !== undefined) {
+        turnFinalStack = sectionStacks['turn_more'].updated[player.id];
+      } else if (sectionStacks['turn_base']?.updated?.[player.id] !== undefined) {
+        turnFinalStack = sectionStacks['turn_base'].updated[player.id];
+      }
+
+      updatedSectionStacks['river_base'].initial[player.id] = player.stack; // Always use original starting stack
+      updatedSectionStacks['river_base'].current[player.id] = turnFinalStack; // For calculations
+      updatedSectionStacks['river_base'].updated[player.id] = turnFinalStack;
+    });
+
+    actions.setSectionStacks(updatedSectionStacks);
+    console.log(`✅ [handleCreateRiver] Copied turn final stacks to river_base`);
+  };
+
+  /**
+   * Handle More Action button click - FR-14.3 & 14.4
+   */
+  const handleMoreAction = () => {
+    const currentLevels = visibleActionLevels.turn || ['base'];
+    const currentLevel = currentLevels[currentLevels.length - 1]; // Last level
+
+    // Fallback safety check: Is betting round already complete?
+    const isComplete = checkBettingRoundComplete('turn', currentLevel, players, playerData);
+
+    if (isComplete.isComplete) {
+      // Block the action
+      alert('Betting round complete. Please create River instead.');
+
+      // Disable the button to prevent repeated clicks
+      setIsAddMoreActionDisabled(true);
+
+      // Focus the Create River button
+      setTimeout(() => {
+        const createRiverButton = document.querySelector('[data-create-river-focus]') as HTMLElement;
+        if (createRiverButton) {
+          createRiverButton.focus();
+        }
+      }, 100);
+
+      return; // Don't create More Action
+    }
+
+    if (!currentLevels.includes('more')) {
+      addActionLevel('turn', 'more');
+      console.log('[TurnView] Added More Action 1');
+
+      // Invalidate processed state since new action level was added
+      setHasProcessedCurrentState(false);
+      console.log('🔄 [TurnView] Invalidated processed state (added More Action 1)');
+
+      // FR-14.3: Copy "Now" stacks from BASE to More Action 1
+      const previousSectionKey = 'turn_base';
+      const newSectionKey = 'turn_more';
+      const updatedSectionStacks = { ...sectionStacks };
+      updatedSectionStacks[newSectionKey] = {
+        initial: {},
+        current: {},
+        updated: {}
+      };
+
+      getActivePlayers().forEach(player => {
+        const previousNowStack = sectionStacks[previousSectionKey]?.updated?.[player.id] ?? player.stack;
+        updatedSectionStacks[newSectionKey].initial[player.id] = player.stack; // Always use original hand starting stack
+        updatedSectionStacks[newSectionKey].current[player.id] = previousNowStack;
+        updatedSectionStacks[newSectionKey].updated[player.id] = previousNowStack;
+      });
+
+      setSectionStacks(updatedSectionStacks);
+      console.log(`✅ Copied "Now" stacks from ${previousSectionKey} to ${newSectionKey}`);
+
+    } else if (!currentLevels.includes('more2')) {
+      addActionLevel('turn', 'more2');
+      console.log('[TurnView] Added More Action 2');
+
+      // Invalidate processed state since new action level was added
+      setHasProcessedCurrentState(false);
+      console.log('🔄 [TurnView] Invalidated processed state (added More Action 2)');
+
+      // FR-14.4: Copy "Now" stacks from More Action 1 to More Action 2
+      const previousSectionKey = 'turn_more';
+      const newSectionKey = 'turn_more2';
+      const updatedSectionStacks = { ...sectionStacks };
+      updatedSectionStacks[newSectionKey] = {
+        initial: {},
+        current: {},
+        updated: {}
+      };
+
+      getActivePlayers().forEach(player => {
+        const previousNowStack = sectionStacks[previousSectionKey]?.updated?.[player.id] ?? player.stack;
+        updatedSectionStacks[newSectionKey].initial[player.id] = player.stack; // Always use original hand starting stack
+        updatedSectionStacks[newSectionKey].current[player.id] = previousNowStack;
+        updatedSectionStacks[newSectionKey].updated[player.id] = previousNowStack;
+      });
+
+      setSectionStacks(updatedSectionStacks);
+      console.log(`✅ Copied "Now" stacks from ${previousSectionKey} to ${newSectionKey}`);
+
+    } else {
+      alert('Maximum action levels reached (BASE + More Action 1 + More Action 2)');
+    }
+  };
+
+  /**
+   * Get available actions for a player based on action level and previous players' actions
+   * Implements FR-1 (Sequential Player Enabling) and FR-9 (More Action Enabling Logic)
+   *
+   * For BASE rounds: All players enabled (but first player has no 'call' - FR-2)
+   * For MORE ACTION rounds: Sequential enabling - previous player must act first
+   */
+  const getAvailableActionsForPlayer = (playerId: number, suffix: string): ActionType[] => {
+    const actionLevel: ActionLevel =
+      suffix === '' ? 'base' :
+      suffix === '_moreAction' ? 'more' : 'more2';
+
+    // For BASE level: All players enabled, but first player has no 'call' (FR-2)
+    if (actionLevel === 'base') {
+      const activePlayers = getActivePlayers();
+      const isFirstPlayer = activePlayers.length > 0 && activePlayers[0].id === playerId;
+
+      // Check if player is all-in from previous rounds
+      const playerStatus = checkPlayerNeedsToAct(playerId, 'turn', actionLevel, players, playerData);
+
+      if (playerStatus.alreadyAllIn) {
+        // Player is all-in from previous round - skip this player
+        return ['all-in']; // Special locked state
+      }
+
+      if (isFirstPlayer) {
+        // FR-2: First player in post-flop BASE cannot call/fold/no action
+        return ['check', 'bet', 'raise', 'all-in'];
+      }
+
+      // All other players have full actions in BASE
+      return ['fold', 'check', 'call', 'bet', 'raise', 'all-in', 'no action'];
+    }
+
+    // For MORE ACTION rounds: Sequential enabling logic (FR-1, FR-9)
+    const activePlayers = getActivePlayers();
+    const currentPlayerIndex = activePlayers.findIndex(p => p.id === playerId);
+
+    if (currentPlayerIndex === -1) {
+      return []; // Player not found
+    }
+
+    // Check if player has already acted
+    const actionKey = `turn${suffix}Action` as keyof PlayerData[number];
+    const playerAction = playerData[playerId]?.[actionKey];
+
+    // If player has already acted, allow them to modify their action (FR-1.3)
+    if (playerAction && playerAction !== 'no action') {
+      return ['call', 'raise', 'all-in', 'fold']; // FR-9.2: No check/bet/no action in More Actions
+    }
+
+    // First player in more action: Enable buttons
+    if (currentPlayerIndex === 0) {
+      return ['call', 'raise', 'all-in', 'fold']; // FR-9.2
+    }
+
+    // Subsequent players: Check if previous player has acted (FR-1.2)
+    const previousPlayer = activePlayers[currentPlayerIndex - 1];
+    const previousPlayerData = playerData[previousPlayer.id];
+    const previousPlayerAction = previousPlayerData?.[actionKey];
+
+    // If previous player hasn't acted yet, disable all buttons
+    if (!previousPlayerAction || previousPlayerAction === 'no action') {
+      return []; // Disabled - sequential enabling
+    }
+
+    // Check if THIS SPECIFIC PLAYER needs to act (using FR-9 logic)
+    const playerStatus = checkPlayerNeedsToAct(playerId, 'turn', actionLevel, players, playerData);
+
+    if (playerStatus.alreadyAllIn) {
+      // Player is all-in from previous round - show locked all-in button (FR-11)
+      return ['all-in']; // Special locked state
+    }
+
+    if (playerStatus.alreadyMatchedMaxBet) {
+      // Player already matched max bet from previous round - no action required
+      return []; // Will show "No action required" in UI
+    }
+
+    // Player needs to act - FR-9.2: Only call, raise, all-in, fold in More Actions
+    return ['call', 'raise', 'all-in', 'fold'];
+  };
+
+  /**
+   * Navigate after an action is selected - handles keyboard navigation flow
+   */
+  const navigateAfterAction = (currentPlayerId: number, suffix: string) => {
+    const actionLevel: ActionLevel =
+      suffix === '' ? 'base' :
+      suffix === '_moreAction' ? 'more' : 'more2';
+
+    const completionCheck = checkBettingRoundComplete('turn', actionLevel, players, playerData);
+
+    if (completionCheck.isComplete) {
+      setTimeout(() => {
+        const processStackButton = document.querySelector('[data-process-stack-focus]') as HTMLElement;
+        if (processStackButton) {
+          processStackButton.focus();
+        }
+      }, 100);
+    } else {
+      setTimeout(() => {
+        const activePlayers = getActivePlayers();
+        const playerIndex = activePlayers.findIndex(p => p.id === currentPlayerId);
+
+        if (actionLevel === 'more' || actionLevel === 'more2') {
+          let foundPlayerWhoNeedsToAct = false;
+
+          for (let i = playerIndex + 1; i < activePlayers.length; i++) {
+            const nextPlayer = activePlayers[i];
+            const playerStatus = checkPlayerNeedsToAct(nextPlayer.id, 'turn', actionLevel, players, playerData);
+
+            if (playerStatus.needsToAct) {
+              const selector = `[data-action-focus="${nextPlayer.id}-turn${suffix}"]`;
+              const nextElement = document.querySelector(selector) as HTMLElement;
+              if (nextElement) {
+                nextElement.focus();
+              }
+              foundPlayerWhoNeedsToAct = true;
+              break;
+            }
+          }
+
+          if (!foundPlayerWhoNeedsToAct) {
+            const processStackButton = document.querySelector('[data-process-stack-focus]') as HTMLElement;
+            if (processStackButton) {
+              processStackButton.focus();
+            }
+          }
+        } else {
+          const nextPlayerIndex = playerIndex + 1;
+          if (nextPlayerIndex < activePlayers.length) {
+            const nextPlayer = activePlayers[nextPlayerIndex];
+            const selector = `[data-action-focus="${nextPlayer.id}-turn${suffix}"]`;
+            const nextElement = document.querySelector(selector) as HTMLElement;
+            if (nextElement) {
+              nextElement.focus();
+            }
+          } else {
+            const processStackButton = document.querySelector('[data-process-stack-focus]') as HTMLElement;
+            if (processStackButton) {
+              processStackButton.focus();
+            }
+          }
+        }
+      }, 100);
+    }
+  };
+
+  /**
+   * Player Action Selector Wrapper with Keyboard Navigation
+   */
+  const PlayerActionSelector: React.FC<{ playerId: number; suffix: string; action: ActionType | null | undefined; children: React.ReactNode }> = ({ playerId, suffix, action, children }) => {
+    const [isFocused, setIsFocused] = React.useState(false);
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        const key = e.key.toLowerCase();
+        const shortcutMap: Record<string, ActionType> = {
+          'f': 'fold',
+          'c': action === 'bet' || action === 'raise' ? 'call' : 'check',
+          'k': 'check',
+          'b': 'bet',
+          'r': 'raise',
+          'a': 'all-in',
+          'n': 'no action',
+        };
+
+        const selectedAction = shortcutMap[key];
+        if (selectedAction) {
+          e.preventDefault();
+          const actionKey = suffix === '' ? 'turnAction' : suffix === '_moreAction' ? 'turn_moreActionAction' : 'turn_moreAction2Action';
+          actions.setPlayerData({
+            ...playerData,
+            [playerId]: {
+              ...playerData[playerId],
+              [actionKey]: selectedAction,
+            },
+          });
+
+          if (selectedAction === 'bet' || selectedAction === 'raise') {
+            setTimeout(() => {
+              const amountInputId = `amount-input-${playerId}${suffix || ''}`;
+              const amountInput = document.querySelector(`#${amountInputId}`) as HTMLInputElement;
+              if (amountInput) {
+                amountInput.focus();
+                amountInput.select();
+              }
+            }, 100);
+          } else {
+            navigateAfterAction(playerId, suffix);
+          }
+          return;
+        }
+      }
+
+      if (e.key === 'Tab' && !e.shiftKey) {
+        e.preventDefault();
+
+        if (action === 'bet' || action === 'raise') {
+          const amountInputId = `amount-input-${playerId}${suffix || ''}`;
+          const amountInput = document.querySelector(`#${amountInputId}`) as HTMLInputElement;
+          if (amountInput) {
+            amountInput.focus();
+            amountInput.select();
+            return;
+          }
+        }
+
+        navigateAfterAction(playerId, suffix);
+        return;
+      }
+    };
+
+    return (
+      <div
+        data-action-focus={`${playerId}-turn${suffix}`}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className={`rounded p-2 transition-all outline-none ${
+          isFocused
+            ? 'border-2 border-blue-400 bg-blue-50 ring-2 ring-blue-500'
+            : 'border-2 border-gray-300 bg-gray-50'
+        }`}
+      >
+        {children}
+      </div>
+    );
   };
 
   return (
@@ -344,10 +971,86 @@ export const TurnView: React.FC<TurnViewProps> = ({
         </div>
 
         {/* COMMUNITY CARDS SECTION */}
-        <div className="mb-3 p-3 bg-green-100 border-2 border-green-300 rounded">
-          <div className="text-sm font-bold text-gray-800 mb-1">Community Cards</div>
-          <div className="text-sm text-gray-600">
-            Flop: Card 1, Card 2, Card 3 | Turn: Card 4
+        <div className="mb-3 p-3 bg-orange-100 border-2 border-orange-300 rounded">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm font-bold text-gray-800">Turn Community Cards</div>
+            {autoSelectCards && (
+              <button
+                onClick={() => cardManagement.autoSelectCommunityCards('turn')}
+                className="px-2 py-1 bg-orange-600 text-white rounded text-xs hover:bg-orange-700 transition-colors"
+              >
+                Auto-Select Turn Card
+              </button>
+            )}
+          </div>
+
+          {/* Visual Card Display */}
+          <div className="flex gap-3 mb-3 justify-center items-center">
+            {/* Previous Flop Cards (Read-only, grayed out) */}
+            <div className="flex gap-2 opacity-60">
+              {[1, 2, 3].map((cardNum) => {
+                const card = communityCards.flop[`card${cardNum}` as 'card1' | 'card2' | 'card3'];
+                return (
+                  <div key={cardNum} className="flex flex-col items-center">
+                    <div className="text-xs font-semibold text-gray-600 mb-1">Flop {cardNum}</div>
+                    <div className={`w-16 h-24 rounded-lg border-2 shadow-sm flex flex-col items-center justify-center ${
+                      card ? 'bg-gray-50 border-gray-300' : 'bg-gray-100 border-gray-300'
+                    }`}>
+                      {card ? (
+                        <>
+                          <div className="text-3xl font-bold text-gray-900">
+                            {card.rank === 'T' ? '10' : card.rank}
+                          </div>
+                          <div className={`text-3xl ${suitColors[card.suit]}`}>
+                            {card.suit}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-3xl font-bold text-gray-300">?</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Divider */}
+            <div className="w-px h-24 bg-orange-300"></div>
+
+            {/* Turn Card (Active, highlighted) */}
+            <div className="flex flex-col items-center">
+              <div className="text-xs font-semibold text-orange-700 mb-1">Turn</div>
+              <div className={`w-20 h-28 rounded-lg border-2 shadow-md flex flex-col items-center justify-center transition-all ${
+                communityCards.turn.card1 ? 'bg-white border-orange-500 ring-2 ring-orange-300' : 'bg-gray-50 border-gray-300'
+              }`}>
+                {communityCards.turn.card1 ? (
+                  <>
+                    <div className="text-4xl font-bold text-gray-900">
+                      {communityCards.turn.card1.rank === 'T' ? '10' : communityCards.turn.card1.rank}
+                    </div>
+                    <div className={`text-4xl ${suitColors[communityCards.turn.card1.suit]}`}>
+                      {communityCards.turn.card1.suit}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-4xl font-bold text-gray-300">?</div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Button Selector for Turn Card */}
+          <div className="flex gap-3 items-center justify-center">
+            <CommunityCardSelector
+              ref={card4Ref}
+              stage="turn"
+              cardNumber={1}
+              label="Turn Card"
+              currentCard={communityCards.turn.card1}
+              onCardChange={cardManagement.updateCommunityCard}
+              isCardAvailable={(rank, suit) => cardManagement.checkCardAvailable(rank, suit, communityCards.turn.card1)}
+              autoSelect={autoSelectCards}
+            />
           </div>
         </div>
 
@@ -366,7 +1069,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
         </div>
 
         {/* ACTION LEVELS */}
-        <div className="overflow-x-auto space-y-4">
+        <div className="space-y-4" style={{ overflowX: 'auto', overflowY: 'visible' }}>
           {visibleActionLevels.turn?.map((actionLevel: ActionLevel) => {
             const suffix =
               actionLevel === 'base'
@@ -392,23 +1095,6 @@ export const TurnView: React.FC<TurnViewProps> = ({
                 : actionLevel === 'more'
                 ? 'border-blue-300'
                 : 'border-green-300';
-
-            // Define position order for postflop (action order)
-            // Postflop: SB acts first, then BB, then UTG, etc.
-            const positionOrder: Record<string, number> = {
-              'SB': 1,
-              'BB': 2,
-              'UTG': 3,
-              'UTG+1': 4,
-              'UTG+2': 5,
-              'MP': 6,
-              'HJ': 7,
-              'MP+1': 8,
-              'MP+2': 9,
-              'CO': 10,
-              'Dealer': 11,
-              '': 999 // Empty position goes last
-            };
 
             const playersToShow = getActivePlayers()
               .filter((p: Player) => {
@@ -457,6 +1143,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
                 {/* MAIN TABLE */}
                 <table
                   className={`w-full border-collapse border-2 ${levelBorderColor}`}
+                  style={{ overflow: 'visible' }}
                 >
                   {/* TABLE HEADER */}
                   <thead>
@@ -514,31 +1201,514 @@ export const TurnView: React.FC<TurnViewProps> = ({
                             )}
                           </td>
 
-                          {/* STACK */}
-                          <td
-                            className={`border ${levelBorderColor} px-4 py-2 text-center text-sm text-gray-700`}
-                          >
-                            {formatStack(player.stack)}
+                          {/* STACK - Start/Now Display */}
+                          <td className={`border ${levelBorderColor} px-2 py-2 text-center relative`} style={{ overflow: 'visible' }}>
+                            {(() => {
+                              // Stack display logic
+                              const historyKey = `${player.id}-turn-${actionLevel}`;
+                              const isExpanded = expandedStackHistories[historyKey] || false;
+                              const sectionKey = `turn_${actionLevel}`;
+                              const hasProcessedStack = processedSections[sectionKey];
+                              const startingStack = player.stack; // Always show hand's initial stack
+
+                              // FR-14.1: Show "Now" stack immediately when initialized, even before processing
+                              const currentStack = sectionStacks[sectionKey]?.updated?.[player.id] ??
+                                                   (hasProcessedStack ? startingStack : null);
+                              const isAllIn = currentStack !== null && currentStack === 0;
+
+                              return (
+                                <>
+                                  <div className="space-y-1">
+                                    {/* Start Stack */}
+                                    <div className="flex items-center justify-between bg-blue-50 rounded px-2 py-1 border border-blue-200">
+                                      <span className="text-[10px] text-blue-600">Start:</span>
+                                      <span className="text-xs font-bold text-blue-900">{formatStack(startingStack)}</span>
+                                    </div>
+
+                                    {/* Now Stack */}
+                                    <div className="flex items-center gap-1">
+                                      <div className={`flex-1 flex items-center justify-between rounded px-2 py-1 border ${isAllIn ? 'bg-red-50 border-2 border-red-400' : 'bg-green-50 border-green-200'}`}>
+                                        <span className={`text-[10px] ${isAllIn ? 'text-red-700 font-bold' : 'text-green-600'}`}>Now:</span>
+                                        {currentStack !== null ? (
+                                          <span className={`text-xs font-bold ${isAllIn ? 'text-red-900' : 'text-green-900'}`}>{formatStack(currentStack)}</span>
+                                        ) : (
+                                          <span className="text-xs font-bold text-gray-400">-</span>
+                                        )}
+                                      </div>
+
+                                      {/* History Button */}
+                                      {currentStack !== null && (
+                                        <button
+                                          onMouseDown={(e) => {
+                                            // Prevent input blur when clicking this button
+                                            e.preventDefault();
+                                          }}
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+
+                                            const isExpanding = !isExpanded;
+                                            setExpandedStackHistories(prev => ({
+                                              ...prev,
+                                              [historyKey]: isExpanding
+                                            }));
+
+                                            if (isExpanding) {
+                                              // Calculate smart positioning based on available viewport space
+                                              const buttonElement = e.currentTarget;
+                                              const buttonRect = buttonElement.getBoundingClientRect();
+
+                                              // Estimate pop-up height (can be adjusted based on content)
+                                              const estimatedPopupHeight = 600; // Approximate height with all sections
+
+                                              // Calculate available space above and below
+                                              const spaceBelow = window.innerHeight - buttonRect.bottom;
+                                              const spaceAbove = buttonRect.top;
+
+                                              // Determine optimal position
+                                              const shouldPositionAbove = spaceBelow < estimatedPopupHeight && spaceAbove > spaceBelow;
+
+                                              setPopupPositions(prev => ({
+                                                ...prev,
+                                                [historyKey]: shouldPositionAbove ? 'above' : 'below'
+                                              }));
+                                            }
+                                          }}
+                                          className="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-[10px] font-semibold rounded shadow-md hover:shadow-lg transition-all duration-200"
+                                          title="Show stack history"
+                                        >
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                          </svg>
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Floating Card - Stack History */}
+                                  {isExpanded && currentStack !== null && (() => {
+                                    const position = popupPositions[historyKey] || 'below';
+                                    const positionClasses = position === 'above'
+                                      ? 'absolute z-[100] bottom-full mb-2 left-1/2 transform -translate-x-1/2'
+                                      : 'absolute z-[100] mt-2 left-1/2 transform -translate-x-1/2';
+
+                                    return (
+                                      <div data-stack-history-card={historyKey} className={positionClasses} style={{ minWidth: '400px', maxWidth: '460px' }}>
+                                        <div className={`bg-gradient-to-br rounded-xl shadow-2xl border-2 overflow-hidden ${isAllIn ? 'from-red-50 to-orange-50 border-red-400' : 'from-white to-blue-50 border-blue-300'}`}>
+                                        {/* Card Header */}
+                                        <div className={`bg-gradient-to-r px-3 py-2 flex items-center justify-between ${isAllIn ? 'from-red-600 to-red-700' : 'from-blue-600 to-blue-700'}`}>
+                                          <div className="flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                            </svg>
+                                            <h3 className="text-white font-bold text-xs">
+                                              {player.name} - Stack History (Turn {actionLevel.toUpperCase()}) {isAllIn && '(ALL-IN)'}
+                                            </h3>
+                                          </div>
+                                          <button
+                                            onClick={() => setExpandedStackHistories(prev => ({
+                                              ...prev,
+                                              [historyKey]: false
+                                            }))}
+                                            className={`text-white transition-colors ${isAllIn ? 'hover:text-red-200' : 'hover:text-blue-200'}`}
+                                          >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                          </button>
+                                        </div>
+
+                                        {/* Card Body */}
+                                        <div className="p-3 space-y-2">
+                                          {/* PreFlop BASE Round */}
+                                          {(() => {
+                                            const preflopAction = (typeof data.preflopAction === 'string' ? data.preflopAction : '') as string;
+                                            const preflopInitialStack = player.stack - (data.postedSB || 0) - (data.postedBB || 0);
+                                            const stackBefore = preflopInitialStack;
+                                            const stackAfter = sectionStacks['preflop_base']?.updated?.[player.id] ?? stackBefore;
+                                            const contribution = stackBefore - stackAfter;
+
+                                            return (
+                                              <div className="bg-indigo-50 rounded-lg p-2 border-l-4 border-indigo-400 shadow-sm">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-[10px] font-bold text-indigo-800 uppercase tracking-wide">PreFlop BASE</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-gray-600">{formatStack(stackBefore)}</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                    </svg>
+                                                    <span className="font-bold text-gray-800">{formatStack(stackAfter)}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    {preflopAction && preflopAction !== 'no action' && preflopAction !== 'check' ? (
+                                                      <>
+                                                        <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
+                                                        <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${preflopAction === 'all-in' ? 'bg-red-600 text-white' : preflopAction === 'raise' ? 'bg-purple-100 text-purple-700' : preflopAction === 'call' ? 'bg-blue-100 text-blue-700' : preflopAction === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                          {preflopAction}
+                                                        </span>
+                                                      </>
+                                                    ) : (
+                                                      <span className="text-gray-400 text-[10px]">no action</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* PreFlop MORE Action 1 Round */}
+                                          {sectionStacks['preflop_more'] && (() => {
+                                            const preflopMoreAction = (typeof data.preflop_moreActionAction === 'string' ? data.preflop_moreActionAction : '') as string;
+                                            const stackBefore = sectionStacks['preflop_base']?.updated?.[player.id] ?? player.stack;
+                                            const stackAfter = sectionStacks['preflop_more']?.updated?.[player.id] ?? stackBefore;
+                                            const contribution = stackBefore - stackAfter;
+
+                                            return (
+                                              <div className="bg-teal-50 rounded-lg p-2 border-l-4 border-teal-400 shadow-sm">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wide">PreFlop MA1</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-gray-600">{formatStack(stackBefore)}</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                    </svg>
+                                                    <span className="font-bold text-gray-800">{formatStack(stackAfter)}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    {preflopMoreAction && preflopMoreAction !== 'no action' && preflopMoreAction !== 'check' ? (
+                                                      <>
+                                                        <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
+                                                        <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${preflopMoreAction === 'all-in' ? 'bg-red-600 text-white' : preflopMoreAction === 'raise' ? 'bg-purple-100 text-purple-700' : preflopMoreAction === 'call' ? 'bg-blue-100 text-blue-700' : preflopMoreAction === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                          {preflopMoreAction}
+                                                        </span>
+                                                      </>
+                                                    ) : (
+                                                      <span className="text-gray-400 text-[10px]">no action</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* PreFlop MORE Action 2 Round */}
+                                          {sectionStacks['preflop_more2'] && (() => {
+                                            const preflopMore2Action = (typeof data.preflop_moreAction2Action === 'string' ? data.preflop_moreAction2Action : '') as string;
+                                            const stackBefore = sectionStacks['preflop_more']?.updated?.[player.id] ?? player.stack;
+                                            const stackAfter = sectionStacks['preflop_more2']?.updated?.[player.id] ?? stackBefore;
+                                            const contribution = stackBefore - stackAfter;
+
+                                            return (
+                                              <div className="bg-cyan-50 rounded-lg p-2 border-l-4 border-cyan-400 shadow-sm">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-[10px] font-bold text-cyan-800 uppercase tracking-wide">PreFlop MA2</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-gray-600">{formatStack(stackBefore)}</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                    </svg>
+                                                    <span className="font-bold text-gray-800">{formatStack(stackAfter)}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    {preflopMore2Action && preflopMore2Action !== 'no action' && preflopMore2Action !== 'check' ? (
+                                                      <>
+                                                        <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
+                                                        <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${preflopMore2Action === 'all-in' ? 'bg-red-600 text-white' : preflopMore2Action === 'raise' ? 'bg-purple-100 text-purple-700' : preflopMore2Action === 'call' ? 'bg-blue-100 text-blue-700' : preflopMore2Action === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                          {preflopMore2Action}
+                                                        </span>
+                                                      </>
+                                                    ) : (
+                                                      <span className="text-gray-400 text-[10px]">no action</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* FLOP BASE Round */}
+                                          {sectionStacks['flop_base'] && (() => {
+                                            const flopBaseAction = (typeof data.flopAction === 'string' ? data.flopAction : '') as string;
+                                            const stackBefore = calculateStartingStack(player, 'base');
+                                            const stackAfter = sectionStacks['flop_base']?.updated?.[player.id] ?? stackBefore;
+                                            const contribution = stackBefore - stackAfter;
+
+                                            return (
+                                              <div className="bg-gray-50 rounded-lg p-2 border-l-4 border-gray-400 shadow-sm">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-[10px] font-bold text-gray-800 uppercase tracking-wide">FLOP BASE</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-gray-600">{formatStack(stackBefore)}</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                    </svg>
+                                                    <span className="font-bold text-gray-800">{formatStack(stackAfter)}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    {flopBaseAction && flopBaseAction !== 'no action' && flopBaseAction !== 'check' ? (
+                                                      <>
+                                                        <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
+                                                        <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${flopBaseAction === 'all-in' ? 'bg-red-600 text-white' : flopBaseAction === 'raise' ? 'bg-purple-100 text-purple-700' : flopBaseAction === 'call' ? 'bg-blue-100 text-blue-700' : flopBaseAction === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                          {flopBaseAction}
+                                                        </span>
+                                                      </>
+                                                    ) : (
+                                                      <span className="text-gray-400 text-[10px]">no action</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* FLOP MA1 Round */}
+                                          {sectionStacks['flop_more'] && (() => {
+                                            const flopMA1Action = (typeof data.flop_moreActionAction === 'string' ? data.flop_moreActionAction : '') as string;
+                                            const stackBefore = sectionStacks['flop_base']?.updated?.[player.id] ?? player.stack;
+                                            const stackAfter = sectionStacks['flop_more']?.updated?.[player.id] ?? stackBefore;
+                                            const contribution = stackBefore - stackAfter;
+
+                                            return (
+                                              <div className="bg-purple-50 rounded-lg p-2 border-l-4 border-purple-400 shadow-sm">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-[10px] font-bold text-purple-800 uppercase tracking-wide">FLOP MA1</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-gray-600">{formatStack(stackBefore)}</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                    </svg>
+                                                    <span className="font-bold text-gray-800">{formatStack(stackAfter)}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    {flopMA1Action && flopMA1Action !== 'no action' && flopMA1Action !== 'check' ? (
+                                                      <>
+                                                        <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
+                                                        <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${flopMA1Action === 'all-in' ? 'bg-red-600 text-white' : flopMA1Action === 'raise' ? 'bg-purple-100 text-purple-700' : flopMA1Action === 'call' ? 'bg-blue-100 text-blue-700' : flopMA1Action === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                          {flopMA1Action}
+                                                        </span>
+                                                      </>
+                                                    ) : (
+                                                      <span className="text-gray-400 text-[10px]">no action</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* FLOP MA2 Round */}
+                                          {sectionStacks['flop_more2'] && (() => {
+                                            const flopMA2Action = (typeof data.flop_moreAction2Action === 'string' ? data.flop_moreAction2Action : '') as string;
+                                            const stackBefore = sectionStacks['flop_more']?.updated?.[player.id] ?? player.stack;
+                                            const stackAfter = sectionStacks['flop_more2']?.updated?.[player.id] ?? stackBefore;
+                                            const contribution = stackBefore - stackAfter;
+
+                                            return (
+                                              <div className="bg-yellow-50 rounded-lg p-2 border-l-4 border-yellow-400 shadow-sm">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-[10px] font-bold text-yellow-800 uppercase tracking-wide">FLOP MA2</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-gray-600">{formatStack(stackBefore)}</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                    </svg>
+                                                    <span className="font-bold text-gray-800">{formatStack(stackAfter)}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    {flopMA2Action && flopMA2Action !== 'no action' && flopMA2Action !== 'check' ? (
+                                                      <>
+                                                        <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
+                                                        <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${flopMA2Action === 'all-in' ? 'bg-red-600 text-white' : flopMA2Action === 'raise' ? 'bg-purple-100 text-purple-700' : flopMA2Action === 'call' ? 'bg-blue-100 text-blue-700' : flopMA2Action === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                          {flopMA2Action}
+                                                        </span>
+                                                      </>
+                                                    ) : (
+                                                      <span className="text-gray-400 text-[10px]">no action</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* TURN BASE Round */}
+                                          {(() => {
+                                            const turnBaseAction = (typeof data.turnAction === 'string' ? data.turnAction : '') as string;
+                                            const stackBefore = calculateStartingStack(player, 'base');
+                                            const stackAfter = sectionStacks['turn_base']?.updated?.[player.id] ?? stackBefore;
+                                            const contribution = stackBefore - stackAfter;
+
+                                            return (
+                                              <div className="bg-orange-50 rounded-lg p-2 border-l-4 border-orange-400 shadow-sm">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-[10px] font-bold text-orange-800 uppercase tracking-wide">TURN BASE</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-gray-600">{formatStack(stackBefore)}</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                    </svg>
+                                                    <span className="font-bold text-gray-800">{formatStack(stackAfter)}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    {turnBaseAction && turnBaseAction !== 'no action' && turnBaseAction !== 'check' ? (
+                                                      <>
+                                                        <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
+                                                        <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${turnBaseAction === 'all-in' ? 'bg-red-600 text-white' : turnBaseAction === 'raise' ? 'bg-purple-100 text-purple-700' : turnBaseAction === 'call' ? 'bg-blue-100 text-blue-700' : turnBaseAction === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                          {turnBaseAction}
+                                                        </span>
+                                                      </>
+                                                    ) : (
+                                                      <span className="text-gray-400 text-[10px]">no action</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* TURN MA1 Round */}
+                                          {visibleActionLevels.turn.includes('more') && (() => {
+                                            const turnMA1Action = (typeof data.turn_moreActionAction === 'string' ? data.turn_moreActionAction : '') as string;
+                                            const stackBefore = sectionStacks['turn_base']?.updated?.[player.id] ?? player.stack;
+                                            const stackAfter = sectionStacks['turn_more']?.updated?.[player.id] ?? stackBefore;
+                                            const contribution = stackBefore - stackAfter;
+
+                                            return (
+                                              <div className="bg-pink-50 rounded-lg p-2 border-l-4 border-pink-400 shadow-sm">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-[10px] font-bold text-pink-800 uppercase tracking-wide">TURN MA1</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-gray-600">{formatStack(stackBefore)}</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                    </svg>
+                                                    <span className="font-bold text-gray-800">{formatStack(stackAfter)}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    {turnMA1Action && turnMA1Action !== 'no action' && turnMA1Action !== 'check' ? (
+                                                      <>
+                                                        <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
+                                                        <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${turnMA1Action === 'all-in' ? 'bg-red-600 text-white' : turnMA1Action === 'raise' ? 'bg-purple-100 text-purple-700' : turnMA1Action === 'call' ? 'bg-blue-100 text-blue-700' : turnMA1Action === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                          {turnMA1Action}
+                                                        </span>
+                                                      </>
+                                                    ) : (
+                                                      <span className="text-gray-400 text-[10px]">no action</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* TURN MA2 Round */}
+                                          {visibleActionLevels.turn.includes('more2') && (() => {
+                                            const turnMA2Action = (typeof data.turn_moreAction2Action === 'string' ? data.turn_moreAction2Action : '') as string;
+                                            const stackBefore = sectionStacks['turn_more']?.updated?.[player.id] ?? player.stack;
+                                            const stackAfter = sectionStacks['turn_more2']?.updated?.[player.id] ?? stackBefore;
+                                            const contribution = stackBefore - stackAfter;
+
+                                            return (
+                                              <div className="bg-lime-50 rounded-lg p-2 border-l-4 border-lime-400 shadow-sm">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="text-[10px] font-bold text-lime-800 uppercase tracking-wide">TURN MA2</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-gray-600">{formatStack(stackBefore)}</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                    </svg>
+                                                    <span className="font-bold text-gray-800">{formatStack(stackAfter)}</span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    {turnMA2Action && turnMA2Action !== 'no action' && turnMA2Action !== 'check' ? (
+                                                      <>
+                                                        <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
+                                                        <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${turnMA2Action === 'all-in' ? 'bg-red-600 text-white' : turnMA2Action === 'raise' ? 'bg-purple-100 text-purple-700' : turnMA2Action === 'call' ? 'bg-blue-100 text-blue-700' : turnMA2Action === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                          {turnMA2Action}
+                                                        </span>
+                                                      </>
+                                                    ) : (
+                                                      <span className="text-gray-400 text-[10px]">no action</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+
+                                          {/* Summary Section */}
+                                          <div className={`rounded-lg p-3 border-2 shadow-md ${isAllIn ? 'bg-gradient-to-r from-gray-50 to-red-50 border-red-300' : 'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-300'}`}>
+                                            <div className="text-[10px] font-bold text-gray-600 uppercase tracking-wide mb-2 pb-2 border-b-2 border-gray-300 flex items-center gap-1">
+                                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                              </svg>
+                                              Summary
+                                            </div>
+                                            <div className="space-y-2">
+                                              <div className="flex justify-between items-center">
+                                                <span className="text-[10px] text-gray-600">Starting Stack:</span>
+                                                <span className="text-xs font-bold text-blue-600">{formatStack(startingStack)}</span>
+                                              </div>
+                                              <div className="flex justify-between items-center">
+                                                <span className="text-[10px] text-gray-600">Total Contributed:</span>
+                                                <span className="text-xs font-bold text-red-600">{formatStack(startingStack - currentStack)}</span>
+                                              </div>
+                                              <div className="flex justify-between items-center pt-2 border-t border-gray-300">
+                                                <span className="text-[10px] text-gray-700 font-bold">Remaining Stack:</span>
+                                                <span className={`text-sm font-bold ${isAllIn ? 'text-red-600' : 'text-green-600'}`}>{formatStack(currentStack)}</span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    );
+                                  })()}
+                                </>
+                              );
+                            })()}
                           </td>
 
                           {/* ACTION */}
                           <td className={`border ${levelBorderColor} px-2 py-1`}>
-                            <ActionButtons
-                              playerId={player.id}
-                              selectedAction={action}
-                              suffix={suffix}
-                              onActionClick={(selectedAction) => {
-                                // Update player action
-                                actions.setPlayerData({
-                                  ...playerData,
-                                  [player.id]: {
-                                    ...playerData[player.id],
-                                    [actionKey]: selectedAction,
-                                  },
-                                });
-                              }}
-                              availableActions={['fold', 'check', 'call', 'bet', 'raise', 'all-in', 'no action']}
-                            />
+                            <PlayerActionSelector playerId={player.id} suffix={suffix} action={action}>
+                              <ActionButtons
+                                playerId={player.id}
+                                selectedAction={action}
+                                suffix={suffix}
+                                onActionClick={(selectedAction) => {
+                                  // Update player action
+                                  actions.setPlayerData({
+                                    ...playerData,
+                                    [player.id]: {
+                                      ...playerData[player.id],
+                                      [actionKey]: selectedAction,
+                                    },
+                                  });
+                                  // Navigate after action selection
+                                  navigateAfterAction(player.id, suffix);
+                                }}
+                                availableActions={getAvailableActionsForPlayer(player.id, suffix)}
+                              />
+                            </PlayerActionSelector>
                           </td>
 
                           {/* AMOUNT/UNIT */}
@@ -546,7 +1716,15 @@ export const TurnView: React.FC<TurnViewProps> = ({
                             <AmountInput
                               playerId={player.id}
                               selectedAmount={amount}
+                              selectedAction={action}
                               selectedUnit={unit as ChipUnit}
+                              suffix={suffix}
+                              // FR-12: Pass validation props
+                              stage="turn"
+                              actionLevel={actionLevel}
+                              players={players}
+                              playerData={playerData}
+                              sectionStacks={sectionStacks}
                               onAmountChange={(playerId, newAmount) => {
                                 actions.setPlayerData({
                                   ...playerData,
@@ -564,6 +1742,10 @@ export const TurnView: React.FC<TurnViewProps> = ({
                                     [unitKey]: newUnit,
                                   },
                                 });
+                              }}
+                              onTabComplete={() => {
+                                console.log(`🔔 [TurnView] onTabComplete called for player ${player.id}`);
+                                navigateAfterAction(player.id, suffix);
                               }}
                               isDisabled={!action || action === 'fold' || action === 'check' || action === 'no action'}
                             />
@@ -584,15 +1766,23 @@ export const TurnView: React.FC<TurnViewProps> = ({
                       {playersToShow.length !== 1 ? 's' : ''}
                     </div>
                     <div className="flex gap-2">
+                      {actionLevel === visibleActionLevels.turn[visibleActionLevels.turn.length - 1] && (
+                        <button
+                          onClick={handleMoreAction}
+                          data-add-more-focus
+                          disabled={isAddMoreActionDisabled || (visibleActionLevels.turn && visibleActionLevels.turn.length >= 3)}
+                          className="px-6 py-3 bg-orange-500 text-white rounded-lg text-sm font-bold shadow-md hover:bg-orange-600 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <span>+</span>
+                          Add More Action {visibleActionLevels.turn ? visibleActionLevels.turn.length : 1}
+                        </button>
+                      )}
                       <button
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition-colors"
+                        onClick={handleCreateRiver}
+                        disabled={isCreateNextStreetDisabled}
+                        className="px-6 py-3 bg-green-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Add More Action
-                      </button>
-                      <button
-                        onClick={() => setCurrentView('river')}
-                        className="px-3 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 transition-colors"
-                      >
+                        <span>→</span>
                         Create River
                       </button>
                     </div>
@@ -608,6 +1798,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
           {/* Process Stack Button */}
           <button
             onClick={handleProcessStack}
+            data-process-stack-focus
             className="px-6 py-3 bg-yellow-500 text-white rounded-lg text-sm font-bold shadow-md hover:bg-yellow-600 transition-colors flex items-center gap-2"
           >
             <span>⚡</span>

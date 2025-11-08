@@ -7,12 +7,11 @@
  * - Tab key navigation to next player's Card 1
  * - Enter key also navigates to next player
  * - Raw value storage (conversion happens during processing, not in input)
- * - Raise validation: ensures second raise is larger than first
+ * - FR-12 Raise validation: comprehensive bet/raise amount validation
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import type { ChipUnit } from '../../types/poker';
-import { ValidationModal } from '../ui/ValidationModal';
+import type { ChipUnit, Stage, ActionLevel, Player, PlayerData, SectionStacks } from '../../types/poker';
 
 interface AmountInputProps {
   playerId: number;
@@ -23,7 +22,12 @@ interface AmountInputProps {
   isForcedAllIn?: boolean;
   isDisabled?: boolean;
   defaultUnit?: ChipUnit;
-  previousRaiseAmount?: number; // For validation
+  // FR-12: Required props for comprehensive validation
+  stage?: Stage;
+  actionLevel?: ActionLevel;
+  players?: Player[];
+  playerData?: PlayerData;
+  sectionStacks?: SectionStacks;
   onAmountChange?: (playerId: number, amount: string, suffix?: string) => void;
   onUnitChange?: (playerId: number, unit: ChipUnit) => void;
   onTabComplete?: () => void;
@@ -38,14 +42,17 @@ export function AmountInput({
   isForcedAllIn = false,
   isDisabled = false,
   defaultUnit = 'K',
-  previousRaiseAmount = 0,
+  // FR-12: Validation props
+  stage,
+  actionLevel,
+  players,
+  playerData,
+  sectionStacks,
   onAmountChange,
   onUnitChange,
   onTabComplete
 }: AmountInputProps): React.ReactElement {
   const [localAmount, setLocalAmount] = useState(selectedAmount || '');
-  const [showValidationModal, setShowValidationModal] = useState(false);
-  const [validationMessage, setValidationMessage] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   // FIX #3A: Only update if selectedAmount is defined and truthy
@@ -80,29 +87,8 @@ export function AmountInput({
   };
 
   const validateAndSave = (): boolean => {
-    // Validate raise amount if action is raise and we have a previous raise
-    if (selectedAction === 'raise' && previousRaiseAmount > 0 && localAmount) {
-      const currentUnit = selectedUnit || defaultUnit;
-      let actualAmount = parseFloat(localAmount);
-
-      // Convert to actual value based on unit
-      if (currentUnit === 'K') {
-        actualAmount *= 1000;
-      } else if (currentUnit === 'Mil') {
-        actualAmount *= 1000000;
-      }
-
-      // Check if current raise is less than or equal to previous raise
-      if (actualAmount <= previousRaiseAmount) {
-        setValidationMessage(
-          `Invalid Raise Amount!\n\nYour raise of ${formatAmount(actualAmount)} must be greater than the previous raise of ${formatAmount(previousRaiseAmount)}.\n\nPlease enter a higher amount.`
-        );
-        setShowValidationModal(true);
-        return false;
-      }
-    }
-
     // Simply save the raw value without conversion
+    // FR-12 validation will be done during Process Stack, not during input
     // Conversion will be done during processing instead
     if (onAmountChange) {
       onAmountChange(playerId, localAmount, suffix);
@@ -131,7 +117,9 @@ export function AmountInput({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Shift+Tab: Navigate back to Action column
+    console.log(`🎹 [AmountInput] Key pressed: "${e.key}" for player ${playerId}${suffix}`);
+
+    // Shift+Tab: Navigate back to Action column (not currently used, but left for completeness)
     if (e.key === 'Tab' && e.shiftKey) {
       console.log(`🔙 [AmountInput] Shift+Tab pressed for player ${playerId}${suffix}`);
       e.preventDefault();
@@ -141,19 +129,9 @@ export function AmountInput({
         return; // Stop if validation failed
       }
 
-      // Navigate back to Action column
-      setTimeout(() => {
-        const actionFocusAttr = `${playerId}-preflop${suffix}`;
-        console.log(`🎯 [AmountInput] Looking for action element: [data-action-focus="${actionFocusAttr}"]`);
-        const actionElement = document.querySelector(`[data-action-focus="${actionFocusAttr}"]`) as HTMLElement;
-        if (actionElement) {
-          console.log(`✅ [AmountInput] Found action element, focusing`);
-          actionElement.focus();
-        } else {
-          console.log(`❌ [AmountInput] Action element not found`);
-        }
-      }, 100);
-
+      console.log(`⚠️ [AmountInput] Shift+Tab - letting default behavior handle for now`);
+      // Note: Since we don't know the stage (preflop/flop/turn/river) here,
+      // we let default behavior handle reverse tab
       // Mark to skip blur validation since we already validated
       e.currentTarget.dataset.skipBlur = 'true';
       return;
@@ -163,21 +141,26 @@ export function AmountInput({
     if (e.key === 'Tab' && !e.shiftKey) {
       console.log(`➡️ [AmountInput] Tab pressed for player ${playerId}${suffix}`);
       e.preventDefault();
+
+      console.log(`🔍 [AmountInput] Validating amount before navigation...`);
       const isValid = validateAndSave();
       if (!isValid) {
         console.log(`❌ [AmountInput] Validation failed, stopping navigation`);
         return; // Stop if validation failed
       }
 
-      console.log(`✅ [AmountInput] Validation passed, calling onTabComplete`);
-      // Navigate to next player's Card 1
+      console.log(`✅ [AmountInput] Validation passed`);
+
+      // Navigate to next player's action
       if (onTabComplete) {
+        console.log(`🔄 [AmountInput] onTabComplete callback exists, calling it`);
         setTimeout(() => {
-          console.log(`🔄 [AmountInput] Executing onTabComplete callback`);
+          console.log(`🚀 [AmountInput] Executing onTabComplete callback`);
           onTabComplete();
         }, 100);
       } else {
-        console.log(`⚠️ [AmountInput] No onTabComplete callback provided`);
+        console.log(`⚠️ [AmountInput] WARNING: No onTabComplete callback provided!`);
+        console.log(`💡 [AmountInput] This means Tab navigation from amount input won't work`);
       }
 
       // Mark to skip blur validation since we already validated
@@ -187,11 +170,17 @@ export function AmountInput({
 
     // Enter key - validate and move to next field
     if (e.key === 'Enter') {
+      console.log(`⏎ [AmountInput] Enter key pressed for player ${playerId}${suffix}`);
       const isValid = validateAndSave();
-      if (!isValid) return; // Stop if validation failed
+      if (!isValid) {
+        console.log(`❌ [AmountInput] Validation failed on Enter`);
+        return; // Stop if validation failed
+      }
 
+      console.log(`✅ [AmountInput] Enter key - validation passed`);
       // Also navigate on Enter
       if (onTabComplete) {
+        console.log(`🔄 [AmountInput] Calling onTabComplete on Enter`);
         setTimeout(() => {
           onTabComplete();
         }, 100);
@@ -214,13 +203,6 @@ export function AmountInput({
 
   return (
     <>
-      <ValidationModal
-        isOpen={showValidationModal}
-        title="Invalid Raise Amount"
-        message={validationMessage}
-        onClose={() => setShowValidationModal(false)}
-        inputRef={inputRef}
-      />
       <div className="flex flex-row items-center gap-1">
         {/* Amount Input */}
         <input
@@ -234,6 +216,7 @@ export function AmountInput({
           readOnly={isInputDisabled}
           disabled={isInputDisabled}
           onKeyDown={handleKeyDown}
+          data-amount-focus={`amount-${playerId}${suffix}`}
           className={`w-16 px-2 py-1 border border-gray-300 rounded text-xs text-center focus:outline-none focus:ring-1 focus:ring-blue-500 ${
             isInputDisabled ? 'bg-gray-100 cursor-not-allowed text-gray-600' : ''
           }`}

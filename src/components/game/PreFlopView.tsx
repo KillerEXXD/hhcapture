@@ -17,6 +17,8 @@ import { processStackSynchronous } from '../../lib/poker/engine/processStack';
 import { calculatePotsForBettingRound } from '../../lib/poker/engine/potCalculationEngine';
 import { checkBettingRoundComplete } from '../../lib/poker/validators/roundCompletionValidator';
 import { checkPlayerNeedsToAct } from '../../lib/poker/validators/playerActionStatus';
+import { returnFocusAfterProcessStack } from '../../lib/poker/utils/focusManagement';
+import { validateRaiseAmount } from '../../lib/poker/validators/raiseValidator';
 
 interface PreFlopViewProps {
   state: GameState;
@@ -62,6 +64,66 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
   // State for tracking expanded stack histories
   const [expandedStackHistories, setExpandedStackHistories] = React.useState<Record<string, boolean>>({});
+
+  // State for tracking pop-up position (above or below) for each player
+  const [popupPositions, setPopupPositions] = React.useState<Record<string, 'above' | 'below'>>({});
+
+  // State for disabling "Add More Action" button when betting round is complete
+  const [isAddMoreActionDisabled, setIsAddMoreActionDisabled] = React.useState(false);
+
+  // State for disabling "Create Next Street" button when betting round is incomplete
+  const [isCreateNextStreetDisabled, setIsCreateNextStreetDisabled] = React.useState(true);
+
+  // State for tracking if current section has been processed
+  const [hasProcessedCurrentState, setHasProcessedCurrentState] = React.useState(false);
+
+  // State for tracking last processed playerData to detect changes
+  const [lastProcessedPlayerDataHash, setLastProcessedPlayerDataHash] = React.useState<string>('');
+
+  // Detect playerData changes and invalidate processed state
+  React.useEffect(() => {
+    const currentLevels = visibleActionLevels.preflop || ['base'];
+
+    // Create hash of current preflop playerData to detect changes
+    const preflopDataHash = JSON.stringify(
+      players.map(p => {
+        const data = playerData[p.id] || {};
+        return {
+          id: p.id,
+          preflopAction: data.preflopAction,
+          preflopAmount: data.preflopAmount,
+          preflopUnit: data.preflopUnit,
+          preflop_moreActionAction: data.preflop_moreActionAction,
+          preflop_moreActionAmount: data.preflop_moreActionAmount,
+          preflop_moreActionUnit: data.preflop_moreActionUnit,
+          preflop_moreAction2Action: data.preflop_moreAction2Action,
+          preflop_moreAction2Amount: data.preflop_moreAction2Amount,
+          preflop_moreAction2Unit: data.preflop_moreAction2Unit,
+        };
+      })
+    );
+
+    // If playerData changed, invalidate processed state
+    if (lastProcessedPlayerDataHash && preflopDataHash !== lastProcessedPlayerDataHash) {
+      console.log('🔄 [PreFlopView] PlayerData changed, invalidating processed state');
+      setHasProcessedCurrentState(false);
+    }
+  }, [playerData, players, lastProcessedPlayerDataHash]);
+
+  // Update button states when playerData or processed state changes
+  React.useEffect(() => {
+    const currentLevels = visibleActionLevels.preflop || ['base'];
+    const currentLevel = currentLevels[currentLevels.length - 1];
+    const isRoundComplete = checkBettingRoundComplete('preflop', currentLevel, players, playerData);
+
+    console.log(`🔄 [PreFlopView useEffect] Current level: ${currentLevel}, Round complete: ${isRoundComplete.isComplete}, Reason: ${isRoundComplete.reason}, Processed: ${hasProcessedCurrentState}`);
+
+    // "Add More Action" is disabled when round is complete OR when state hasn't been processed
+    setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
+
+    // "Create Next Street" is disabled when round is incomplete OR when state hasn't been processed
+    setIsCreateNextStreetDisabled(!isRoundComplete.isComplete || !hasProcessedCurrentState);
+  }, [playerData, visibleActionLevels.preflop, players, hasProcessedCurrentState]);
 
   // Utility function for suit colors
   const getCardColor = (suit: string | null | undefined) => {
@@ -186,6 +248,28 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
   const handleAddMoreAction = () => {
     const currentLevels = visibleActionLevels.preflop || ['base'];
+    const currentLevel = currentLevels[currentLevels.length - 1]; // Last level
+
+    // Fallback safety check: Is betting round already complete?
+    const isComplete = checkBettingRoundComplete('preflop', currentLevel, players, playerData);
+
+    if (isComplete.isComplete) {
+      // Block the action
+      alert('Betting round complete. Please create Flop instead.');
+
+      // Disable the button to prevent repeated clicks
+      setIsAddMoreActionDisabled(true);
+
+      // Focus the Create Flop button
+      setTimeout(() => {
+        const createFlopButton = document.querySelector('[data-create-flop-focus]') as HTMLElement;
+        if (createFlopButton) {
+          createFlopButton.focus();
+        }
+      }, 100);
+
+      return; // Don't create More Action
+    }
 
     // Check if max levels reached
     if (currentLevels.length >= 3) {
@@ -195,6 +279,10 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
     // Determine next level
     const nextLevel: ActionLevel = currentLevels.length === 1 ? 'more' : 'more2';
+
+    // Invalidate processed state since new action level is being added
+    setHasProcessedCurrentState(false);
+    console.log('🔄 [PreFlopView] Invalidated processed state (adding More Action)');
 
     // Add the new level to visible action levels
     actions.setVisibleActionLevels({
@@ -217,6 +305,33 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
     });
 
     actions.setPlayerData(updatedPlayerData);
+
+    // FR-14.3 & 14.4: Copy "Now" stacks from previous level
+    // For More Action 1: Copy from BASE
+    // For More Action 2: Copy from More Action 1
+    const previousLevel = nextLevel === 'more' ? 'base' : 'more';
+    const previousSectionKey = `preflop_${previousLevel}`;
+    const newSectionKey = `preflop_${nextLevel}`;
+
+    const updatedSectionStacks = { ...sectionStacks };
+
+    // Initialize new section with copied "Now" stacks
+    updatedSectionStacks[newSectionKey] = {
+      initial: {},
+      current: {},
+      updated: {}
+    };
+
+    activePlayers.forEach(player => {
+      // Copy "Now" stack (updated value) from previous level to new level's "initial"
+      const previousNowStack = sectionStacks[previousSectionKey]?.updated?.[player.id] ?? player.stack;
+      updatedSectionStacks[newSectionKey].initial[player.id] = previousNowStack;
+      updatedSectionStacks[newSectionKey].current[player.id] = previousNowStack;
+      updatedSectionStacks[newSectionKey].updated[player.id] = previousNowStack;
+    });
+
+    actions.setSectionStacks(updatedSectionStacks);
+    console.log(`✅ Copied "Now" stacks from ${previousSectionKey} to ${newSectionKey}:`, updatedSectionStacks[newSectionKey]);
 
     // Focus on first player's Action field in the new level
     setTimeout(() => {
@@ -275,6 +390,33 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         flop: ['base'],
       });
     }
+
+    // FR-14.5: Copy "Now" stacks from preflop's last round to flop_base
+    const updatedSectionStacks = { ...sectionStacks };
+    updatedSectionStacks['flop_base'] = {
+      initial: {},
+      current: {},
+      updated: {}
+    };
+
+    getActivePlayers().forEach(player => {
+      // Get the final stack from preflop (check more2 -> more -> base)
+      let preflopFinalStack = player.stack;
+      if (sectionStacks['preflop_more2']?.updated?.[player.id] !== undefined) {
+        preflopFinalStack = sectionStacks['preflop_more2'].updated[player.id];
+      } else if (sectionStacks['preflop_more']?.updated?.[player.id] !== undefined) {
+        preflopFinalStack = sectionStacks['preflop_more'].updated[player.id];
+      } else if (sectionStacks['preflop_base']?.updated?.[player.id] !== undefined) {
+        preflopFinalStack = sectionStacks['preflop_base'].updated[player.id];
+      }
+
+      updatedSectionStacks['flop_base'].initial[player.id] = player.stack; // Always use original hand starting stack
+      updatedSectionStacks['flop_base'].current[player.id] = preflopFinalStack;
+      updatedSectionStacks['flop_base'].updated[player.id] = preflopFinalStack;
+    });
+
+    actions.setSectionStacks(updatedSectionStacks);
+    console.log(`✅ [handleCreateFlop] Copied preflop final stacks to flop_base`);
   };
 
   /**
@@ -432,7 +574,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
     // NEW LOGIC: Check if THIS SPECIFIC PLAYER needs to act
     // This replaces the checkBettingRoundComplete check with per-player evaluation
-    const playerStatus = checkPlayerNeedsToAct(playerId, actionLevel, players, playerData);
+    const playerStatus = checkPlayerNeedsToAct(playerId, 'preflop', actionLevel, players, playerData);
 
     if (playerStatus.alreadyAllIn) {
       // Player is all-in from previous round - show locked all-in button
@@ -496,7 +638,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
           // Check each subsequent player
           for (let i = playerIndex + 1; i < activePlayers.length; i++) {
             const nextPlayer = activePlayers[i];
-            const playerStatus = checkPlayerNeedsToAct(nextPlayer.id, actionLevel, players, playerData);
+            const playerStatus = checkPlayerNeedsToAct(nextPlayer.id, 'preflop', actionLevel, players, playerData);
 
             console.log(`🔍 [navigateAfterAction] Checking player ${nextPlayer.name} (${nextPlayer.id}):`, playerStatus);
 
@@ -590,6 +732,70 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
     // Get all visible action levels for preflop
     const currentLevels = visibleActionLevels.preflop || ['base'];
+
+    // FR-12 VALIDATION: Comprehensive raise/bet validation
+    // Run full FR-12 validation for all players with bet/raise actions
+    console.log('🔍 [ProcessStack] Running FR-12 validation for all raise/bet amounts...');
+    const validationErrors: string[] = [];
+
+    currentLevels.forEach((actionLevel) => {
+      const suffix = actionLevel === 'base' ? '' : actionLevel === 'more' ? '_moreAction' : '_moreAction2';
+
+      players.forEach((player) => {
+        if (!player.name) return;
+
+        const data = playerData[player.id] || {};
+        const actionKey = `preflop${suffix}Action` as keyof typeof data;
+        const amountKey = `preflop${suffix}Amount` as keyof typeof data;
+        const unitKey = `preflop${suffix}Unit` as keyof typeof data;
+
+        const action = data[actionKey] as string;
+        const amount = data[amountKey] as string;
+        const unit = data[unitKey] as ChipUnit;
+
+        // Only validate if action is bet or raise
+        if (action === 'bet' || action === 'raise') {
+          const raiseToAmount = parseFloat(amount);
+
+          // Basic validation: check if amount is a valid number > 0
+          if (!amount || amount.trim() === '' || isNaN(raiseToAmount) || raiseToAmount <= 0) {
+            validationErrors.push(`${player.name} (PreFlop ${actionLevel.toUpperCase()}): Missing or invalid raise amount`);
+            return; // Skip FR-12 validation if basic validation fails
+          }
+
+          // Run FR-12 validation
+          const validationResult = validateRaiseAmount(
+            player.id,
+            raiseToAmount,
+            'preflop',
+            actionLevel,
+            players,
+            playerData,
+            sectionStacks,
+            unit || defaultUnit
+          );
+
+          if (!validationResult.isValid) {
+            validationErrors.push(
+              `${player.name} (PreFlop ${actionLevel.toUpperCase()}): ${validationResult.errorMessage}`
+            );
+          }
+        }
+      });
+    });
+
+    // If there are validation errors, show them and abort processing
+    if (validationErrors.length > 0) {
+      alert(
+        `Cannot Process Stack - Raise/Bet Validation Failed:\n\n` +
+        validationErrors.join('\n\n') +
+        `\n\nPlease correct the amounts and try again.`
+      );
+      console.error('❌ [ProcessStack] FR-12 Validation errors:', validationErrors);
+      return;
+    }
+
+    console.log('✅ [ProcessStack] All raise/bet amounts passed FR-12 validation');
 
     try {
       // Normalize playerData: for base level, set undefined actions to 'fold'
@@ -700,6 +906,28 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
       // Display final results
       console.log(`\n✅ Process Stack Complete - Total Pot: ${finalPotInfo.totalPot}`);
 
+      // Set processed state flag and save hash
+      const preflopDataHash = JSON.stringify(
+        players.map(p => {
+          const data = latestPlayerData[p.id] || {};
+          return {
+            id: p.id,
+            preflopAction: data.preflopAction,
+            preflopAmount: data.preflopAmount,
+            preflopUnit: data.preflopUnit,
+            preflop_moreActionAction: data.preflop_moreActionAction,
+            preflop_moreActionAmount: data.preflop_moreActionAmount,
+            preflop_moreActionUnit: data.preflop_moreActionUnit,
+            preflop_moreAction2Action: data.preflop_moreAction2Action,
+            preflop_moreAction2Amount: data.preflop_moreAction2Amount,
+            preflop_moreAction2Unit: data.preflop_moreAction2Unit,
+          };
+        })
+      );
+      setHasProcessedCurrentState(true);
+      setLastProcessedPlayerDataHash(preflopDataHash);
+      console.log('✅ [PreFlopView] Set hasProcessedCurrentState to true');
+
       // Show alert to user
       alert(
         `Process Stack Complete!\n\n` +
@@ -711,6 +939,33 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         `Dead Money: ${finalPotInfo.deadMoney}\n\n` +
         `Check console for detailed breakdown.`
       );
+
+      // Check if betting round is complete after processing
+      const currentLevel = currentLevels[currentLevels.length - 1]; // Last processed level
+      const isRoundComplete = checkBettingRoundComplete(
+        'preflop',
+        currentLevel,
+        players,
+        latestPlayerData
+      );
+
+      // Disable "Add More Action" button if round is complete
+      setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
+      console.log(`🎯 [PreFlop] Betting round complete: ${isRoundComplete.isComplete}, Add More Action disabled: ${isRoundComplete.isComplete || !hasProcessedCurrentState}`);
+
+      // FR-13.4: Return focus after Process Stack completes
+      const hasMoreActionButton = (currentLevel === 'base' || currentLevel === 'more') && !isRoundComplete.isComplete;
+      const hasCreateNextStreetButton = true; // "Create Flop" button is always available
+
+      returnFocusAfterProcessStack({
+        stage: 'preflop',
+        actionLevel: currentLevel,
+        players,
+        playerData: latestPlayerData,
+        hasMoreActionButton,
+        hasCreateNextStreetButton,
+      });
+
     } catch (error) {
       console.error('❌ Error processing stack:', error);
       alert(`Error processing stack: ${error instanceof Error ? error.message : String(error)}`);
@@ -962,7 +1217,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         </div>
 
         {/* ACTION LEVELS */}
-        <div className="overflow-x-auto space-y-4">
+        <div className="space-y-4" style={{ overflowX: 'auto', overflowY: 'visible' }}>
           {visibleActionLevels.preflop?.map((actionLevel: ActionLevel, levelIndex: number) => {
             const suffix =
               actionLevel === 'base'
@@ -1062,6 +1317,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                 {/* MAIN TABLE */}
                 <table
                   className={`w-full border-collapse border-2 ${levelBorderColor}`}
+                  style={{ overflow: 'visible' }}
                 >
                   {/* TABLE HEADER */}
                   <thead>
@@ -1163,9 +1419,17 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                               const sectionKey = `preflop_${actionLevel}`;
                               const hasProcessedStack = processedSections[sectionKey];
                               const startingStack = player.stack; // Always show hand's initial stack
-                              const currentStack = hasProcessedStack
-                                ? (sectionStacks[sectionKey]?.updated?.[player.id] ?? calculateStartingStack(player, actionLevel))
-                                : null;
+
+                              // FR-14.1: Show "Now" stack immediately when initialized, even before processing
+                              const currentStack = sectionStacks[sectionKey]?.updated?.[player.id] ??
+                                                   (hasProcessedStack ? calculateStartingStack(player, actionLevel) : null);
+
+                              console.log(`🔍 [PreFlopView] Player ${player.id} ${actionLevel}:`, {
+                                sectionKey,
+                                hasProcessedStack,
+                                sectionStacksValue: sectionStacks[sectionKey]?.updated?.[player.id],
+                                currentStack
+                              });
 
                               // Check if player is all-in (currentStack is 0)
                               const isAllIn = currentStack !== null && currentStack === 0;
@@ -1189,100 +1453,39 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                                       </div>
                                       {currentStack !== null && (
                                         <button
+                                          onMouseDown={(e) => {
+                                            // Prevent input blur when clicking this button
+                                            e.preventDefault();
+                                          }}
                                           onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+
                                             const isExpanding = !isExpanded;
                                             setExpandedStackHistories(prev => ({
                                               ...prev,
                                               [historyKey]: isExpanding
                                             }));
 
-                                            // Auto-scroll to show the full card when expanding
                                             if (isExpanding) {
-                                              console.log('[PreFlopView] ========================================');
-                                              console.log('[PreFlopView] History button clicked - expanding stack history card');
-                                              console.log('[PreFlopView] Player:', player.name, 'historyKey:', historyKey);
-                                              setTimeout(() => {
-                                                const buttonElement = e.currentTarget;
-                                                const tdElement = buttonElement.closest('td');
+                                              // Calculate smart positioning based on available viewport space
+                                              const buttonElement = e.currentTarget;
+                                              const buttonRect = buttonElement.getBoundingClientRect();
 
-                                                console.log('[PreFlopView] Looking for floating card to scroll into view');
-                                                console.log('[PreFlopView] tdElement:', tdElement);
+                                              // Estimate pop-up height (can be adjusted based on content)
+                                              const estimatedPopupHeight = 600; // Approximate height with all sections
 
-                                                if (tdElement) {
-                                                  // Try multiple selectors to find the floating card
-                                                  let floatingCard = tdElement.querySelector(`[data-stack-history-card="${historyKey}"]`);
-                                                  console.log('[PreFlopView] floatingCard by data attribute:', floatingCard);
+                                              // Calculate available space above and below
+                                              const spaceBelow = window.innerHeight - buttonRect.bottom;
+                                              const spaceAbove = buttonRect.top;
 
-                                                  if (!floatingCard) {
-                                                    floatingCard = tdElement.querySelector('.absolute.z-50');
-                                                    console.log('[PreFlopView] floatingCard by class selector:', floatingCard);
-                                                  }
+                                              // Determine optimal position
+                                              const shouldPositionAbove = spaceBelow < estimatedPopupHeight && spaceAbove > spaceBelow;
 
-                                                  if (floatingCard) {
-                                                    // Get card dimensions BEFORE scrolling
-                                                    const cardRect = floatingCard.getBoundingClientRect();
-                                                    const viewportHeight = window.innerHeight;
-                                                    const viewportTop = window.scrollY;
-                                                    const viewportBottom = viewportTop + viewportHeight;
-
-                                                    console.log('[PreFlopView] === Card Dimensions ===');
-                                                    console.log('[PreFlopView] Card height:', cardRect.height, 'px');
-                                                    console.log('[PreFlopView] Card top (viewport):', cardRect.top, 'px');
-                                                    console.log('[PreFlopView] Card bottom (viewport):', cardRect.bottom, 'px');
-                                                    console.log('[PreFlopView] Card top (absolute):', cardRect.top + window.scrollY, 'px');
-                                                    console.log('[PreFlopView] Card bottom (absolute):', cardRect.bottom + window.scrollY, 'px');
-                                                    console.log('[PreFlopView] === Viewport Info ===');
-                                                    console.log('[PreFlopView] Viewport height:', viewportHeight, 'px');
-                                                    console.log('[PreFlopView] Viewport scrollY:', window.scrollY, 'px');
-                                                    console.log('[PreFlopView] Viewport top (absolute):', viewportTop, 'px');
-                                                    console.log('[PreFlopView] Viewport bottom (absolute):', viewportBottom, 'px');
-                                                    console.log('[PreFlopView] === Scroll Needed? ===');
-                                                    console.log('[PreFlopView] Card extends above viewport:', cardRect.top < 0);
-                                                    console.log('[PreFlopView] Card extends below viewport:', cardRect.bottom > viewportHeight);
-                                                    console.log('[PreFlopView] Needs scroll:', cardRect.top < 0 || cardRect.bottom > viewportHeight);
-
-                                                    // Try scrollIntoView with different options
-                                                    console.log('[PreFlopView] Attempting scrollIntoView with block: "nearest"');
-                                                    (floatingCard as HTMLElement).scrollIntoView({
-                                                      behavior: 'smooth',
-                                                      block: 'nearest',
-                                                      inline: 'nearest'
-                                                    });
-
-                                                    // Check after scroll attempt
-                                                    setTimeout(() => {
-                                                      const newCardRect = floatingCard.getBoundingClientRect();
-                                                      console.log('[PreFlopView] === After Scroll Attempt ===');
-                                                      console.log('[PreFlopView] New scrollY:', window.scrollY, 'px');
-                                                      console.log('[PreFlopView] New card top:', newCardRect.top, 'px');
-                                                      console.log('[PreFlopView] New card bottom:', newCardRect.bottom, 'px');
-                                                      console.log('[PreFlopView] Still needs scroll:', newCardRect.top < 0 || newCardRect.bottom > viewportHeight);
-
-                                                      // If still not visible, try alternative scroll method
-                                                      if (newCardRect.top < 0 || newCardRect.bottom > viewportHeight) {
-                                                        console.log('[PreFlopView] scrollIntoView did not work, trying manual scroll');
-                                                        const cardAbsoluteTop = newCardRect.top + window.scrollY;
-                                                        const targetScrollY = cardAbsoluteTop - 20; // 20px padding from top
-                                                        console.log('[PreFlopView] Scrolling to:', targetScrollY, 'px');
-                                                        window.scrollTo({
-                                                          top: targetScrollY,
-                                                          behavior: 'smooth'
-                                                        });
-                                                      }
-                                                      console.log('[PreFlopView] ========================================');
-                                                    }, 500); // Wait for smooth scroll to complete
-                                                  } else {
-                                                    // Fallback: scroll the td element if card not found yet
-                                                    console.log('[PreFlopView] Floating card not found after 100ms, scrolling td element instead');
-                                                    tdElement.scrollIntoView({
-                                                      behavior: 'smooth',
-                                                      block: 'nearest',
-                                                      inline: 'nearest'
-                                                    });
-                                                    console.log('[PreFlopView] ========================================');
-                                                  }
-                                                }
-                                              }, 100); // Increased delay to ensure card is rendered
+                                              setPopupPositions(prev => ({
+                                                ...prev,
+                                                [historyKey]: shouldPositionAbove ? 'above' : 'below'
+                                              }));
                                             }
                                           }}
                                           className="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-[10px] font-semibold rounded shadow-md hover:shadow-lg transition-all duration-200"
@@ -1297,9 +1500,15 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                                   </div>
 
                                   {/* Floating Card - Stack History */}
-                                  {isExpanded && currentStack !== null && (
-                                    <div data-stack-history-card={historyKey} className="absolute z-50 mt-2 left-1/2 transform -translate-x-1/2" style={{ minWidth: '400px', maxWidth: '460px' }}>
-                                      <div className={`bg-gradient-to-br rounded-xl shadow-2xl border-2 overflow-hidden ${isAllIn ? 'from-red-50 to-orange-50 border-red-400' : 'from-white to-blue-50 border-blue-300'}`}>
+                                  {isExpanded && currentStack !== null && (() => {
+                                    const position = popupPositions[historyKey] || 'below';
+                                    const positionClasses = position === 'above'
+                                      ? 'absolute z-[100] bottom-full mb-2 left-1/2 transform -translate-x-1/2'
+                                      : 'absolute z-[100] mt-2 left-1/2 transform -translate-x-1/2';
+
+                                    return (
+                                      <div data-stack-history-card={historyKey} className={positionClasses} style={{ minWidth: '400px', maxWidth: '460px' }}>
+                                        <div className={`bg-gradient-to-br rounded-xl shadow-2xl border-2 overflow-hidden ${isAllIn ? 'from-red-50 to-orange-50 border-red-400' : 'from-white to-blue-50 border-blue-300'}`}>
                                         {/* Card Header */}
                                         <div className={`bg-gradient-to-r px-3 py-2 flex items-center justify-between ${isAllIn ? 'from-red-600 to-red-700' : 'from-blue-600 to-blue-700'}`}>
                                           <div className="flex items-center gap-2">
@@ -1338,8 +1547,20 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                                               const baseAction = (typeof data.preflopAction === 'string' ? data.preflopAction : '') as string;
                                               const baseStackBefore = player.stack;
                                               const baseStackAfter = sectionStacks['preflop_base']?.updated?.[player.id] ?? baseStackBefore;
-                                              const contribution = baseStackBefore - baseStackAfter;
+                                              const totalContribution = baseStackBefore - baseStackAfter;
                                               const isActiveRound = actionLevel === 'base';
+
+                                              // Get posted amounts
+                                              const postedSB = data.postedSB || 0;
+                                              const postedBB = data.postedBB || 0;
+                                              const postedAnte = data.postedAnte || 0;
+                                              const totalPosted = postedSB + postedBB + postedAnte;
+
+                                              // Calculate betting contribution (excluding antes)
+                                              const bettingContribution = totalContribution - totalPosted;
+
+                                              // Determine if we should show breakdown
+                                              const showBreakdown = totalPosted > 0 && (baseAction === 'raise' || baseAction === 'call' || baseAction === 'all-in');
 
                                               return (
                                                 <div className={`rounded-lg p-2 mb-1 border shadow-sm ${isActiveRound ? 'bg-yellow-50 border-l-4 border-yellow-400' : 'bg-white border-gray-200'}`}>
@@ -1349,27 +1570,88 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                                                       {isActiveRound ? 'Active' : 'Complete'}
                                                     </span>
                                                   </div>
-                                                  <div className="flex items-center justify-between text-xs">
-                                                    <div className="flex items-center gap-1">
-                                                      <span className="text-gray-600">{formatStack(baseStackBefore)}</span>
-                                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                                      </svg>
-                                                      <span className="font-bold text-gray-800">{formatStack(baseStackAfter)}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                      {baseAction && baseAction !== 'no action' && baseAction !== 'check' ? (
-                                                        <>
-                                                          <span className="text-gray-500 text-[10px]">-{formatStack(contribution)}</span>
-                                                          <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${baseAction === 'all-in' ? 'bg-red-600 text-white' : baseAction === 'raise' ? 'bg-purple-100 text-purple-700' : baseAction === 'call' ? 'bg-blue-100 text-blue-700' : baseAction === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                                                            {baseAction}
-                                                          </span>
-                                                        </>
+
+                                                  {showBreakdown ? (
+                                                    // Show detailed breakdown for blinds/antes + action
+                                                    <div className="space-y-1">
+                                                      {/* Ante line (if applicable) */}
+                                                      {postedAnte > 0 && (
+                                                        <div className="flex items-center justify-between text-xs bg-orange-50 rounded px-2 py-1">
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-gray-600">{formatStack(baseStackBefore)}</span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                            </svg>
+                                                            <span className="font-bold text-gray-800">{formatStack(baseStackBefore - postedAnte)}</span>
+                                                          </div>
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-orange-600 text-[10px]">-{formatStack(postedAnte)}</span>
+                                                            <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-orange-100 text-orange-700">ante</span>
+                                                          </div>
+                                                        </div>
+                                                      )}
+
+                                                      {/* Blinds + Action line */}
+                                                      {baseAction === 'fold' ? (
+                                                        // If fold, just show blinds
+                                                        <div className="flex items-center justify-between text-xs bg-gray-50 rounded px-2 py-1">
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-gray-600">{formatStack(baseStackBefore - postedAnte)}</span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                            </svg>
+                                                            <span className="font-bold text-gray-800">{formatStack(baseStackAfter)}</span>
+                                                          </div>
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-gray-600 text-[10px]">-{formatStack(postedSB + postedBB)}</span>
+                                                            <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-gray-100 text-gray-700">
+                                                              {postedBB > 0 && postedSB > 0 ? 'sb+bb' : postedBB > 0 ? 'bb' : 'sb'}
+                                                            </span>
+                                                          </div>
+                                                        </div>
                                                       ) : (
-                                                        <span className="text-gray-400 text-[10px]">no action</span>
+                                                        // Show raise/call/all-in separately
+                                                        <div className="flex items-center justify-between text-xs bg-purple-50 rounded px-2 py-1">
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-gray-600">{formatStack(baseStackBefore - postedAnte)}</span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                            </svg>
+                                                            <span className="font-bold text-gray-800">{formatStack(baseStackAfter)}</span>
+                                                          </div>
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-purple-600 text-[10px]">-{formatStack(postedSB + postedBB + bettingContribution)}</span>
+                                                            <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${baseAction === 'all-in' ? 'bg-red-600 text-white' : baseAction === 'raise' ? 'bg-purple-100 text-purple-700' : baseAction === 'call' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                                                              {baseAction}
+                                                            </span>
+                                                          </div>
+                                                        </div>
                                                       )}
                                                     </div>
-                                                  </div>
+                                                  ) : (
+                                                    // Original single-line display for no blinds/antes or no action
+                                                    <div className="flex items-center justify-between text-xs">
+                                                      <div className="flex items-center gap-1">
+                                                        <span className="text-gray-600">{formatStack(baseStackBefore)}</span>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                        </svg>
+                                                        <span className="font-bold text-gray-800">{formatStack(baseStackAfter)}</span>
+                                                      </div>
+                                                      <div className="flex items-center gap-1">
+                                                        {baseAction && baseAction !== 'no action' && baseAction !== 'check' ? (
+                                                          <>
+                                                            <span className="text-gray-500 text-[10px]">-{formatStack(totalContribution)}</span>
+                                                            <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${baseAction === 'all-in' ? 'bg-red-600 text-white' : baseAction === 'raise' ? 'bg-purple-100 text-purple-700' : baseAction === 'call' ? 'bg-blue-100 text-blue-700' : baseAction === 'bet' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                              {baseAction}
+                                                            </span>
+                                                          </>
+                                                        ) : (
+                                                          <span className="text-gray-400 text-[10px]">no action</span>
+                                                        )}
+                                                      </div>
+                                                    </div>
+                                                  )}
                                                 </div>
                                               );
                                             })()}
@@ -1481,7 +1763,8 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                                         </div>
                                       </div>
                                     </div>
-                                  )}
+                                    );
+                                  })()}
                                 </>
                               );
                             })()}
@@ -1614,8 +1897,15 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                             <AmountInput
                               playerId={player.id}
                               selectedAmount={amount}
+                              selectedAction={action}
                               selectedUnit={unit as ChipUnit}
                               suffix={suffix}
+                              // FR-12: Pass validation props
+                              stage="preflop"
+                              actionLevel={actionLevel}
+                              players={players}
+                              playerData={playerData}
+                              sectionStacks={sectionStacks}
                               onAmountChange={(playerId, newAmount) => {
                                 actions.setPlayerData({
                                   ...playerData,
@@ -1711,7 +2001,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                 }
               }
             }}
-            disabled={visibleActionLevels.preflop && visibleActionLevels.preflop.length >= 3}
+            disabled={isAddMoreActionDisabled || (visibleActionLevels.preflop && visibleActionLevels.preflop.length >= 3)}
             className="px-6 py-3 bg-orange-500 text-white rounded-lg text-sm font-bold shadow-md hover:bg-orange-600 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span>+</span>
@@ -1723,7 +2013,8 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
             onClick={handleCreateFlop}
             data-create-flop-focus
             tabIndex={0}
-            className="px-6 py-3 bg-green-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-green-700 transition-colors flex items-center gap-2"
+            disabled={isCreateNextStreetDisabled}
+            className="px-6 py-3 bg-green-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span>→</span>
             Create Flop
