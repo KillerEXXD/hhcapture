@@ -50944,59 +50944,186 @@ Henry Dealer 3100
             // Remove surrounding quotes
             actualText = actualText.replace(/^["']|["']$/g, '');
 
-            // Parse both texts
+            // Parse both texts (Actual is source of truth)
             const expected = parseNextHandData(expectedText);
             const actual = parseNextHandData(actualText);
 
-            // Compare critical fields
-            const results = [];
-            let allPassed = true;
+            // Validation results
+            const validations = {
+                orderCorrect: true,
+                orderErrors: [],
+                stacksCorrect: true,
+                stackErrors: [],
+                handNumberCorrect: true,
+                handNumberError: '',
+                blindsAnteCorrect: true,
+                blindsAnteError: '',
+                debugLog: []
+            };
 
-            // Check Hand Number
-            if (expected.handNumber === actual.handNumber) {
-                results.push({ field: 'Hand Number', pass: true, expected: expected.handNumber, actual: actual.handNumber });
+            // Log for debugging
+            validations.debugLog.push('=== COMPARISON DEBUG LOG ===');
+            validations.debugLog.push(`Test Case: ${testCaseId}`);
+            validations.debugLog.push(`Timestamp: ${new Date().toISOString()}`);
+            validations.debugLog.push('');
+
+            // 1. Check Hand Number
+            validations.debugLog.push('--- Hand Number Check ---');
+            if (expected.handNumber !== actual.handNumber) {
+                validations.handNumberCorrect = false;
+                validations.handNumberError = `Expected Hand (${expected.handNumber}), got Hand (${actual.handNumber})`;
+                validations.debugLog.push(`❌ FAIL: ${validations.handNumberError}`);
             } else {
-                results.push({ field: 'Hand Number', pass: false, expected: expected.handNumber, actual: actual.handNumber });
-                allPassed = false;
+                validations.debugLog.push(`✓ PASS: Hand (${actual.handNumber})`);
             }
+            validations.debugLog.push('');
 
-            // Check Started At
-            if (expected.startedAt === actual.startedAt) {
-                results.push({ field: 'Started At', pass: true, expected: expected.startedAt, actual: actual.startedAt });
+            // 2. Check Blinds & Ante
+            validations.debugLog.push('--- Blinds & Ante Check ---');
+            if (expected.sb !== actual.sb || expected.bb !== actual.bb || expected.ante !== actual.ante) {
+                validations.blindsAnteCorrect = false;
+                validations.blindsAnteError = `Expected SB ${expected.sb} BB ${expected.bb} Ante ${expected.ante}, got SB ${actual.sb} BB ${actual.bb} Ante ${actual.ante}`;
+                validations.debugLog.push(`❌ FAIL: ${validations.blindsAnteError}`);
             } else {
-                results.push({ field: 'Started At', pass: false, expected: expected.startedAt, actual: actual.startedAt });
-                allPassed = false;
+                validations.debugLog.push(`✓ PASS: SB ${actual.sb} BB ${actual.bb} Ante ${actual.ante}`);
             }
+            validations.debugLog.push('');
 
-            // Check Player Stacks
-            for (const player of expected.players) {
-                const actualPlayer = actual.players.find(p => p.name === player.name && p.position === player.position);
-                if (actualPlayer) {
-                    if (player.stack === actualPlayer.stack) {
-                        results.push({ field: `${player.name} ${player.position}`, pass: true, expected: player.stack, actual: actualPlayer.stack });
-                    } else {
-                        results.push({ field: `${player.name} ${player.position}`, pass: false, expected: player.stack, actual: actualPlayer.stack });
-                        allPassed = false;
+            // 3. Check Player Order (sequence must match exactly)
+            validations.debugLog.push('--- Player Order Check ---');
+            validations.debugLog.push('Expected order:');
+            expected.players.forEach((p, i) => {
+                validations.debugLog.push(`  ${i + 1}. ${p.name} ${p.position}`);
+            });
+            validations.debugLog.push('Actual order:');
+            actual.players.forEach((p, i) => {
+                validations.debugLog.push(`  ${i + 1}. ${p.name} ${p.position}`);
+            });
+
+            if (expected.players.length !== actual.players.length) {
+                validations.orderCorrect = false;
+                validations.orderErrors.push(`Player count mismatch: Expected ${expected.players.length} players, got ${actual.players.length} players`);
+                validations.debugLog.push(`❌ FAIL: Player count mismatch`);
+            } else {
+                for (let i = 0; i < expected.players.length; i++) {
+                    const exp = expected.players[i];
+                    const act = actual.players[i];
+
+                    if (exp.name !== act.name || exp.position !== act.position) {
+                        validations.orderCorrect = false;
+                        validations.orderErrors.push(`Position ${i + 1}: Expected "${exp.name} ${exp.position}", got "${act.name} ${act.position}"`);
+                        validations.debugLog.push(`❌ FAIL at position ${i + 1}: Expected "${exp.name} ${exp.position}", got "${act.name} ${act.position}"`);
                     }
+                }
+
+                if (validations.orderCorrect) {
+                    validations.debugLog.push('✓ PASS: Player order matches exactly');
+                }
+            }
+            validations.debugLog.push('');
+
+            // 4. Check Player Stacks (amounts must match for each player)
+            validations.debugLog.push('--- Stack Validation Check ---');
+            for (let i = 0; i < actual.players.length; i++) {
+                const act = actual.players[i];
+                const exp = expected.players.find(p => p.name === act.name && p.position === act.position);
+
+                if (!exp) {
+                    validations.stacksCorrect = false;
+                    validations.stackErrors.push(`Player "${act.name} ${act.position}" not found in expected output`);
+                    validations.debugLog.push(`❌ FAIL: "${act.name} ${act.position}" not found in expected output`);
+                } else if (exp.stack !== act.stack) {
+                    validations.stacksCorrect = false;
+                    validations.stackErrors.push(`${act.name} ${act.position}: Expected ${exp.stack}, got ${act.stack}`);
+                    validations.debugLog.push(`❌ FAIL: ${act.name} ${act.position} - Expected ${exp.stack}, got ${act.stack}`);
                 } else {
-                    results.push({ field: `${player.name} ${player.position}`, pass: false, expected: player.stack, actual: 'NOT FOUND' });
-                    allPassed = false;
+                    validations.debugLog.push(`✓ PASS: ${act.name} ${act.position} - ${act.stack}`);
                 }
             }
 
-            // Display results
-            let html = `<div class="result-title">${allPassed ? '✅ PASSED' : '❌ FAILED'}</div>`;
-            for (const result of results) {
-                const className = result.pass ? 'check-item pass' : 'check-item fail';
-                html += `<div class="${className}">${result.field}: ${result.expected}`;
-                if (!result.pass) {
-                    html += `<div class="diff">Expected: ${result.expected}, Got: ${result.actual}</div>`;
-                }
+            if (validations.stacksCorrect) {
+                validations.debugLog.push('✓ PASS: All player stacks match');
+            }
+            validations.debugLog.push('');
+
+            // Overall pass/fail
+            const allPassed = validations.orderCorrect && validations.stacksCorrect &&
+                             validations.handNumberCorrect && validations.blindsAnteCorrect;
+
+            validations.debugLog.push('--- SUMMARY ---');
+            validations.debugLog.push(`Overall Result: ${allPassed ? 'PASSED ✓' : 'FAILED ✗'}`);
+            validations.debugLog.push(`Order Correct: ${validations.orderCorrect ? 'YES ✓' : 'NO ✗'}`);
+            validations.debugLog.push(`Stacks Correct: ${validations.stacksCorrect ? 'YES ✓' : 'NO ✗'}`);
+            validations.debugLog.push(`Hand Number Correct: ${validations.handNumberCorrect ? 'YES ✓' : 'NO ✗'}`);
+            validations.debugLog.push(`Blinds/Ante Correct: ${validations.blindsAnteCorrect ? 'YES ✓' : 'NO ✗'}`);
+            validations.debugLog.push('=== END DEBUG LOG ===');
+
+            // Display results with clear sections
+            let html = `<div class="result-title">${allPassed ? '✅ ALL CHECKS PASSED' : '❌ VALIDATION FAILED'}</div>`;
+
+            // Order Check
+            html += `<div class="check-item ${validations.orderCorrect ? 'pass' : 'fail'}">Order is correct`;
+            if (!validations.orderCorrect) {
+                html += '<div class="diff">';
+                validations.orderErrors.forEach(err => {
+                    html += `<div>${err}</div>`;
+                });
                 html += '</div>';
             }
+            html += '</div>';
+
+            // Stack Check
+            html += `<div class="check-item ${validations.stacksCorrect ? 'pass' : 'fail'}">Stacks are correct`;
+            if (!validations.stacksCorrect) {
+                html += '<div class="diff">';
+                validations.stackErrors.forEach(err => {
+                    html += `<div>${err}</div>`;
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+
+            // Hand Number Check
+            html += `<div class="check-item ${validations.handNumberCorrect ? 'pass' : 'fail'}">Hand number is correct`;
+            if (!validations.handNumberCorrect) {
+                html += `<div class="diff">${validations.handNumberError}</div>`;
+            }
+            html += '</div>';
+
+            // Blinds/Ante Check
+            html += `<div class="check-item ${validations.blindsAnteCorrect ? 'pass' : 'fail'}">Blinds and ante are correct`;
+            if (!validations.blindsAnteCorrect) {
+                html += `<div class="diff">${validations.blindsAnteError}</div>`;
+            }
+            html += '</div>';
+
+            // Copy Debug Logs Button
+            const debugLogText = validations.debugLog.join('\n');
+            html += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">`;
+            html += `<button onclick="copyDebugLog('${testCaseId}', \`${debugLogText.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)"
+                     style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;">
+                     📋 Copy Debug Logs
+                     </button>`;
+            html += `</div>`;
 
             resultDiv.innerHTML = html;
             resultDiv.className = `comparison-result ${allPassed ? 'passed' : 'failed'}`;
+        }
+
+        function copyDebugLog(testCaseId, logText) {
+            navigator.clipboard.writeText(logText).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✓ Copied!';
+                btn.style.background = '#28a745';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '#17a2b8';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy debug log:', err);
+                alert('Failed to copy debug log. Please check console.');
+            });
         }
 
         function parseNextHandData(text) {
@@ -51005,6 +51132,9 @@ Henry Dealer 3100
             const data = {
                 handNumber: '',
                 startedAt: '',
+                sb: '',
+                bb: '',
+                ante: '',
                 players: []
             };
 
@@ -51018,6 +51148,17 @@ Henry Dealer 3100
             const timeMatch = lines[1].match(/started_at:\s*(\S+)/);
             if (timeMatch) {
                 data.startedAt = timeMatch[1];
+            }
+
+            // Extract SB, BB, Ante (line format: "SB 50 BB 100 Ante 100")
+            for (const line of lines) {
+                const blindsMatch = line.match(/SB\s+(\d+)\s+BB\s+(\d+)\s+Ante\s+(\d+)/);
+                if (blindsMatch) {
+                    data.sb = blindsMatch[1];
+                    data.bb = blindsMatch[2];
+                    data.ante = blindsMatch[3];
+                    break;
+                }
             }
 
             // Extract Players (after "Stack Setup:")
