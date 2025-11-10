@@ -3,6 +3,227 @@
 ## Project Context
 This document defines the complete specification for generating poker hand history pot calculation test cases for a tournament poker hand collector application.
 
+## ⚠️ CRITICAL ERRORS TO AVOID (Updated from TC-1.1 to TC-13.1 Fixes)
+
+### 1. Next Hand Preview - Winners Must Show NEW Stack (NOT Final Stack)
+
+**CRITICAL ERROR:** Winners showing Final Stack instead of New Stack in Next Hand Preview
+
+**Rule:**
+```
+New Stack = Final Stack + Total Pots Won
+```
+
+**Example:**
+```
+Charlie (Dealer):
+- Starting Stack: 10,000
+- Final Stack: 9,900 (after contributing 100)
+- Wins Main Pot: 400
+- New Stack for Next Hand: 9,900 + 400 = 10,300 ✅
+
+WRONG: Charlie BB 9900 ❌
+RIGHT: Charlie BB 10300 ✅
+```
+
+**What to do:**
+- For each winner in Expected Results table, identify pots won
+- Calculate: New Stack = Final Stack + Sum of All Pots Won
+- Use NEW Stack in Next Hand Preview (3 locations: copy button, content div, compare button)
+
+---
+
+### 2. Next Hand Preview - ALL Players Must Appear (Including Eliminated)
+
+**CRITICAL ERROR:** Missing players from Next Hand Preview
+
+**Rule:** ALL players must appear in Next Hand Preview, including:
+- ✅ Winners (show New Stack = Final + Won)
+- ✅ Active players (show Final Stack)
+- ✅ Eliminated players (show 0, NOT omitted)
+
+**Example:**
+```
+After Hand 6:
+- Frank: Final 0, Won 22,450 → Next Hand: Frank HJ 22450 ✅
+- Charlie: Final 0, Won 0 → Next Hand: Charlie BB 0 ✅ (NOT omitted!)
+
+WRONG: Omit Frank and Charlie from Next Hand ❌
+RIGHT: Include both with correct stacks ✅
+```
+
+**What to do:**
+- Check Expected Results table for ALL players
+- Winners going all-in: Include with New Stack (Final + Won)
+- Eliminated players (Final = 0, Won = 0): Include with stack = 0
+- NEVER say "Tournament Complete" unless it's the final hand of a tournament
+
+---
+
+### 3. Stack Setup - Position Labels ONLY for Dealer, SB, BB
+
+**CRITICAL ERROR:** Showing position labels (UTG, UTG+1, MP, CO, HJ) for non-button players
+
+**Rule:**
+```
+✅ SHOW positions for: Dealer, SB, BB
+❌ DO NOT show positions for: UTG, UTG+1, UTG+2, MP, CO, HJ
+
+Stack Setup format:
+PlayerName Dealer Stack
+PlayerName SB Stack
+PlayerName BB Stack
+PlayerName Stack  ← NO POSITION LABEL
+PlayerName Stack  ← NO POSITION LABEL
+```
+
+**Example:**
+```
+WRONG:
+Henry Dealer 10000
+Alice SB 10000
+Bob BB 10000
+Charlie UTG 10000 ❌
+David UTG+1 10000 ❌
+Eve MP 10000 ❌
+
+RIGHT:
+Henry Dealer 10000
+Alice SB 10000
+Bob BB 10000
+Charlie 10000 ✅
+David 10000 ✅
+Eve 10000 ✅
+```
+
+**What to do:**
+- Stack Setup: Only show Dealer, SB, BB positions
+- Next Hand Preview: Only show Dealer, SB, BB positions
+- All other players: Just "PlayerName Stack" (no position)
+- This applies to BOTH current hand AND next hand preview
+
+---
+
+### 4. Action Flow - Correct "More" Section Assignments
+
+**CRITICAL ERROR:** Players appearing in wrong "More" sections
+
+**Rule:**
+```
+Preflop Base: Initial betting round (blinds, calls, raises)
+Preflop More 1: Actions after FIRST raise in Base
+Preflop More 2: Actions after SECOND raise (re-raise)
+Preflop More 3: Actions after THIRD raise (re-re-raise)
+```
+
+**Example:**
+```
+Preflop Base:
+- Charlie (UTG): Raise 300
+- Frank (CO): Raise 800 (re-raise)
+- Bob (BB): Call 800
+
+Preflop More 1:
+- Charlie (UTG): Raise 2000 (re-raise Frank's 800)
+- Frank (CO): Call 2000
+- Bob (BB): Call 2000 ✅
+
+WRONG: Bob in "Preflop More 2" ❌
+RIGHT: Bob in "Preflop More 1" ✅
+```
+
+**What to do:**
+- Track raise count to determine correct "More" section
+- Base = initial betting round
+- More 1 = after 1st raise
+- More 2 = after 2nd raise (re-raise)
+- Each new raise level creates a new "More" section
+
+---
+
+### 5. Stack Setup Position Order - Must Start with Dealer
+
+**CRITICAL ERROR:** Stack Setup starting with SB or BB instead of Dealer
+
+**Rule:**
+```
+Stack Setup Order (Clockwise from Dealer):
+Dealer → SB → BB → Player1 → Player2 → ...
+
+NEVER start with SB or BB
+ALWAYS start with Dealer
+```
+
+**Example:**
+```
+WRONG:
+Alice SB 10000 ❌ (starts with SB)
+Bob BB 10000
+Charlie 10000
+Henry Dealer 10000
+
+RIGHT:
+Henry Dealer 10000 ✅ (starts with Dealer)
+Alice SB 10000
+Bob BB 10000
+Charlie 10000
+```
+
+**Exception:** Heads-up (2 players) has NO Dealer line, only SB and BB
+
+**What to do:**
+- Always list Dealer first in Stack Setup
+- Then SB, then BB, then remaining players clockwise
+- Verify stack setup order matches specification
+
+---
+
+### 6. Next Hand Preview - Button Rotation (Dealer Position)
+
+**CRITICAL ERROR:** Button not rotating clockwise for next hand
+
+**Rule:**
+```
+Previous SB → New Dealer
+Previous BB → New SB
+Previous Dealer → New BB (or next active player clockwise if Dealer was eliminated)
+```
+
+**Example:**
+```
+Hand 2:
+Charlie Dealer 300
+Alice SB 10000
+Bob BB 10000
+
+Hand 3 (WRONG):
+Charlie Dealer 1000  ❌ Button didn't rotate!
+Alice SB 10000
+Bob BB 9300
+
+Hand 3 (CORRECT):
+Alice Dealer 10000  ✅ Previous SB becomes Dealer
+Bob SB 9300         ✅ Previous BB becomes SB
+Charlie BB 1000     ✅ Previous Dealer becomes BB
+```
+
+**What to do:**
+1. Identify current hand positions: Who is Dealer, SB, BB
+2. Apply rotation:
+   - Previous **SB** → New **Dealer**
+   - Previous **BB** → New **SB**
+   - Previous **Dealer** → New **BB**
+3. Update all 3 locations (copy button, content div, compare button)
+4. Skip eliminated players (button moves to next active player)
+
+**Heads-Up Special Case:**
+```
+Hand 1: Alice SB, Bob BB
+Hand 2: Bob SB, Alice BB  ✅ Players swap positions each hand
+```
+
+---
+
 ## Critical Calculation Rules
 
 ### 1. BB Ante Posting Order
@@ -299,12 +520,119 @@ Side Pot 1
 - **Total Contributed**: Live contribution + Ante (if BB)
 - **Max Win**: Maximum pot amount player can win based on contribution level
 
+### Next Hand Preview Section
+
+**CRITICAL:** This section shows the starting stacks for the next hand.
+
+**Format:**
+```
+Hand (X+1)
+started_at: HH:MM:SS ended_at: HH:MM:SS
+SB {value} BB {value} Ante {value}
+Stack Setup:
+PlayerName Dealer NewStack
+PlayerName SB NewStack
+PlayerName BB NewStack
+PlayerName NewStack
+...
+```
+
+**New Stack Calculation Rules:**
+
+1. **For Winners (players who won pots):**
+   ```
+   New Stack = Final Stack + Total Pots Won
+   ```
+   Example: Final 9,900 + Won 400 = New Stack 10,300
+
+2. **For Active Players (didn't win, didn't bust):**
+   ```
+   New Stack = Final Stack
+   ```
+   Example: Final 9,950 = New Stack 9,950
+
+3. **For Eliminated Players (busted, stack = 0):**
+   ```
+   New Stack = 0
+   ```
+   **CRITICAL:** Do NOT omit eliminated players! Show them with stack = 0
+
+**Button Rotation:**
+- Button moves clockwise to next active player each hand
+- Position labels updated accordingly
+- **CRITICAL:** Button rotation formula:
+  ```
+  Current Hand:      PlayerA Dealer, PlayerB SB, PlayerC BB
+  Next Hand:         PlayerB Dealer, PlayerC SB, PlayerA BB
+
+  Rule: Previous SB becomes new Dealer
+        Previous BB becomes new SB
+        Previous Dealer becomes new BB (or next in clockwise order)
+  ```
+
+**Button Rotation Examples:**
+
+**3-Player Example:**
+```
+Hand 2: Charlie Dealer, Alice SB, Bob BB
+Hand 3: Alice Dealer, Bob SB, Charlie BB  ✅ (Button rotated clockwise)
+
+WRONG: Charlie Dealer, Alice SB, Bob BB  ❌ (Button didn't rotate)
+```
+
+**Heads-Up (2 Players):**
+```
+Hand 1: Alice SB, Bob BB
+Hand 2: Bob SB, Alice BB  ✅ (Players swap positions)
+```
+
+**With Eliminated Players:**
+```
+Hand 5: Alice Dealer 9700, Bob SB 11100, Charlie BB 9200
+(Bob eliminated in Hand 5)
+Hand 6: Alice Dealer 9700, Charlie SB 9200  ❌ WRONG - Button didn't rotate
+
+CORRECT Hand 6: Charlie Dealer 9200, Alice SB 9700  ✅
+(Button skips eliminated Bob, rotates to next active player)
+```
+
+**3 Locations to Update:**
+1. Copy button `onclick` attribute
+2. `next-hand-content` div
+3. Compare button `onclick` attribute
+
+**Example:**
+```
+Current Hand Result:
+- Alice (SB): Final 9,900, Won 0 → Next Hand: Alice Dealer 9,900
+- Bob (BB): Final 9,800, Won 0 → Next Hand: Bob SB 9,800
+- Charlie (Dealer): Final 9,900, Won Main Pot 400 → Next Hand: Charlie BB 10,300
+
+Next Hand Preview:
+Hand (2)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice Dealer 9900
+Bob SB 9800
+Charlie BB 10300  ← Final 9,900 + Won 400 = 10,300
+```
+
 ## Validation Checklist
 
 For EACH test case, verify:
 
+### ⚠️ CRITICAL ERRORS (See Top Section for Details)
+- [ ] **Next Hand Preview**: Winners show NEW Stack (Final + Pots Won), NOT just Final Stack
+- [ ] **Next Hand Preview**: ALL players appear (including eliminated players with 0 stack)
+- [ ] **Next Hand Preview**: Button rotates clockwise (Previous SB → New Dealer)
+- [ ] **Stack Setup**: Position labels ONLY for Dealer, SB, BB (NO UTG, MP, CO, HJ, etc.)
+- [ ] **Action Flow**: Players in correct "More" sections based on raise count
+- [ ] **Stack Setup Order**: Must start with Dealer (not SB or BB)
+
 ### Position and Format
-- [ ] Stack Setup lists players in clockwise order: Dealer → SB → BB → UTG → etc.
+- [ ] Stack Setup lists players in clockwise order: Dealer → SB → BB → Player1 → Player2 → etc.
+- [ ] Stack Setup shows positions ONLY for Dealer, SB, BB (all others have no position label)
 - [ ] Heads-up hands only have SB and BB (no Dealer line)
 - [ ] Action order respects preflop (UTG first, BB last) and postflop (SB first, Dealer last)
 - [ ] Action flow follows Base → More 1 → More 2 pattern for raises
