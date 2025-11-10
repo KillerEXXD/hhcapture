@@ -16,7 +16,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "types": ["node", "vitest/globals"],
+    "types": ["node"],
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
@@ -29,6 +29,8 @@
     "playground",
     "**/__tests__/**",
     "**/*.test.ts",
-    "**/*.test.tsx"
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
   ]
 }

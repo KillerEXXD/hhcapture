@@ -86,21 +86,23 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
     // Create hash of current preflop playerData to detect changes
     const preflopDataHash = JSON.stringify(
-      players.map(p => {
-        const data = playerData[p.id] || {};
-        return {
-          id: p.id,
-          preflopAction: data.preflopAction,
-          preflopAmount: data.preflopAmount,
-          preflopUnit: data.preflopUnit,
-          preflop_moreActionAction: data.preflop_moreActionAction,
-          preflop_moreActionAmount: data.preflop_moreActionAmount,
-          preflop_moreActionUnit: data.preflop_moreActionUnit,
-          preflop_moreAction2Action: data.preflop_moreAction2Action,
-          preflop_moreAction2Amount: data.preflop_moreAction2Amount,
-          preflop_moreAction2Unit: data.preflop_moreAction2Unit,
-        };
-      })
+      players
+        .filter(p => p.name) // Only include players with names
+        .map(p => {
+          const data = playerData[p.id] || {};
+          return {
+            id: p.id,
+            preflopAction: data.preflopAction,
+            preflopAmount: data.preflopAmount,
+            preflopUnit: data.preflopUnit,
+            preflop_moreActionAction: data.preflop_moreActionAction,
+            preflop_moreActionAmount: data.preflop_moreActionAmount,
+            preflop_moreActionUnit: data.preflop_moreActionUnit,
+            preflop_moreAction2Action: data.preflop_moreAction2Action,
+            preflop_moreAction2Amount: data.preflop_moreAction2Amount,
+            preflop_moreAction2Unit: data.preflop_moreAction2Unit,
+          };
+        })
     );
 
     // If playerData changed, invalidate processed state
@@ -735,10 +737,25 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
     // FR-12 VALIDATION: Comprehensive raise/bet validation
     // Run full FR-12 validation for all players with bet/raise actions
+    // ONLY validate sections that haven't been processed yet
     console.log('🔍 [ProcessStack] Running FR-12 validation for all raise/bet amounts...');
+    console.log('📋 Current visible levels:', currentLevels);
+    console.log('✅ Processed sections:', processedSections);
     const validationErrors: string[] = [];
 
     currentLevels.forEach((actionLevel) => {
+      const sectionKey = `preflop_${actionLevel}`;
+      console.log(`\n🔍 Checking section: ${sectionKey}`);
+      console.log(`   - Is processed? ${processedSections[sectionKey]}`);
+
+      // Skip validation for sections that are already processed
+      if (processedSections[sectionKey]) {
+        console.log(`⏭️  Skipping validation for ${sectionKey} (already processed)`);
+        return;
+      }
+
+      console.log(`✔️  Validating ${sectionKey}...`);
+
       const suffix = actionLevel === 'base' ? '' : actionLevel === 'more' ? '_moreAction' : '_moreAction2';
 
       players.forEach((player) => {
@@ -763,7 +780,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
             return; // Skip FR-12 validation if basic validation fails
           }
 
-          // Run FR-12 validation
+          // Run FR-12 validation (order-aware: only consider raises from players who acted before this player)
           const validationResult = validateRaiseAmount(
             player.id,
             raiseToAmount,
@@ -772,7 +789,8 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
             players,
             playerData,
             sectionStacks,
-            unit || defaultUnit
+            unit || defaultUnit,
+            player.id // Only consider raises from players with ID <= this player's ID
           );
 
           if (!validationResult.isValid) {
@@ -908,21 +926,23 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
       // Set processed state flag and save hash
       const preflopDataHash = JSON.stringify(
-        players.map(p => {
-          const data = latestPlayerData[p.id] || {};
-          return {
-            id: p.id,
-            preflopAction: data.preflopAction,
-            preflopAmount: data.preflopAmount,
-            preflopUnit: data.preflopUnit,
-            preflop_moreActionAction: data.preflop_moreActionAction,
-            preflop_moreActionAmount: data.preflop_moreActionAmount,
-            preflop_moreActionUnit: data.preflop_moreActionUnit,
-            preflop_moreAction2Action: data.preflop_moreAction2Action,
-            preflop_moreAction2Amount: data.preflop_moreAction2Amount,
-            preflop_moreAction2Unit: data.preflop_moreAction2Unit,
-          };
-        })
+        players
+          .filter(p => p.name) // Only include players with names
+          .map(p => {
+            const data = latestPlayerData[p.id] || {};
+            return {
+              id: p.id,
+              preflopAction: data.preflopAction,
+              preflopAmount: data.preflopAmount,
+              preflopUnit: data.preflopUnit,
+              preflop_moreActionAction: data.preflop_moreActionAction,
+              preflop_moreActionAmount: data.preflop_moreActionAmount,
+              preflop_moreActionUnit: data.preflop_moreActionUnit,
+              preflop_moreAction2Action: data.preflop_moreAction2Action,
+              preflop_moreAction2Amount: data.preflop_moreAction2Amount,
+              preflop_moreAction2Unit: data.preflop_moreAction2Unit,
+            };
+          })
       );
       setHasProcessedCurrentState(true);
       setLastProcessedPlayerDataHash(preflopDataHash);
@@ -1269,8 +1289,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                 if (actionLevel === 'base') return true;
 
                 // For more action levels, only show players who haven't folded in previous levels
-                const data = playerData[p.id];
-                if (!data) return true;
+                const data = playerData[p.id] || {};
 
                 if (actionLevel === 'more') {
                   // For more action 1, exclude players who folded in base
@@ -1591,42 +1610,22 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                                                         </div>
                                                       )}
 
-                                                      {/* Blinds + Action line */}
-                                                      {baseAction === 'fold' ? (
-                                                        // If fold, just show blinds
-                                                        <div className="flex items-center justify-between text-xs bg-gray-50 rounded px-2 py-1">
-                                                          <div className="flex items-center gap-1">
-                                                            <span className="text-gray-600">{formatStack(baseStackBefore - postedAnte)}</span>
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                                            </svg>
-                                                            <span className="font-bold text-gray-800">{formatStack(baseStackAfter)}</span>
-                                                          </div>
-                                                          <div className="flex items-center gap-1">
-                                                            <span className="text-gray-600 text-[10px]">-{formatStack(postedSB + postedBB)}</span>
-                                                            <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-gray-100 text-gray-700">
-                                                              {postedBB > 0 && postedSB > 0 ? 'sb+bb' : postedBB > 0 ? 'bb' : 'sb'}
-                                                            </span>
-                                                          </div>
+                                                      {/* Blinds + Action line - show raise/call/all-in */}
+                                                      <div className="flex items-center justify-between text-xs bg-purple-50 rounded px-2 py-1">
+                                                        <div className="flex items-center gap-1">
+                                                          <span className="text-gray-600">{formatStack(baseStackBefore - postedAnte)}</span>
+                                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                          </svg>
+                                                          <span className="font-bold text-gray-800">{formatStack(baseStackAfter)}</span>
                                                         </div>
-                                                      ) : (
-                                                        // Show raise/call/all-in separately
-                                                        <div className="flex items-center justify-between text-xs bg-purple-50 rounded px-2 py-1">
-                                                          <div className="flex items-center gap-1">
-                                                            <span className="text-gray-600">{formatStack(baseStackBefore - postedAnte)}</span>
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                                            </svg>
-                                                            <span className="font-bold text-gray-800">{formatStack(baseStackAfter)}</span>
-                                                          </div>
-                                                          <div className="flex items-center gap-1">
-                                                            <span className="text-purple-600 text-[10px]">-{formatStack(postedSB + postedBB + bettingContribution)}</span>
-                                                            <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${baseAction === 'all-in' ? 'bg-red-600 text-white' : baseAction === 'raise' ? 'bg-purple-100 text-purple-700' : baseAction === 'call' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
-                                                              {baseAction}
-                                                            </span>
-                                                          </div>
+                                                        <div className="flex items-center gap-1">
+                                                          <span className="text-purple-600 text-[10px]">-{formatStack(postedSB + postedBB + bettingContribution)}</span>
+                                                          <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${baseAction === 'all-in' ? 'bg-red-600 text-white' : baseAction === 'raise' ? 'bg-purple-100 text-purple-700' : baseAction === 'call' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                                                            {baseAction}
+                                                          </span>
                                                         </div>
-                                                      )}
+                                                      </div>
                                                     </div>
                                                   ) : (
                                                     // Original single-line display for no blinds/antes or no action
