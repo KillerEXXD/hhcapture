@@ -943,6 +943,40 @@ export const TurnView: React.FC<TurnViewProps> = ({
   return (
     <div className="p-2 max-w-full mx-auto bg-gray-50 min-h-screen">
       <div className="bg-white rounded-lg shadow-lg p-3">
+        {/* TAB NAVIGATION */}
+        <div className="flex gap-2 mb-3 border-b border-gray-200 pb-2">
+          <button
+            onClick={() => setCurrentView('stack')}
+            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+          >
+            Stack
+          </button>
+          <button
+            onClick={() => setCurrentView('preflop')}
+            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+          >
+            Pre-flop
+          </button>
+          <button
+            onClick={() => setCurrentView('flop')}
+            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+          >
+            Flop
+          </button>
+          <button
+            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-blue-600 text-white"
+            disabled
+          >
+            Turn
+          </button>
+          <button
+            onClick={() => setCurrentView('river')}
+            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+          >
+            River
+          </button>
+        </div>
+
         {/* HEADER */}
         <div className="flex justify-between items-center mb-3">
           <h1 className="text-lg font-bold text-gray-800">{getViewTitle()}</h1>
