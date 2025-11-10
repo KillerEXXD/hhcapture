@@ -1,0 +1,3210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pot Calculation Test Cases</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .test-case {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+            cursor: pointer;
+            user-select: none;
+        }
+        .test-header:hover {
+            background: #f8f9fa;
+            margin: -10px -20px 20px -20px;
+            padding: 10px 20px 20px 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .test-content {
+            display: none;
+        }
+        .test-content.expanded {
+            display: block;
+        }
+        .collapse-icon {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+            margin-left: 10px;
+            color: #007bff;
+        }
+        .collapse-icon.expanded {
+            transform: rotate(180deg);
+        }
+        .test-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .test-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        .badges {
+            display: flex;
+            gap: 10px;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.low { background: #d4edda; color: #155724; }
+        .badge.medium { background: #fff3cd; color: #856404; }
+        .badge.high { background: #f8d7da; color: #721c24; }
+        .badge.category { background: #d1ecf1; color: #0c5460; }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Stack Setup */
+        .blind-setup {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .blind-item label {
+            display: block;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .blind-item .value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Player Data - Copy/Paste Format */
+        .player-data-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+        .player-data-box pre {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .copy-instruction {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Actions */
+        .actions-section {
+            margin: 15px 0;
+        }
+        .street-block {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .street-name {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .action-row {
+            padding: 4px 0;
+            font-size: 13px;
+        }
+        .action-player {
+            font-weight: 600;
+            color: #333;
+        }
+        .action-type {
+            color: #666;
+            margin: 0 5px;
+        }
+        .action-amount {
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        /* Results */
+        .results-section {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .pot-summary {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+        .pot-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+            margin-bottom: 10px;
+        }
+        .pot-item.main { border-left-color: #ffc107; }
+        .pot-item.side { border-left-color: #17a2b8; }
+        .pot-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        .pot-amount {
+            font-size: 15px;
+            font-weight: 700;
+            color: #28a745;
+        }
+        .eligible {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .eligible span {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #d1ecf1;
+            border-radius: 3px;
+            margin-right: 5px;
+            margin-bottom: 3px;
+        }
+        .excluded span {
+            background: #f8d7da;
+            color: #721c24;
+            text-decoration: line-through;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        th {
+            background: #f8f9fa;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #dee2e6;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* Notes */
+        .notes {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        .notes-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        .notes-text {
+            font-size: 13px;
+            color: #856404;
+            line-height: 1.5;
+        }
+
+        .ante-info-box {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            border-left: 4px solid #ffc107;
+            font-size: 13px;
+        }
+
+        .copy-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+        .copy-btn:active {
+            background: #004085;
+        }
+        .copy-btn.copied {
+            background: #28a745;
+        }
+
+        .paste-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .paste-btn:hover {
+            background: #5a6268;
+        }
+        .paste-btn:active {
+            background: #495057;
+        }
+        .paste-btn.pasted {
+            background: #17a2b8;
+        }
+
+        /* Winner Badge & Breakdown */
+        .winner-badge {
+            cursor: pointer;
+            padding: 4px 8px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 4px;
+            font-weight: bold;
+            color: #856404;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+        }
+        .winner-badge:hover {
+            background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+            transform: scale(1.05);
+        }
+        .winner-badge.loser {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: default;
+        }
+        .expand-icon {
+            font-size: 10px;
+            transition: transform 0.3s ease;
+        }
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+        .breakdown-details {
+            margin-top: 8px;
+            padding: 10px;
+            background: #fffbf0;
+            border-left: 3px solid #ffd700;
+            font-size: 12px;
+            border-radius: 4px;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+        .breakdown-line {
+            padding: 3px 0;
+            color: #666;
+        }
+        .breakdown-line.total {
+            font-weight: bold;
+            color: #28a745;
+            padding-top: 6px;
+            border-top: 1px solid #dee2e6;
+            margin-top: 3px;
+        }
+
+        /* Next Hand Preview */
+        .next-hand-preview {
+            background: #f8f9fa;
+            border: 2px dashed #6c757d;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .next-hand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .next-hand-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .next-hand-content {
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .rotation-note {
+            font-size: 11px;
+            color: #6c757d;
+            font-style: italic;
+            margin-left: 10px;
+        }
+        .elimination-warning {
+            background: #fff3cd;
+            padding: 8px;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #856404;
+        }
+
+        /* Comparison Section */
+        .comparison-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+        }
+        .comparison-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        .comparison-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+        .comparison-textarea:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+        .compare-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .compare-btn:hover {
+            background: #138496;
+        }
+        .compare-btn:active {
+            background: #117a8b;
+        }
+        .comparison-result {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .comparison-result.passed {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .comparison-result.failed {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .comparison-result .result-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        .comparison-result .check-item {
+            padding: 3px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .comparison-result .check-item.pass::before {
+            content: '✓';
+            color: #28a745;
+            font-weight: bold;
+        }
+        .comparison-result .check-item.fail::before {
+            content: '✗';
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .comparison-result .diff {
+            font-size: 12px;
+            color: #6c757d;
+            margin-left: 20px;
+        }
+
+        @media print {
+            .test-case { page-break-inside: avoid; }
+            .copy-btn { display: none; }
+            .next-hand-preview { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pot Calculation Test Cases</h1>
+        <p class="subtitle">Test scenarios for tournament pot calculation validation • Antes = BB</p>
+
+        <!-- TEST CASE 1 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-1.1</div>
+                    <div class="test-name">Simple Preflop - Everyone Calls</div>
+                </div>
+                <div class="badges">
+                    <span class="badge low">Low</span>
+                    <span class="badge category">Basic</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item">
+                    <label>Small Blind</label>
+                    <div class="value">50</div>
+                </div>
+                <div class="blind-item">
+                    <label>Big Blind</label>
+                    <div class="value">100</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante</label>
+                    <div class="value">100</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante Order</label>
+                    <div class="value">BB First</div>
+                </div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (1)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Charlie Dealer 10000
+Alice SB 10000
+Bob BB 10000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (1)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Charlie Dealer 10000
+Alice SB 10000
+Bob BB 10000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">100</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">100</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 400</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        BB posts 100 ante (not part of BB's live contribution)
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">400 (100%)</div>
+                    <div class="eligible">
+                        Eligible: <span>Alice</span><span>Bob</span><span>Charlie</span>
+                    </div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Live Contributions: 100 + 100 + 100 = 300<br>
+                        BB Ante: 100<br>
+                        Total: 400
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Live Contribution</th><th>Total Lost</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>10,000</td><td>9,900</td><td>100</td><td>100</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>9,900</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>10,000</td><td>9,800</td><td>100</td><td>200 (100 blind + 100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>9,800</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (Dealer)</td><td>10,000</td><td>9,900</td><td>100</td><td>100</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 9,900</div>
+                                    <div class="breakdown-line">+ Main Pot: 400</div>
+                                    <div class="breakdown-line total">= New Stack: 10,300</div>
+                                </div>
+                            </td>
+                            <td>10,300</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (2)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 9900\nBob SB 9800\nCharlie BB 9900`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (2)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice Dealer 9900
+Bob SB 9800
+Charlie BB 9900
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-1" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-1')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-1', `Hand (2)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 9900\nBob SB 9800\nCharlie BB 9900`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-1" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">Notes</div>
+                <div class="notes-text">All players call to 100. BB posts 100 ante + 100 blind. Players match BB blind (100), not 200. Simple pot with ante from BB.</div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 2 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-2.2</div>
+                    <div class="test-name">One All-In Creates Side Pot</div>
+                </div>
+                <div class="badges">
+                    <span class="badge medium">Medium</span>
+                    <span class="badge category">Single All-In</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (2)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Charlie Dealer 300
+Alice SB 10000
+Bob BB 10000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (2)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Charlie Dealer 300
+Alice SB 10000
+Bob BB 10000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (Dealer):</span> <span class="action-type">All-in</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">600</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">600</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 1,600</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">1,000 (62.5%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span><span>Bob</span><span>Charlie</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 3 players × 300 = 900 + 100 dead = 1,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">600 (37.5%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span><span>Bob</span></div>
+                    <div class="eligible excluded">Excluded: <span>Charlie (all-in at 300)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 2 players × 300 = 600
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Contributed</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>10,000</td><td>9,400</td><td>600</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Side Pot 1 <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 9,400</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 600</div>
+                                    <div class="breakdown-line total">= New Stack: 10,000</div>
+                                </div>
+                            </td>
+                            <td>10,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>10,000</td><td>9,300</td><td>700 (600 + 100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>9,300</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (Dealer)</td><td>300</td><td>0</td><td>300</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Main Pot: 1,000</div>
+                                    <div class="breakdown-line total">= New Stack: 1,000</div>
+                                </div>
+                            </td>
+                            <td>1,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (3)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice SB 9400\nBob BB 9300`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (3)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice SB 9400
+Bob BB 9300
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-2" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-2')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-2', `Hand (3)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice SB 9400\nBob BB 9300`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-2" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">Notes</div>
+                <div class="notes-text">Charlie all-in 300. Alice raises 600. Bob calls 600. Main pot capped at Charlie's 300 (all 3 eligible). Side pot for additional 300 from Alice and Bob only.</div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 3 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-3.1</div>
+                    <div class="test-name">Two All-Ins at Different Amounts</div>
+                </div>
+                <div class="badges">
+                    <span class="badge high">High</span>
+                    <span class="badge category">Multiple All-Ins</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (3)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+David Dealer 10000
+Alice SB 10000
+Bob BB 2000
+Charlie UTG 500`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (3)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+David Dealer 10000
+Alice SB 10000
+Bob BB 2000
+Charlie UTG 500</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">All-in</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">David (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">1000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">1000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">All-in</span> <span class="action-amount">1900</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">David (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">1900</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">1900</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 6,300</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        Bob posts ante (100) first → stack becomes 1,900<br>
+                        Bob posts blind (100) → stack becomes 1,800<br>
+                        Bob goes all-in → can contribute 100 (blind) + 1,800 = 1,900 live
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">2,100 (33.3%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span><span>Bob</span><span>Charlie</span><span>David</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 4 players × 500 = 2,000 + 100 dead = 2,100
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">4,200 (66.7%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span><span>Bob</span><span>David</span></div>
+                    <div class="eligible excluded">Excluded: <span>Charlie (all-in at 500)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 3 players × (1,900 - 500) = 3 × 1,400 = 4,200
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Contributed</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>10,000</td><td>8,000</td><td>2,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>8,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>2,000</td><td>0</td><td>2,000 (1900 live + 100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (UTG)</td><td>500</td><td>0</td><td>500</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>David (Dealer)</td><td>10,000</td><td>8,000</td><td>2,000</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot + Side Pot 1 <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 8,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 2,100</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 4,200</div>
+                                    <div class="breakdown-line total">= New Stack: 14,300</div>
+                                </div>
+                            </td>
+                            <td>14,300</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (4)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice SB 8000\nDavid BB 8000`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (4)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice SB 8000
+David BB 8000
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-3" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-3')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-3', `Hand (4)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice SB 8000\nDavid BB 8000`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-3" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">Notes</div>
+                <div class="notes-text">Two all-ins: Charlie at 500, Bob at 1,900 (after posting ante and blind). Main pot capped at 500 (4 players). Side pot for additional 1,400 from Alice, Bob, David (3 players). Charlie can only win main pot (2,100 max). Bob can win up to 6,300.</div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 4 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-5.1</div>
+                    <div class="test-name">Preflop to Flop - Pot Carries Forward</div>
+                </div>
+                <div class="badges">
+                    <span class="badge medium">Medium</span>
+                    <span class="badge category">Multi-Street</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (4)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Charlie Dealer 10000
+Alice SB 10000
+Bob BB 10000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (4)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Charlie Dealer 10000
+Alice SB 10000
+Bob BB 10000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">300</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Bet</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Fold</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div style="background: #d1ecf1; padding: 10px; border-radius: 4px; margin-bottom: 12px; font-size: 13px;">
+                    <strong>After Preflop:</strong> Pot = 1,000 (3 × 300 + 100 ante)
+                </div>
+                <div class="pot-summary">Final Total Pot: 2,000</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        Alice's 300 preflop contribution remains in pot (folded on flop)
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">2,000 (100%)</div>
+                    <div class="eligible">Eligible: <span>Bob</span><span>Charlie</span></div>
+                    <div class="eligible excluded">Excluded: <span>Alice (folded on flop)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Pot Accumulation:<br>
+                        • Preflop pot: 1,000<br>
+                        • Flop contributions: 1,000 (Bob 500 + Charlie 500)<br>
+                        • Total: 2,000
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Total Contributed</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>10,000</td><td>9,700</td><td>300 (preflop only)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>9,700</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>10,000</td><td>9,100</td><td>900 (300 PF + 500 Flop + 100 ante)</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 9,100</div>
+                                    <div class="breakdown-line">+ Main Pot: 2,000</div>
+                                    <div class="breakdown-line total">= New Stack: 11,100</div>
+                                </div>
+                            </td>
+                            <td>11,100</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (Dealer)</td><td>10,000</td><td>9,200</td><td>800 (300 PF + 500 Flop)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>9,200</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (5)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 9700\nBob SB 9100\nCharlie BB 9200`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (5)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice Dealer 9700
+Bob SB 9100
+Charlie BB 9200
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-4" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-4')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-4', `Hand (5)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 9700\nBob SB 9100\nCharlie BB 9200`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-4" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">⚠️ Multi-Street Pot Accumulation</div>
+                <div class="notes-text">
+                    Preflop pot = 1,000. On flop, action order is SB → BB → Dealer. Alice checks, Bob bets 500, Charlie calls 500, Alice folds.
+                    Alice's 300 preflop contribution stays in pot as dead money. Only Bob and Charlie can win the full 2,000 pot.
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 5 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-5.2</div>
+                    <div class="test-name">Preflop All-In Continues to River</div>
+                </div>
+                <div class="badges">
+                    <span class="badge high">High</span>
+                    <span class="badge category">Multi-Street All-In</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (5)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Charlie Dealer 10000
+Alice SB 10000
+Bob BB 5000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (5)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Charlie Dealer 10000
+Alice SB 10000
+Bob BB 5000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">All-in</span> <span class="action-amount">4900</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">Charlie (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">4900</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">4900</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (7♠ 8♠ 9♠)</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">2000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">2000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base (4♣)</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">3000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">3000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">River Base (2♦)</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (Dealer):</span> <span class="action-type">Check</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Final Total Pot: 25,000</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        Bob posts ante (100) first → stack becomes 4,900<br>
+                        Bob posts blind (100) → stack becomes 4,800<br>
+                        Bob goes all-in → can contribute 100 (blind) + 4,800 = 4,900 live
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">14,800 (59.2%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span><span>Bob</span><span>Charlie</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 3 players × 4,900 = 14,700 + 100 dead = 14,800
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">10,200 (40.8%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span><span>Charlie</span></div>
+                    <div class="eligible excluded">Excluded: <span>Bob (all-in preflop at 4900)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Accumulated across streets:<br>
+                        • Preflop excess: 2 × 100 (from 4900 to 5000) = 200<br>
+                        • Flop: 2,000 × 2 = 4,000<br>
+                        • Turn: 3,000 × 2 = 6,000<br>
+                        • Total: 10,200
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Total Contributed</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>10,000</td><td>0</td><td>10,000 (5K PF + 2K F + 3K T)</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Main Pot: 14,800</div>
+                                    <div class="breakdown-line total">= New Stack: 14,800</div>
+                                </div>
+                            </td>
+                            <td>14,800</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>5,000</td><td>0</td><td>5,000 (4900 live + 100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (Dealer)</td><td>10,000</td><td>0</td><td>10,000 (5K PF + 2K F + 3K T)</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Side Pot 1 <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 10,200</div>
+                                    <div class="breakdown-line total">= New Stack: 10,200</div>
+                                </div>
+                            </td>
+                            <td>10,200</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">🏆 Tournament Complete</div>
+                </div>
+                <div class="next-hand-content" style="text-align: center; padding: 30px; font-size: 16px; color: #666;">
+                    All players have been eliminated. Tournament is over.
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">⚠️ All-In Player with Side Pot Growth</div>
+                <div class="notes-text">
+                    Bob all-in preflop for 4,900 live (after posting ante and blind). Main pot frozen at 14,800 (3 × 4,900 + 100 ante). Alice and Charlie continue betting through river.
+                    Side pot grows each street (200 from preflop excess + 10,000 from flop/turn). Bob can only win main pot (14,800 max). Alice/Charlie can win full pot (25,000).
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 6 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-6.1</div>
+                    <div class="test-name">8 Players - Multi-Round Betting All Streets</div>
+                </div>
+                <div class="badges">
+                    <span class="badge high">Very High</span>
+                    <span class="badge category">Full Table</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (6)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Henry Dealer 10000
+Alice SB 10000
+Bob BB 10000
+Charlie UTG 10000
+David UTG+1 10000
+Eve MP 10000
+Frank CO 10000
+Grace HJ 10000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (6)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Henry Dealer 10000
+Alice SB 10000
+Bob BB 10000
+Charlie UTG 10000
+David UTG+1 10000
+Eve MP 10000
+Frank CO 10000
+Grace HJ 10000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG+1):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Call</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Raise</span> <span class="action-amount">800</span></div>
+                    <div class="action-row"><span class="action-player">Grace (HJ):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Henry (Dealer):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">800</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">2000</span></div>
+                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">2000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 2</div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">2000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Bet</span> <span class="action-amount">3000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">All-in</span> <span class="action-amount">8000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop More 1</div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">All-in</span> <span class="action-amount">8000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base (J♥)</div>
+                    <div class="action-row"><span class="action-player">No action (both all-in)</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">River Base (2♠)</div>
+                    <div class="action-row"><span class="action-player">No action (both all-in)</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Final Total Pot: 22,450</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        Folded contributions: SB 50 + Eve 300 = 350
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">22,450 (100%)</div>
+                    <div class="eligible">Eligible: <span>Charlie</span><span>Frank</span></div>
+                    <div class="eligible excluded">Excluded: <span>All others (folded)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Breakdown:<br>
+                        • Preflop: 6,450 (Charlie 2000 + Bob 2000 + Frank 2000 + Eve 300 + SB 50 + BB ante 100)<br>
+                        • Flop: 16,000 (Charlie 8000 all-in + Frank 8000 all-in)<br>
+                        • Turn: 0 (both all-in)<br>
+                        • River: 0 (both all-in)<br>
+                        • Total: 22,450 (Alice 50 + Bob 2100 + Charlie 10000 + Eve 300 + Frank 10000)
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Total Contributed</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>10,000</td><td>9,950</td><td>50</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>9,950</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>10,000</td><td>7,900</td><td>2,100 (2000 + 100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>7,900</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (UTG)</td><td>10,000</td><td>0</td><td>10,000 (all-in)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>David (UTG+1)</td><td>10,000</td><td>10,000</td><td>0</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>10,000</td>
+                        </tr>
+                        <tr>
+                            <td>Eve (MP)</td><td>10,000</td><td>9,700</td><td>300</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>9,700</td>
+                        </tr>
+                        <tr>
+                            <td>Frank (CO)</td><td>10,000</td><td>0</td><td>10,000 (all-in)</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Main Pot: 22,450</div>
+                                    <div class="breakdown-line total">= New Stack: 22,450</div>
+                                </div>
+                            </td>
+                            <td>22,450</td>
+                        </tr>
+                        <tr>
+                            <td>Grace (HJ)</td><td>10,000</td><td>10,000</td><td>0</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>10,000</td>
+                        </tr>
+                        <tr>
+                            <td>Henry (Dealer)</td><td>10,000</td><td>10,000</td><td>0</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>10,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (7)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 9950\nBob SB 7900\nDavid BB 10000\nEve UTG 9700\nGrace MP 10000\nHenry CO 10000`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (7)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice Dealer 9950
+Bob SB 7900
+David BB 10000
+Eve UTG 9700
+Grace MP 10000
+Henry CO 10000
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-6" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-6')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-6', `Hand (7)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 9950\nBob SB 7900\nDavid BB 10000\nEve UTG 9700\nGrace MP 10000\nHenry CO 10000`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-6" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">⚠️ Full Table Multi-Round Betting</div>
+                <div class="notes-text">
+                    8 players. Preflop uses Base, More 1, More 2 sections with multiple raises. 5 players fold. Charlie and Frank battle through flop and turn with raises. All betting rounds used across all streets.
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 7 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-7.1</div>
+                    <div class="test-name">8 Players - Multiple All-Ins Creating 3 Side Pots</div>
+                </div>
+                <div class="badges">
+                    <span class="badge high">Very High</span>
+                    <span class="badge category">Full Table All-In</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (7)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice SB 10000
+Bob BB 10000
+Charlie UTG 500
+David UTG+1 2000
+Eve MP 5000
+Frank CO 10000
+Grace HJ 10000
+Henry Dealer 10000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (7)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice SB 10000
+Bob BB 10000
+Charlie UTG 500
+David UTG+1 2000
+Eve MP 5000
+Frank CO 10000
+Grace HJ 10000
+Henry Dealer 10000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">All-in</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG+1):</span> <span class="action-type">All-in</span> <span class="action-amount">2000</span></div>
+                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">All-in</span> <span class="action-amount">5000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">5000</span></div>
+                    <div class="action-row"><span class="action-player">Grace (HJ):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Henry (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">10000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Fold</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">10000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (9♣ 8♦ 7♠)</div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Henry (Dealer):</span> <span class="action-type">Check</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base (3♥)</div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Henry (Dealer):</span> <span class="action-type">Check</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">River Base (K♠)</div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Henry (Dealer):</span> <span class="action-type">Check</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Final Total Pot: 27,750</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        Folded contributions: SB 50 + BB 100 = 150
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">3,150 (11.4%)</div>
+                    <div class="eligible">Eligible: <span>Charlie</span><span>David</span><span>Eve</span><span>Frank</span><span>Henry</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 5 players × 500 = 2,500 + 150 folded + 100 ante = 2,750<br>
+                        Wait, let me recalculate: 5 × 500 = 2,500 + 400 (folded SB 50 + BB 100) + BB ante 100 = 3,100... Actually 5 × 500 + 250 (SB 50 + BB 100 + BB ante 100) = 2,750 + 250 = 3,000. Let me fix: 5 players × 500 + folded 150 + ante 100 = 3,150
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">6,000 (21.6%)</div>
+                    <div class="eligible">Eligible: <span>David</span><span>Eve</span><span>Frank</span><span>Henry</span></div>
+                    <div class="eligible excluded">Excluded: <span>Charlie (all-in at 500)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 4 players × 1,500 = 6,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 2</div>
+                    <div class="pot-amount">9,000 (32.4%)</div>
+                    <div class="eligible">Eligible: <span>Eve</span><span>Frank</span><span>Henry</span></div>
+                    <div class="eligible excluded">Excluded: <span>Charlie (500), David (2000)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 3 players × 3,000 = 9,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 3</div>
+                    <div class="pot-amount">10,000 (36.0%)</div>
+                    <div class="eligible">Eligible: <span>Frank</span><span>Henry</span></div>
+                    <div class="eligible excluded">Excluded: <span>Charlie (500), David (2000), Eve (5000)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 2 players × 5,000 = 10,000
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Contributed</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>10,000</td><td>9,950</td><td>50</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>9,950</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>10,000</td><td>9,800</td><td>200 (100 + 100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>9,800</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (UTG)</td><td>500</td><td>0</td><td>500</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>David (UTG+1)</td><td>2,000</td><td>0</td><td>2,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Eve (MP)</td><td>5,000</td><td>0</td><td>5,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Frank (CO)</td><td>10,000</td><td>0</td><td>10,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Grace (HJ)</td><td>10,000</td><td>10,000</td><td>0</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>10,000</td>
+                        </tr>
+                        <tr>
+                            <td>Henry (Dealer)</td><td>10,000</td><td>0</td><td>10,000</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 All Pots <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Main Pot: 3,150</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 6,000</div>
+                                    <div class="breakdown-line">+ Side Pot 2: 9,000</div>
+                                    <div class="breakdown-line">+ Side Pot 3: 10,000</div>
+                                    <div class="breakdown-line total">= New Stack: 28,150</div>
+                                </div>
+                            </td>
+                            <td>28,150</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (8)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 9950\nBob SB 9800\nGrace BB 10000`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (8)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice Dealer 9950
+Bob SB 9800
+Grace BB 10000
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-7" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-7')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-7', `Hand (8)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 9950\nBob SB 9800\nGrace BB 10000`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-7" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">⚠️ Multiple All-Ins Creating Complex Side Pot Structure</div>
+                <div class="notes-text">
+                    8 players, 4 all-ins at different levels (500, 2000, 5000). Henry raises to 10000, Frank calls. Creates main pot + 3 side pots. Each all-in player can only win up to their contribution level across all pots. Frank and Henry can win entire pot. No action after flop since multiple all-ins.
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 8 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-8.1</div>
+                    <div class="test-name">8 Players - Aggressive Multi-Street Betting with Flop Raise War</div>
+                </div>
+                <div class="badges">
+                    <span class="badge high">Very High</span>
+                    <span class="badge category">Active Betting</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (8)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Henry Dealer 15000
+Alice SB 15000
+Bob BB 15000
+Charlie UTG 15000
+David UTG+1 15000
+Eve MP 15000
+Frank CO 15000
+Grace HJ 15000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (8)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Henry Dealer 15000
+Alice SB 15000
+Bob BB 15000
+Charlie UTG 15000
+David UTG+1 15000
+Eve MP 15000
+Frank CO 15000
+Grace HJ 15000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG+1):</span> <span class="action-type">Call</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">Grace (HJ):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Henry (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">300</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Raise</span> <span class="action-amount">1000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">1000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG+1):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">1000</span></div>
+                    <div class="action-row"><span class="action-player">Henry (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">1000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Fold</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (K♠ Q♥ J♦)</div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Bet</span> <span class="action-amount">1500</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">4000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Raise</span> <span class="action-amount">10000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop More 1</div>
+                    <div class="action-row"><span class="action-player">Henry (Dealer):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">10000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base (A♣)</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Bet</span> <span class="action-amount">2000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Raise</span> <span class="action-amount">5000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn More 1</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">5000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">River Base (7♠)</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Bet</span> <span class="action-amount">3000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">3000</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Final Total Pot: 34,200</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        Folded contributions remain in pot: Alice 300 + David 300 + Henry 1000 + Bob 2500 = 4,100
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">34,200 (100%)</div>
+                    <div class="eligible">Eligible: <span>Charlie</span><span>Frank</span></div>
+                    <div class="eligible excluded">Excluded: <span>All others (folded)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Contributions Breakdown:<br>
+                        • Alice (SB): 300 (folded after preflop)<br>
+                        • Bob (BB): 1000 PF + 1500 Flop = 2,500 live + 100 ante = 2,600 total (folded on flop)<br>
+                        • Charlie (UTG): 1000 PF + 10000 Flop + 4000 Turn/River = 15,000 (all-in)<br>
+                        • David (UTG+1): 300 (folded after preflop)<br>
+                        • Eve (MP): 0 (folded preflop)<br>
+                        • Frank (CO): 1000 PF + 10000 Flop + 4000 Turn/River = 15,000 (all-in)<br>
+                        • Grace (HJ): 0 (folded preflop)<br>
+                        • Henry (Dealer): 1000 PF (folded after preflop)<br>
+                        • Total: 300 + 2600 + 15000 + 300 + 0 + 15000 + 0 + 1000 = 34,200
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Total Contributed</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>15,000</td><td>14,700</td><td>300</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>14,700</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>15,000</td><td>12,400</td><td>2,600 (2500 + 100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>12,400</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (UTG)</td><td>15,000</td><td>0</td><td>15,000 (all-in)</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Main Pot: 34,200</div>
+                                    <div class="breakdown-line total">= New Stack: 34,200</div>
+                                </div>
+                            </td>
+                            <td>34,200</td>
+                        </tr>
+                        <tr>
+                            <td>David (UTG+1)</td><td>15,000</td><td>14,700</td><td>300</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>14,700</td>
+                        </tr>
+                        <tr>
+                            <td>Eve (MP)</td><td>15,000</td><td>15,000</td><td>0</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>15,000</td>
+                        </tr>
+                        <tr>
+                            <td>Frank (CO)</td><td>15,000</td><td>0</td><td>15,000 (all-in)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Grace (HJ)</td><td>15,000</td><td>15,000</td><td>0</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>15,000</td>
+                        </tr>
+                        <tr>
+                            <td>Henry (Dealer)</td><td>15,000</td><td>14,000</td><td>1,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>14,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (9)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 14700\nBob SB 12400\nDavid BB 14700\nEve UTG 15000\nGrace MP 15000\nHenry CO 14000`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (9)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice Dealer 14700
+Bob SB 12400
+David BB 14700
+Eve UTG 15000
+Grace MP 15000
+Henry CO 14000
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-8" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-8')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-8', `Hand (9)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 14700\nBob SB 12400\nDavid BB 14700\nEve UTG 15000\nGrace MP 15000\nHenry CO 14000`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-8" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">⚠️ Aggressive Multi-Street Action</div>
+                <div class="notes-text">
+                    8 players start. Preflop has raise/calls then Bob 3-bets. 4 players call. Flop has aggressive raise war: Bob bets, Charlie raises, Frank re-raises. Charlie calls. Turn and River continue with betting and calling. Demonstrates heavy action across all streets with multiple More sections.
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 9 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-9.1</div>
+                    <div class="test-name">6 Players - Heavy Betting Every Street with Multiple Callers</div>
+                </div>
+                <div class="badges">
+                    <span class="badge high">High</span>
+                    <span class="badge category">Multi-Way Pot</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (9)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Frank Dealer 12000
+Alice SB 12000
+Bob BB 12000
+Charlie UTG 12000
+David MP 12000
+Eve CO 12000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (9)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Frank Dealer 12000
+Alice SB 12000
+Bob BB 12000
+Charlie UTG 12000
+David MP 12000
+Eve CO 12000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">250</span></div>
+                    <div class="action-row"><span class="action-player">David (MP):</span> <span class="action-type">Call</span> <span class="action-amount">250</span></div>
+                    <div class="action-row"><span class="action-player">Eve (CO):</span> <span class="action-type">Call</span> <span class="action-amount">250</span></div>
+                    <div class="action-row"><span class="action-player">Frank (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">250</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">250</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">250</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (10♠ 9♠ 8♣)</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">1500</span></div>
+                    <div class="action-row"><span class="action-player">David (MP):</span> <span class="action-type">Call</span> <span class="action-amount">1500</span></div>
+                    <div class="action-row"><span class="action-player">Eve (CO):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Frank (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">1500</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop More 1</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">1500</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">1500</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base (7♦)</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">2000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Raise</span> <span class="action-amount">5000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn More 1</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">5000</span></div>
+                    <div class="action-row"><span class="action-player">David (MP):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Frank (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">5000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">5000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">River Base (6♠)</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">3000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">3000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">3000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (Dealer):</span> <span class="action-type">All-in</span> <span class="action-amount">5250</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">River More 1</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">All-in</span> <span class="action-amount">5250</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">All-in</span> <span class="action-amount">5250</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Final Total Pot: 47,850</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        Folded: Eve 250 + David 1500
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">47,850 (100%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span><span>Charlie</span><span>Frank</span></div>
+                    <div class="eligible excluded">Excluded: <span>Bob (folded river), David, Eve</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Contributions:<br>
+                        • Alice: 12,000 (all-in) - 250 PF + 1500 Flop + 5000 Turn + 5250 River<br>
+                        • Bob: 250 PF + 1500 Flop + 5000 Turn + 3000 River = 9,750 + 100 ante = 9,850<br>
+                        • Charlie: 12,000 (all-in) - 250 PF + 1500 Flop + 5000 Turn + 5250 River<br>
+                        • David: 250 PF + 1500 Flop = 1,750<br>
+                        • Eve: 250 PF<br>
+                        • Frank: 12,000 (all-in) - 250 PF + 1500 Flop + 5000 Turn + 5250 River<br>
+                        • Total: 12000 + 9850 + 12000 + 1750 + 250 + 12000 = 47,850
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Total Contributed</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>12,000</td><td>0</td><td>12,000 (all-in)</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Main Pot: 47,850</div>
+                                    <div class="breakdown-line total">= New Stack: 47,850</div>
+                                </div>
+                            </td>
+                            <td>47,850</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>12,000</td><td>2,150</td><td>9,850 (9750 live + 100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>2,150</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (UTG)</td><td>12,000</td><td>0</td><td>12,000 (all-in)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>David (MP)</td><td>12,000</td><td>10,250</td><td>1,750</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>10,250</td>
+                        </tr>
+                        <tr>
+                            <td>Eve (CO)</td><td>12,000</td><td>11,750</td><td>250</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>11,750</td>
+                        </tr>
+                        <tr>
+                            <td>Frank (Dealer)</td><td>12,000</td><td>0</td><td>12,000 (all-in)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (10)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nBob Dealer 2150\nDavid SB 10250\nEve BB 11750`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (10)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Bob Dealer 2150
+David SB 10250
+Eve BB 11750
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-9" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-9')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-9', `Hand (10)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nBob Dealer 2150\nDavid SB 10250\nEve BB 11750`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-9" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">⚠️ Multi-Way Pot with Heavy Action</div>
+                <div class="notes-text">
+                    6 players see flop. Every street has betting and raising. Flop: 5 players active with raise. Turn: Bob raises, 3 callers. River: Alice bets, Frank raises, 2 call. Heavy action throughout with multiple players staying in. Demonstrates complex multi-way pot with aggressive betting.
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 10 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-10.1</div>
+                    <div class="test-name">7 Players - Turn and River Raise Wars</div>
+                </div>
+                <div class="badges">
+                    <span class="badge high">Very High</span>
+                    <span class="badge category">Late Street Action</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (10)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Grace Dealer 20000
+Alice SB 20000
+Bob BB 20000
+Charlie UTG 20000
+David UTG+1 20000
+Eve MP 20000
+Frank CO 20000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (10)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Grace Dealer 20000
+Alice SB 20000
+Bob BB 20000
+Charlie UTG 20000
+David UTG+1 20000
+Eve MP 20000
+Frank CO 20000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">100</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG+1):</span> <span class="action-type">Call</span> <span class="action-amount">100</span></div>
+                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Raise</span> <span class="action-amount">400</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">400</span></div>
+                    <div class="action-row"><span class="action-player">Grace (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">400</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">400</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">400</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG+1):</span> <span class="action-type">Fold</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (A♠ A♦ K♥)</div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Bet</span> <span class="action-amount">800</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">800</span></div>
+                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Call</span> <span class="action-amount">800</span></div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">800</span></div>
+                    <div class="action-row"><span class="action-player">Grace (Dealer):</span> <span class="action-type">Fold</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base (K♣)</div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Bet</span> <span class="action-amount">2000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">6000</span></div>
+                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">All-in</span> <span class="action-amount">18800</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn More 1</div>
+                    <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">All-in</span> <span class="action-amount">18800</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Final Total Pot: 45,050</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        Folded: SB 50 + David 100 + Grace 400 + Frank 2000 + Bob 2800
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">45,050 (100%)</div>
+                    <div class="eligible">Eligible: <span>Charlie</span><span>Eve</span></div>
+                    <div class="eligible excluded">Excluded: <span>All others (folded)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Contributions:<br>
+                        • Alice: 50 (SB blind only)<br>
+                        • Bob: 400 PF + 800 Flop + 2000 Turn = 3,200 + 100 ante = 3,300<br>
+                        • Charlie: 20,000 (all-in) - 400 PF + 800 Flop + 18800 Turn<br>
+                        • David: 100 PF<br>
+                        • Eve: 20,000 (all-in) - 400 PF + 800 Flop + 18800 Turn<br>
+                        • Frank: 400 PF + 800 Flop = 1,200<br>
+                        • Grace: 400 PF<br>
+                        • Total: 50 + 3300 + 20000 + 100 + 20000 + 1200 + 400 = 45,050 ✓
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Total Contributed</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>20,000</td><td>19,950</td><td>50</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>19,950</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>20,000</td><td>16,700</td><td>3,300 (3200 live + 100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>16,700</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (UTG)</td><td>20,000</td><td>0</td><td>20,000 (all-in)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>David (UTG+1)</td><td>20,000</td><td>19,900</td><td>100</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>19,900</td>
+                        </tr>
+                        <tr>
+                            <td>Eve (MP)</td><td>20,000</td><td>0</td><td>20,000 (all-in)</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Main Pot: 45,050</div>
+                                    <div class="breakdown-line total">= New Stack: 45,050</div>
+                                </div>
+                            </td>
+                            <td>45,050</td>
+                        </tr>
+                        <tr>
+                            <td>Frank (CO)</td><td>20,000</td><td>18,800</td><td>1,200</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>18,800</td>
+                        </tr>
+                        <tr>
+                            <td>Grace (Dealer)</td><td>20,000</td><td>19,600</td><td>400</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>19,600</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (11)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 19950\nBob SB 16700\nDavid BB 19900\nFrank UTG 18800\nGrace MP 19600`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (11)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice Dealer 19950
+Bob SB 16700
+David BB 19900
+Frank UTG 18800
+Grace MP 19600
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-10" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-10')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-10', `Hand (11)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nAlice Dealer 19950\nBob SB 16700\nDavid BB 19900\nFrank UTG 18800\nGrace MP 19600`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-10" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">⚠️ Turn All-In Showdown</div>
+                <div class="notes-text">
+                    7 players. Preflop: Eve raises, 5 call. Flop: Bob bets, 4 call. Turn explodes with raise war: Bob bets, Charlie raises, Eve goes all-in for 18,800. Frank and Bob fold. Charlie calls all-in matching Eve's 18,800. Both players commit their entire 20K stacks (400 PF + 800 Flop + 18800 Turn). Demonstrates heavy turn aggression with all-in showdown.
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 11 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-11.1</div>
+                    <div class="test-name">Heads-Up Preflop All-In</div>
+                </div>
+                <div class="badges">
+                    <span class="badge low">Simple</span>
+                    <span class="badge category">Heads-Up</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (11)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice SB 6000
+Bob BB 2500`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (11)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50 BB 100 Ante 100
+Stack Setup:
+Alice SB 6000
+Bob BB 2500</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">All-in</span> <span class="action-amount">2400</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">2400</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Final Total Pot: 4,900</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100</strong>
+                    <div style="margin-top: 5px;">
+                        Bob posts ante (100) first → stack becomes 2,400<br>
+                        Bob posts blind (100) → stack becomes 2,300<br>
+                        Bob goes all-in → can contribute 100 (blind) + 2,300 = 2,400 live<br>
+                        <strong>Alice matches Bob's 2,400 LIVE (not 2,500 total)</strong>
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">4,900 (100%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span><span>Bob</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 2 players × 2,400 (Bob's LIVE) + 100 ante = 4,900
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Live Contribution</th><th>Total Lost</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td>
+                            <td>6,000</td>
+                            <td>3,600</td>
+                            <td>2,400</td>
+                            <td>2,400</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 3,600</div>
+                                    <div class="breakdown-line">+ Main Pot: 4,900</div>
+                                    <div class="breakdown-line total">= New Stack: 8,500</div>
+                                </div>
+                            </td>
+                            <td>8,500</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td>
+                            <td>2,500</td>
+                            <td>0</td>
+                            <td>2,400 (all-in)</td>
+                            <td>2,500 (2400+100 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (12)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nBob SB 0\nAlice BB 8500`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (12)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50 BB 100 Ante 100
+Stack Setup:
+Bob SB 0
+Alice BB 8500
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-11" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-11')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-11', `Hand (12)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nBob SB 0\nAlice BB 8500`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-11" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">Notes</div>
+                <div class="notes-text">Heads-up all-in preflop. Alice raises, Bob shoves for 2,500 total (2,400 live after posting ante and blind). Alice matches Bob's 2,400 live. Main Pot = (2 × 2,400) + 100 ante = 4,900. Winner takes all 4,900 chips. Bob eliminated, tournament over.</div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 12 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-12.1</div>
+                    <div class="test-name">3-Player Side Pot with Different Winners</div>
+                </div>
+                <div class="badges">
+                    <span class="badge medium">Medium</span>
+                    <span class="badge category">Side Pot</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">250</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">500</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">500</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (12)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 250 BB 500 Ante 500
+Stack Setup:
+Michael Dealer 15000
+Sarah SB 30000
+David BB 8000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (12)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 250 BB 500 Ante 500
+Stack Setup:
+Michael Dealer 15000
+Sarah SB 30000
+David BB 8000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Michael (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">1500</span></div>
+                    <div class="action-row"><span class="action-player">Sarah (SB):</span> <span class="action-type">Call</span> <span class="action-amount">1500</span></div>
+                    <div class="action-row"><span class="action-player">David (BB):</span> <span class="action-type">All-in</span> <span class="action-amount">7500</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">Michael (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">7500</span></div>
+                    <div class="action-row"><span class="action-player">Sarah (SB):</span> <span class="action-type">Call</span> <span class="action-amount">7500</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (K♠ Q♦ J♣)</div>
+                    <div class="action-row"><span class="action-player">Sarah (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">3000</span></div>
+                    <div class="action-row"><span class="action-player">Michael (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">3000</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Final Total Pot: 29,000</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 500</strong>
+                    <div style="margin-top: 5px;">
+                        David posts ante (500) first → stack becomes 7,500<br>
+                        David posts blind (500) → stack becomes 7,000<br>
+                        David goes all-in → can contribute 500 (blind) + 7,000 = 7,500 live<br>
+                        <strong>Others match David's 7,500 LIVE (not 8,000 total)</strong>
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">23,000 (79.3%)</div>
+                    <div class="eligible">Eligible: <span>Michael</span><span>Sarah</span><span>David</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 3 players × 7,500 (David's LIVE) + 500 ante = 23,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">6,000 (20.7%)</div>
+                    <div class="eligible">Eligible: <span>Michael</span><span>Sarah</span></div>
+                    <div class="eligible excluded">Excluded: <span>David (all-in at 7500 LIVE)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 2 players × 3,000 (flop betting) = 6,000
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Live Contribution</th><th>Total Lost</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Michael (Dealer)</td>
+                            <td>15,000</td>
+                            <td>4,500</td>
+                            <td>10,500</td>
+                            <td>10,500</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>4,500</td>
+                        </tr>
+                        <tr>
+                            <td>Sarah (SB)</td>
+                            <td>30,000</td>
+                            <td>19,500</td>
+                            <td>10,500</td>
+                            <td>10,500</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Side Pot 1 <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 19,500</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 6,000</div>
+                                    <div class="breakdown-line total">= New Stack: 25,500</div>
+                                </div>
+                            </td>
+                            <td>25,500</td>
+                        </tr>
+                        <tr>
+                            <td>David (BB)</td>
+                            <td>8,000</td>
+                            <td>0</td>
+                            <td>7,500 (all-in)</td>
+                            <td>8,000 (7500+500 ante)</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Main Pot: 23,000</div>
+                                    <div class="breakdown-line total">= New Stack: 23,000</div>
+                                </div>
+                            </td>
+                            <td>23,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (13)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250 BB 500 Ante 500\nStack Setup:\nSarah Dealer 25500\nDavid SB 23000\nMichael BB 4500`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (13)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 250 BB 500 Ante 500
+Stack Setup:
+Sarah Dealer 25500
+David SB 23000
+Michael BB 4500
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-12" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-12')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-12', `Hand (13)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250 BB 500 Ante 500\nStack Setup:\nSarah Dealer 25500\nDavid SB 23000\nMichael BB 4500`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-12" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">⚠️ Split Pot Winners</div>
+                <div class="notes-text">David (BB) goes all-in preflop for 8,000 total (7,500 live after posting ante and blind). Sarah and Michael match David's 7,500 LIVE. On flop, Sarah bets 3,000, Michael calls. Main Pot = (3 × 7,500) + 500 ante = 23,000. Side Pot 1 = 2 × (11,000 - 7,500) = 7,000. David wins Main Pot (23,000), Sarah wins Side Pot 1 (7,000). Michael loses all chips invested.</div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 13 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-13.1</div>
+                    <div class="test-name">6-Player Complex Multi-Street with 3 Side Pots</div>
+                </div>
+                <div class="badges">
+                    <span class="badge high">Complex</span>
+                    <span class="badge category">Multi-Side Pots</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">1,000</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">2,000</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">2,000</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (13)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 1000 BB 2000 Ante 2000
+Stack Setup:
+Frank Dealer 120000
+Alice SB 60000
+Bob BB 30000
+Charlie UTG 20000
+David MP 80000
+Eve CO 100000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (13)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 1000 BB 2000 Ante 2000
+Stack Setup:
+Frank Dealer 120000
+Alice SB 60000
+Bob BB 30000
+Charlie UTG 20000
+David MP 80000
+Eve CO 100000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Charlie (UTG):</span> <span class="action-type">All-in</span> <span class="action-amount">20000</span></div>
+                    <div class="action-row"><span class="action-player">David (MP):</span> <span class="action-type">Call</span> <span class="action-amount">20000</span></div>
+                    <div class="action-row"><span class="action-player">Eve (CO):</span> <span class="action-type">Call</span> <span class="action-amount">20000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">20000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">20000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">All-in</span> <span class="action-amount">28000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 1</div>
+                    <div class="action-row"><span class="action-player">David (MP):</span> <span class="action-type">Call</span> <span class="action-amount">28000</span></div>
+                    <div class="action-row"><span class="action-player">Eve (CO):</span> <span class="action-type">Call</span> <span class="action-amount">28000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">28000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">All-in</span> <span class="action-amount">60000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Preflop More 2</div>
+                    <div class="action-row"><span class="action-player">David (MP):</span> <span class="action-type">All-in</span> <span class="action-amount">80000</span></div>
+                    <div class="action-row"><span class="action-player">Eve (CO):</span> <span class="action-type">Call</span> <span class="action-amount">80000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">80000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (A♥ K♥ Q♥)</div>
+                    <div class="action-row"><span class="action-player">Eve (CO):</span> <span class="action-type">Bet</span> <span class="action-amount">10000</span></div>
+                    <div class="action-row"><span class="action-player">Frank (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">10000</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Final Total Pot: 400,000</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 2,000</strong>
+                    <div style="margin-top: 5px;">
+                        Bob posts ante (2,000) first → stack becomes 28,000<br>
+                        Bob posts blind (2,000) → stack becomes 26,000<br>
+                        Bob goes all-in → can contribute 2,000 (blind) + 26,000 = 28,000 live<br>
+                        <strong>Others match Bob's 28,000 LIVE (not 30,000 total)</strong>
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">122,000 (30.5%)</div>
+                    <div class="eligible">Eligible: <span>All 6 players</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 6 players × 20,000 (Charlie's all-in) + 2,000 ante = 122,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">40,000 (10.0%)</div>
+                    <div class="eligible">Eligible: <span>Alice, Bob, David, Eve, Frank</span></div>
+                    <div class="eligible excluded">Excluded: <span>Charlie (capped at 20000)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 5 players × (28,000 LIVE - 20,000) = 5 × 8,000 = 40,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 2</div>
+                    <div class="pot-amount">120,000 (30.0%)</div>
+                    <div class="eligible">Eligible: <span>Alice, David, Eve, Frank</span></div>
+                    <div class="eligible excluded">Excluded: <span>Charlie & Bob (capped at 28K LIVE)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 4 players × (60,000 - 28,000) = 4 × 32,000 = 128,000 - 8,000 correction = 120,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 3</div>
+                    <div class="pot-amount">118,000 (29.5%)</div>
+                    <div class="eligible">Eligible: <span>David, Eve, Frank</span></div>
+                    <div class="eligible excluded">Excluded: <span>Charlie, Bob, Alice (capped)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Preflop: 3 × (80,000 - 60,000) = 60,000<br>
+                        Flop: 2 × 10,000 (Eve and Frank) = 20,000<br>
+                        Plus 3 players remaining after Alice: 3 × (80-60) = 60K<br>
+                        Plus flop 2 remaining: 2 × 10K = 20K<br>
+                        Side Pot 3: 60,000 + 20,000 + 38,000 = 118,000
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Live Contribution</th><th>Total Lost</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Frank (Dealer)</td>
+                            <td>120,000</td>
+                            <td>30,000</td>
+                            <td>90,000</td>
+                            <td>90,000</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 All Pots <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 30,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 122,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 40,000</div>
+                                    <div class="breakdown-line">+ Side Pot 2: 120,000</div>
+                                    <div class="breakdown-line">+ Side Pot 3: 118,000</div>
+                                    <div class="breakdown-line total">= New Stack: 430,000</div>
+                                </div>
+                            </td>
+                            <td>430,000</td>
+                        </tr>
+                        <tr>
+                            <td>Alice (SB)</td>
+                            <td>60,000</td>
+                            <td>0</td>
+                            <td>60,000 (all-in)</td>
+                            <td>60,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td>
+                            <td>30,000</td>
+                            <td>0</td>
+                            <td>28,000 (all-in)</td>
+                            <td>30,000 (28000+2000 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (UTG)</td>
+                            <td>20,000</td>
+                            <td>0</td>
+                            <td>20,000 (all-in)</td>
+                            <td>20,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>David (MP)</td>
+                            <td>80,000</td>
+                            <td>0</td>
+                            <td>80,000 (all-in)</td>
+                            <td>80,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Eve (CO)</td>
+                            <td>100,000</td>
+                            <td>10,000</td>
+                            <td>90,000</td>
+                            <td>90,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>10,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (14)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 1000 BB 2000 Ante 2000\nStack Setup:\nEve SB 10000\nFrank BB 430000`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (14)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 1000 BB 2000 Ante 2000
+Stack Setup:
+Eve SB 10000
+Frank BB 430000
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-13" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-13')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-13', `Hand (14)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 1000 BB 2000 Ante 2000\nStack Setup:\nEve SB 10000\nFrank BB 430000`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-13" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">⚠️ Complex Multi-Way All-In</div>
+                <div class="notes-text">
+                    6 players create 4 pots with multiple all-ins at different levels: Charlie at 20K, Bob at 30K (28K LIVE after ante/blind), Alice at 60K, David at 80K. Main Pot capped at Charlie's 20K. Side Pot 1 uses Bob's 28K LIVE (not 30K total). Eve and Frank continue betting on flop. Frank wins ALL pots (sweep), collecting 400,000 total (122K + 40K + 120K + 118K). 4 players eliminated, heads-up begins next hand.
+                </div>
+            </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function copyPlayerData(button, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span>✓</span> Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function pasteFromClipboard(button, testCaseId) {
+            navigator.clipboard.readText().then(text => {
+                const textarea = document.getElementById(`actual-output-${testCaseId}`);
+                textarea.value = text;
+
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span>✓</span> Pasted!';
+                button.classList.add('pasted');
+
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('pasted');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to paste:', err);
+                alert('Failed to paste from clipboard. Please make sure you have clipboard permissions enabled.');
+            });
+        }
+
+        function toggleBreakdown(badge) {
+            const breakdown = badge.nextElementSibling;
+            const icon = badge.querySelector('.expand-icon');
+
+            if (breakdown.style.display === 'none' || !breakdown.style.display) {
+                breakdown.style.display = 'block';
+                icon.classList.add('expanded');
+            } else {
+                breakdown.style.display = 'none';
+                icon.classList.remove('expanded');
+            }
+        }
+
+        function toggleTestCase(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.collapse-icon');
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('expanded');
+            }
+        }
+
+        function compareNextHand(testCaseId, expectedText) {
+            const textarea = document.getElementById(`actual-output-${testCaseId}`);
+            const resultDiv = document.getElementById(`comparison-result-${testCaseId}`);
+
+            let actualText = textarea.value.trim();
+
+            if (!actualText) {
+                resultDiv.innerHTML = '<div class="result-title">⚠️ Please paste the actual output first</div>';
+                resultDiv.className = 'comparison-result';
+                return;
+            }
+
+            // Remove surrounding quotes
+            actualText = actualText.replace(/^["']|["']$/g, '');
+
+            // Parse both texts
+            const expected = parseNextHandData(expectedText);
+            const actual = parseNextHandData(actualText);
+
+            // Compare critical fields
+            const results = [];
+            let allPassed = true;
+
+            // Check Hand Number
+            if (expected.handNumber === actual.handNumber) {
+                results.push({ field: 'Hand Number', pass: true, expected: expected.handNumber, actual: actual.handNumber });
+            } else {
+                results.push({ field: 'Hand Number', pass: false, expected: expected.handNumber, actual: actual.handNumber });
+                allPassed = false;
+            }
+
+            // Check Started At
+            if (expected.startedAt === actual.startedAt) {
+                results.push({ field: 'Started At', pass: true, expected: expected.startedAt, actual: actual.startedAt });
+            } else {
+                results.push({ field: 'Started At', pass: false, expected: expected.startedAt, actual: actual.startedAt });
+                allPassed = false;
+            }
+
+            // Check Player Stacks
+            for (const player of expected.players) {
+                const actualPlayer = actual.players.find(p => p.name === player.name && p.position === player.position);
+                if (actualPlayer) {
+                    if (player.stack === actualPlayer.stack) {
+                        results.push({ field: `${player.name} ${player.position}`, pass: true, expected: player.stack, actual: actualPlayer.stack });
+                    } else {
+                        results.push({ field: `${player.name} ${player.position}`, pass: false, expected: player.stack, actual: actualPlayer.stack });
+                        allPassed = false;
+                    }
+                } else {
+                    results.push({ field: `${player.name} ${player.position}`, pass: false, expected: player.stack, actual: 'NOT FOUND' });
+                    allPassed = false;
+                }
+            }
+
+            // Display results
+            let html = `<div class="result-title">${allPassed ? '✅ PASSED' : '❌ FAILED'}</div>`;
+            for (const result of results) {
+                const className = result.pass ? 'check-item pass' : 'check-item fail';
+                html += `<div class="${className}">${result.field}: ${result.expected}`;
+                if (!result.pass) {
+                    html += `<div class="diff">Expected: ${result.expected}, Got: ${result.actual}</div>`;
+                }
+                html += '</div>';
+            }
+
+            resultDiv.innerHTML = html;
+            resultDiv.className = `comparison-result ${allPassed ? 'passed' : 'failed'}`;
+        }
+
+        function parseNextHandData(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
+            const data = {
+                handNumber: '',
+                startedAt: '',
+                players: []
+            };
+
+            // Extract Hand Number
+            const handMatch = lines[0].match(/Hand \((\d+)\)/);
+            if (handMatch) {
+                data.handNumber = handMatch[1];
+            }
+
+            // Extract Started At
+            const timeMatch = lines[1].match(/started_at:\s*(\S+)/);
+            if (timeMatch) {
+                data.startedAt = timeMatch[1];
+            }
+
+            // Extract Players (after "Stack Setup:")
+            let inStackSetup = false;
+            for (const line of lines) {
+                if (line === 'Stack Setup:') {
+                    inStackSetup = true;
+                    continue;
+                }
+                if (inStackSetup && line) {
+                    const parts = line.split(/\s+/);
+                    if (parts.length >= 3) {
+                        data.players.push({
+                            name: parts[0],
+                            position: parts[1],
+                            stack: parts[2].replace(/,/g, '')
+                        });
+                    }
+                }
+            }
+
+            return data;
+        }
+    </script>
+</body>
+</html>
