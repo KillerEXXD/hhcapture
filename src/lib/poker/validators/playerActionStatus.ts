@@ -90,25 +90,30 @@ function convertAmount(amount: string | number | undefined, unit: ChipUnit | und
  */
 function checkIfPlayerAllIn(
   playerId: number,
+  stage: Stage,
   actionLevel: ActionLevel,
   playerData: PlayerData
 ): boolean {
   const data = playerData[playerId];
   if (!data) return false;
 
-  // Check forced all-in during blind posting
-  if (data.isForcedAllInPreflop) return true;
+  // Check forced all-in during blind posting (only for preflop)
+  if (stage === 'preflop' && data.isForcedAllInPreflop) return true;
+
+  // Build field names dynamically based on stage
+  const baseActionKey = `${stage}Action` as keyof PlayerData[number];
+  const moreAction1Key = `${stage}_moreActionAction` as keyof PlayerData[number];
 
   // For More Action 1: Check BASE round
   if (actionLevel === 'more') {
-    return data.preflopAction === 'all-in';
+    return data[baseActionKey] === 'all-in';
   }
 
   // For More Action 2: Check BASE and More Action 1
   if (actionLevel === 'more2') {
     return (
-      data.preflopAction === 'all-in' ||
-      data.preflop_moreActionAction === 'all-in'
+      data[baseActionKey] === 'all-in' ||
+      data[moreAction1Key] === 'all-in'
     );
   }
 
@@ -126,6 +131,7 @@ function checkIfPlayerAllIn(
  */
 function calculateCumulativeContribution(
   playerId: number,
+  stage: Stage,
   actionLevel: ActionLevel,
   playerData: PlayerData
 ): number {
@@ -133,16 +139,27 @@ function calculateCumulativeContribution(
   if (!data) return 0;
 
   let contribution = 0;
-  const blindsAntes = (data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0);
+
+  // Only preflop has blinds/antes
+  const blindsAntes = stage === 'preflop' ? ((data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0)) : 0;
   console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} posted blinds/antes:`, blindsAntes);
+
+  // Build field names dynamically based on stage
+  const baseActionKey = `${stage}Action` as keyof PlayerData[number];
+  const baseAmountKey = `${stage}Amount` as keyof PlayerData[number];
+  const baseUnitKey = `${stage}Unit` as keyof PlayerData[number];
+  const moreAction1ActionKey = `${stage}_moreActionAction` as keyof PlayerData[number];
+  const moreAction1AmountKey = `${stage}_moreActionAmount` as keyof PlayerData[number];
+  const moreAction1UnitKey = `${stage}_moreActionUnit` as keyof PlayerData[number];
 
   // For More Action 1: Get contribution from BASE round only
   if (actionLevel === 'more') {
-    if (data.preflopAction && data.preflopAction !== 'fold' && data.preflopAction !== 'check' && data.preflopAction !== 'no action') {
-      console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} BASE action:`, data.preflopAction);
-      console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} preflopAmount:`, data.preflopAmount);
-      console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} preflopUnit:`, data.preflopUnit);
-      const baseAmount = convertAmount(data.preflopAmount as string | undefined, data.preflopUnit as ChipUnit | undefined);
+    const baseAction = data[baseActionKey];
+    if (baseAction && baseAction !== 'fold' && baseAction !== 'check' && baseAction !== 'no action') {
+      console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} BASE action:`, baseAction);
+      console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} ${baseAmountKey}:`, data[baseAmountKey]);
+      console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} ${baseUnitKey}:`, data[baseUnitKey]);
+      const baseAmount = convertAmount(data[baseAmountKey] as string | undefined, data[baseUnitKey] as ChipUnit | undefined);
       console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} converted baseAmount:`, baseAmount, '(includes blinds)');
       contribution = baseAmount; // Already includes blinds!
     } else {
@@ -155,25 +172,28 @@ function calculateCumulativeContribution(
   // For More Action 2: Get contribution from BASE + More Action 1
   else if (actionLevel === 'more2') {
     // Check if player acted in More Action 1
-    const moreAction1 = data.preflop_moreActionAction;
+    const moreAction1 = data[moreAction1ActionKey];
     if (moreAction1 && moreAction1 !== 'fold' && moreAction1 !== 'check' && moreAction1 !== 'no action') {
       const moreAction1Amount = convertAmount(
-        data.preflop_moreActionAmount as string | undefined,
-        data.preflop_moreActionUnit as ChipUnit | undefined
+        data[moreAction1AmountKey] as string | undefined,
+        data[moreAction1UnitKey] as ChipUnit | undefined
       );
       console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} More Action 1 amount:`, moreAction1Amount, '(TOTAL including BASE)');
       contribution = moreAction1Amount; // This is the cumulative total through More Action 1
     }
     // Otherwise check BASE
-    else if (data.preflopAction && data.preflopAction !== 'fold' && data.preflopAction !== 'check' && data.preflopAction !== 'no action') {
-      const baseAmount = convertAmount(data.preflopAmount as string | undefined, data.preflopUnit as ChipUnit | undefined);
-      console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} BASE amount:`, baseAmount, '(includes blinds, no MA1 action)');
-      contribution = baseAmount;
-    }
-    // Otherwise just blinds
     else {
-      contribution = blindsAntes;
-      console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} no actions, using blinds only`);
+      const baseAction = data[baseActionKey];
+      if (baseAction && baseAction !== 'fold' && baseAction !== 'check' && baseAction !== 'no action') {
+        const baseAmount = convertAmount(data[baseAmountKey] as string | undefined, data[baseUnitKey] as ChipUnit | undefined);
+        console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} BASE amount:`, baseAmount, '(includes blinds, no MA1 action)');
+        contribution = baseAmount;
+      }
+      // Otherwise just blinds
+      else {
+        contribution = blindsAntes;
+        console.log(`   🔍 [calculateCumulativeContribution] Player ${playerId} no actions, using blinds only`);
+      }
     }
   }
 
@@ -190,13 +210,25 @@ function calculateCumulativeContribution(
  * action amount exists (it already includes them).
  */
 function calculateMaxContribution(
+  stage: Stage,
   actionLevel: ActionLevel,
   players: Player[],
   playerData: PlayerData
 ): number {
   let maxContribution = 0;
 
-  console.log(`   🔍 [calculateMaxContribution] Action level: ${actionLevel}`);
+  console.log(`   🔍 [calculateMaxContribution] Stage: ${stage}, Action level: ${actionLevel}`);
+
+  // Build field names dynamically based on stage
+  const baseActionKey = `${stage}Action` as keyof PlayerData[number];
+  const baseAmountKey = `${stage}Amount` as keyof PlayerData[number];
+  const baseUnitKey = `${stage}Unit` as keyof PlayerData[number];
+  const moreAction1ActionKey = `${stage}_moreActionAction` as keyof PlayerData[number];
+  const moreAction1AmountKey = `${stage}_moreActionAmount` as keyof PlayerData[number];
+  const moreAction1UnitKey = `${stage}_moreActionUnit` as keyof PlayerData[number];
+  const moreAction2ActionKey = `${stage}_moreAction2Action` as keyof PlayerData[number];
+  const moreAction2AmountKey = `${stage}_moreAction2Amount` as keyof PlayerData[number];
+  const moreAction2UnitKey = `${stage}_moreAction2Unit` as keyof PlayerData[number];
 
   for (const player of players) {
     if (!player.name) continue;
@@ -205,18 +237,21 @@ function calculateMaxContribution(
     if (!data) continue;
 
     // Skip folded players
-    if (data.preflopAction === 'fold') continue;
-    if (data.preflop_moreActionAction === 'fold') continue;
-    if (data.preflop_moreAction2Action === 'fold') continue;
+    if (data[baseActionKey] === 'fold') continue;
+    if (data[moreAction1ActionKey] === 'fold') continue;
+    if (data[moreAction2ActionKey] === 'fold') continue;
 
     let contribution = 0;
-    const blindsAntes = (data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0);
+
+    // Only preflop has blinds/antes
+    const blindsAntes = stage === 'preflop' ? ((data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0)) : 0;
     console.log(`   🔍 [calculateMaxContribution] Player ${player.id} (${player.name}) blinds/antes: ${blindsAntes}`);
 
-    // BASE round: Use action amount if exists (already includes blinds), otherwise just blinds
-    if (data.preflopAction && data.preflopAction !== 'fold' && data.preflopAction !== 'check' && data.preflopAction !== 'no action') {
-      const baseAmount = convertAmount(data.preflopAmount as string | undefined, data.preflopUnit as ChipUnit | undefined);
-      console.log(`   🔍 [calculateMaxContribution] Player ${player.id} BASE: ${data.preflopAction} ${data.preflopAmount}${data.preflopUnit || ''} = ${baseAmount} (includes blinds)`);
+    // BASE round: Use action amount + blinds if action exists, otherwise just blinds
+    const baseAction = data[baseActionKey];
+    if (baseAction && baseAction !== 'fold' && baseAction !== 'check' && baseAction !== 'no action') {
+      const baseAmount = convertAmount(data[baseAmountKey] as string | undefined, data[baseUnitKey] as ChipUnit | undefined);
+      console.log(`   🔍 [calculateMaxContribution] Player ${player.id} BASE: ${baseAction} ${data[baseAmountKey]}${data[baseUnitKey] || ''} = ${baseAmount} (includes blinds)`);
       contribution = baseAmount; // Already includes blinds!
     } else {
       // No action in BASE, just blinds
@@ -226,31 +261,31 @@ function calculateMaxContribution(
 
     // For More Action 1 or More Action 2: Add More Action 1 contributions
     if (actionLevel === 'more' || actionLevel === 'more2') {
-      const moreAction1 = data.preflop_moreActionAction;
+      const moreAction1 = data[moreAction1ActionKey];
       if (moreAction1 && moreAction1 !== 'fold' && moreAction1 !== 'check' && moreAction1 !== 'no action') {
         console.log(`   🔍 [calculateMaxContribution] Player ${player.id} checking More Action 1 data:`);
-        console.log(`      preflop_moreActionAction: "${moreAction1}"`);
-        console.log(`      preflop_moreActionAmount: "${data.preflop_moreActionAmount}" (type: ${typeof data.preflop_moreActionAmount})`);
-        console.log(`      preflop_moreActionUnit: "${data.preflop_moreActionUnit}" (type: ${typeof data.preflop_moreActionUnit})`);
+        console.log(`      ${moreAction1ActionKey}: "${moreAction1}"`);
+        console.log(`      ${moreAction1AmountKey}: "${data[moreAction1AmountKey]}" (type: ${typeof data[moreAction1AmountKey]})`);
+        console.log(`      ${moreAction1UnitKey}: "${data[moreAction1UnitKey]}" (type: ${typeof data[moreAction1UnitKey]})`);
 
         const moreAction1Amount = convertAmount(
-          data.preflop_moreActionAmount as string | undefined,
-          data.preflop_moreActionUnit as ChipUnit | undefined
+          data[moreAction1AmountKey] as string | undefined,
+          data[moreAction1UnitKey] as ChipUnit | undefined
         );
-        console.log(`   🔍 [calculateMaxContribution] Player ${player.id} More Action 1: ${moreAction1} ${data.preflop_moreActionAmount}${data.preflop_moreActionUnit || ''} = ${moreAction1Amount} (TOTAL including BASE)`);
+        console.log(`   🔍 [calculateMaxContribution] Player ${player.id} More Action 1: ${moreAction1} ${data[moreAction1AmountKey]}${data[moreAction1UnitKey] || ''} = ${moreAction1Amount} (TOTAL including BASE)`);
         contribution = moreAction1Amount; // This is the NEW total, replaces previous
       }
     }
 
     // For More Action 2: Use More Action 2 amount if exists
     if (actionLevel === 'more2') {
-      const moreAction2 = data.preflop_moreAction2Action;
+      const moreAction2 = data[moreAction2ActionKey];
       if (moreAction2 && moreAction2 !== 'fold' && moreAction2 !== 'check' && moreAction2 !== 'no action') {
         const moreAction2Amount = convertAmount(
-          data.preflop_moreAction2Amount as string | undefined,
-          data.preflop_moreAction2Unit as ChipUnit | undefined
+          data[moreAction2AmountKey] as string | undefined,
+          data[moreAction2UnitKey] as ChipUnit | undefined
         );
-        console.log(`   🔍 [calculateMaxContribution] Player ${player.id} More Action 2: ${moreAction2} ${data.preflop_moreAction2Amount}${data.preflop_moreAction2Unit || ''} = ${moreAction2Amount} (TOTAL including BASE + MA1)`);
+        console.log(`   🔍 [calculateMaxContribution] Player ${player.id} More Action 2: ${moreAction2} ${data[moreAction2AmountKey]}${data[moreAction2UnitKey] || ''} = ${moreAction2Amount} (TOTAL including BASE + MA1)`);
         contribution = moreAction2Amount; // This is the NEW total, replaces previous
       }
     }
@@ -267,6 +302,7 @@ function calculateMaxContribution(
  * Check if a specific player needs to act in the current More Action round
  *
  * @param playerId - ID of the player to check
+ * @param stage - Current stage ('preflop', 'flop', 'turn', 'river')
  * @param actionLevel - Current action level ('more' or 'more2')
  * @param players - All players in the game
  * @param playerData - Player data with actions and amounts
@@ -274,22 +310,71 @@ function calculateMaxContribution(
  */
 export function checkPlayerNeedsToAct(
   playerId: number,
+  stage: Stage,
   actionLevel: ActionLevel,
   players: Player[],
   playerData: PlayerData
 ): PlayerActionStatus {
-  console.log(`🔍 [checkPlayerNeedsToAct] Checking player ${playerId}, action level: ${actionLevel}`);
+  console.log(`🔍 [checkPlayerNeedsToAct] Checking player ${playerId}, stage: ${stage}, action level: ${actionLevel}`);
+
+  const data = playerData[playerId];
+  if (!data) {
+    return {
+      needsToAct: false,
+      alreadyMatchedMaxBet: false,
+      alreadyAllIn: false,
+      cumulativeContribution: 0,
+      maxContribution: 0,
+    };
+  }
+
+  // Build field names dynamically based on stage
+  const baseActionKey = `${stage}Action` as keyof PlayerData[number];
+  const moreAction1ActionKey = `${stage}_moreActionAction` as keyof PlayerData[number];
+  const moreAction2ActionKey = `${stage}_moreAction2Action` as keyof PlayerData[number];
+
+  // Check if player has folded
+  if (data[baseActionKey] === 'fold') {
+    console.log(`   → Player ${playerId} has folded in BASE, does NOT need to act`);
+    return {
+      needsToAct: false,
+      alreadyMatchedMaxBet: false,
+      alreadyAllIn: false,
+      cumulativeContribution: 0,
+      maxContribution: 0,
+    };
+  }
+  if (data[moreAction1ActionKey] === 'fold') {
+    console.log(`   → Player ${playerId} has folded in More Action 1, does NOT need to act`);
+    return {
+      needsToAct: false,
+      alreadyMatchedMaxBet: false,
+      alreadyAllIn: false,
+      cumulativeContribution: 0,
+      maxContribution: 0,
+    };
+  }
+  if (data[moreAction2ActionKey] === 'fold') {
+    console.log(`   → Player ${playerId} has folded in More Action 2, does NOT need to act`);
+    return {
+      needsToAct: false,
+      alreadyMatchedMaxBet: false,
+      alreadyAllIn: false,
+      cumulativeContribution: 0,
+      maxContribution: 0,
+    };
+  }
 
   // Calculate cumulative contribution for this player
-  const cumulativeContribution = calculateCumulativeContribution(playerId, actionLevel, playerData);
+  const cumulativeContribution = calculateCumulativeContribution(playerId, stage, actionLevel, playerData);
   console.log(`   Player ${playerId} cumulative contribution: ${cumulativeContribution}`);
 
   // Calculate max contribution among all players
-  const maxContribution = calculateMaxContribution(actionLevel, players, playerData);
+  const maxContribution = calculateMaxContribution(stage, actionLevel, players, playerData);
   console.log(`   Max contribution: ${maxContribution}`);
 
   // Check if player is all-in from previous rounds
-  const alreadyAllIn = checkIfPlayerAllIn(playerId, actionLevel, playerData);
+  const alreadyAllIn = checkIfPlayerAllIn(playerId, stage, actionLevel, playerData);
   console.log(`   Player ${playerId} all-in: ${alreadyAllIn}`);
 
   if (alreadyAllIn) {
