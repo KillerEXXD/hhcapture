@@ -618,6 +618,56 @@ Bob SB 9800
 Charlie BB 10300  ← Final 9,900 + Won 400 = 10,300
 ```
 
+## Comparison Validation Feature
+
+### Enhanced Comparison Functionality
+
+Each test case includes an interactive comparison feature that validates actual poker application output against expected output.
+
+**Validation Categories:**
+
+1. **Order Validation** - Checks if player sequence matches exactly:
+   - Validates player count matches
+   - Checks each position (name + position label) in sequence
+   - Reports specific position mismatches
+
+2. **Stack Validation** - Checks if stack amounts match for each player:
+   - Compares each player's stack amount
+   - Reports specific discrepancies per player
+
+3. **Hand Number Validation** - Ensures hand numbers match
+
+4. **Blinds & Ante Validation** - Checks SB, BB, and Ante values match
+
+**Output Format:**
+
+When Compare button is clicked, the result shows:
+```
+✅ ALL CHECKS PASSED  or  ❌ VALIDATION FAILED
+
+✓ Order is correct  or  ✗ Order is correct
+   (with detailed error messages if failed)
+
+✓ Stacks are correct  or  ✗ Stacks are correct
+   (with specific player discrepancies if failed)
+
+✓ Hand number is correct  or  ✗ Hand number is correct
+
+✓ Blinds and ante are correct  or  ✗ Blinds and ante are correct
+
+[Copy Debug Logs Button]
+```
+
+**Debug Logs Include:**
+- Test case ID and timestamp
+- Hand number check results
+- Blinds & ante check results
+- Player order comparison (expected vs actual)
+- Stack validation results for each player
+- Summary section with overall results
+
+**Important:** Actual output from the poker application is treated as the **source of truth** for comparison purposes.
+
 ## Validation Checklist
 
 For EACH test case, verify:
@@ -629,6 +679,7 @@ For EACH test case, verify:
 - [ ] **Stack Setup**: Position labels ONLY for Dealer, SB, BB (NO UTG, MP, CO, HJ, etc.)
 - [ ] **Action Flow**: Players in correct "More" sections based on raise count
 - [ ] **Stack Setup Order**: Must start with Dealer (not SB or BB)
+- [ ] **Comparison Feature**: Validates order, stacks, hand number, and blinds/ante with detailed error reporting
 
 ### Position and Format
 - [ ] Stack Setup lists players in clockwise order: Dealer → SB → BB → Player1 → Player2 → etc.
