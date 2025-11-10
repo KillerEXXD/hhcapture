@@ -70,7 +70,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
   const [expandedStackHistories, setExpandedStackHistories] = useState<Record<string, boolean>>({});
 
   // State for tracking pop-up position (above or below) for each player
-  const [popupPositions, setPopupPositions] = useState<Record<string, 'above' | 'below'>>({});
+  const [popupPositions, setPopupPositions] = useState<Record<string, 'above' | 'below' | number>>({});
 
   // State for disabling "Add More Action" button when betting round is complete
   const [isAddMoreActionDisabled, setIsAddMoreActionDisabled] = useState(false);
@@ -325,10 +325,25 @@ export const TurnView: React.FC<TurnViewProps> = ({
 
     // FR-12 VALIDATION: Comprehensive raise/bet validation
     // Run full FR-12 validation for all players with bet/raise actions
+    // ONLY validate sections that haven't been processed yet
     console.log('🔍 [ProcessStack] Running FR-12 validation for all raise/bet amounts...');
+    console.log('📋 Current visible levels:', currentLevels);
+    console.log('✅ Processed sections:', processedSections);
     const validationErrors: string[] = [];
 
     currentLevels.forEach((actionLevel) => {
+      const sectionKey = `turn_${actionLevel}`;
+      console.log(`\n🔍 Checking section: ${sectionKey}`);
+      console.log(`   - Is processed? ${processedSections[sectionKey]}`);
+
+      // Skip validation for sections that are already processed
+      if (processedSections[sectionKey]) {
+        console.log(`⏭️  Skipping validation for ${sectionKey} (already processed)`);
+        return;
+      }
+
+      console.log(`✔️  Validating ${sectionKey}...`);
+
       const suffix = actionLevel === 'base' ? '' : actionLevel === 'more' ? '_moreAction' : '_moreAction2';
 
       players.forEach((player) => {
@@ -353,7 +368,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
             return; // Skip FR-12 validation if basic validation fails
           }
 
-          // Run FR-12 validation
+          // Run FR-12 validation (order-aware: only consider raises from players who acted before this player)
           const validationResult = validateRaiseAmount(
             player.id,
             raiseToAmount,
@@ -362,7 +377,8 @@ export const TurnView: React.FC<TurnViewProps> = ({
             players,
             playerData,
             sectionStacks,
-            unit || defaultUnit
+            unit || defaultUnit,
+            player.id // Only consider raises from players with ID <= this player's ID
           );
 
           if (!validationResult.isValid) {
@@ -1265,12 +1281,24 @@ export const TurnView: React.FC<TurnViewProps> = ({
                                               const spaceBelow = window.innerHeight - buttonRect.bottom;
                                               const spaceAbove = buttonRect.top;
 
-                                              // Determine optimal position
+                                              // Determine optimal position with better logic
+                                              // Position above if: not enough space below AND more space above
                                               const shouldPositionAbove = spaceBelow < estimatedPopupHeight && spaceAbove > spaceBelow;
+
+                                              // Calculate the actual top position for the popup
+                                              let topPosition: number;
+                                              if (shouldPositionAbove) {
+                                                // Position above: popup bottom aligns with button top, with some margin
+                                                topPosition = Math.max(10, buttonRect.top - estimatedPopupHeight - 8);
+                                              } else {
+                                                // Position below: popup top aligns with button bottom, with some margin
+                                                topPosition = buttonRect.bottom + 8;
+                                              }
 
                                               setPopupPositions(prev => ({
                                                 ...prev,
-                                                [historyKey]: shouldPositionAbove ? 'above' : 'below'
+                                                [historyKey]: shouldPositionAbove ? 'above' : 'below',
+                                                [`${historyKey}_top`]: topPosition
                                               }));
                                             }
                                           }}
@@ -1288,12 +1316,21 @@ export const TurnView: React.FC<TurnViewProps> = ({
                                   {/* Floating Card - Stack History */}
                                   {isExpanded && currentStack !== null && (() => {
                                     const position = popupPositions[historyKey] || 'below';
-                                    const positionClasses = position === 'above'
-                                      ? 'absolute z-[100] bottom-full mb-2 left-1/2 transform -translate-x-1/2'
-                                      : 'absolute z-[100] mt-2 left-1/2 transform -translate-x-1/2';
+                                    const topPosition = popupPositions[`${historyKey}_top`] as number || 0;
+                                    const positionClasses = 'fixed z-[9999] left-1/2 transform -translate-x-1/2';
 
                                     return (
-                                      <div data-stack-history-card={historyKey} className={positionClasses} style={{ minWidth: '400px', maxWidth: '460px' }}>
+                                      <div
+                                        data-stack-history-card={historyKey}
+                                        className={positionClasses}
+                                        style={{
+                                          minWidth: '400px',
+                                          maxWidth: '460px',
+                                          top: `${topPosition}px`,
+                                          maxHeight: 'calc(100vh - 20px)',
+                                          overflowY: 'auto'
+                                        }}
+                                      >
                                         <div className={`bg-gradient-to-br rounded-xl shadow-2xl border-2 overflow-hidden ${isAllIn ? 'from-red-50 to-orange-50 border-red-400' : 'from-white to-blue-50 border-blue-300'}`}>
                                         {/* Card Header */}
                                         <div className={`bg-gradient-to-r px-3 py-2 flex items-center justify-between ${isAllIn ? 'from-red-600 to-red-700' : 'from-blue-600 to-blue-700'}`}>

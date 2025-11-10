@@ -179,15 +179,17 @@ function getAlreadyContributed(
 /**
  * Get current max bet in the round
  * @param excludePlayerId - Optional player ID to exclude (when validating their raise)
+ * @param maxPlayerIdToConsider - Optional max player ID to consider (for order-aware validation)
  */
 function getMaxBet(
   stage: Stage,
   actionLevel: ActionLevel,
   players: Player[],
   playerData: PlayerData,
-  excludePlayerId?: number
+  excludePlayerId?: number,
+  maxPlayerIdToConsider?: number
 ): number {
-  console.log(`🔍 [getMaxBet] Calculating max bet for stage: ${stage}, level: ${actionLevel}, excluding player: ${excludePlayerId || 'none'}`);
+  console.log(`🔍 [getMaxBet] Calculating max bet for stage: ${stage}, level: ${actionLevel}, excluding player: ${excludePlayerId || 'none'}, maxPlayerId: ${maxPlayerIdToConsider || 'none'}`);
   let maxContribution = 0;
 
   // Build field names dynamically based on stage
@@ -206,6 +208,12 @@ function getMaxBet(
 
     const data = playerData[player.id];
     if (!data) continue;
+
+    // Skip players who haven't acted yet (order-aware validation)
+    if (maxPlayerIdToConsider !== undefined && player.id > maxPlayerIdToConsider) {
+      console.log(`   Player ${player.id} (${player.name}): SKIPPED (hasn't acted yet in this validation order)`);
+      continue;
+    }
 
     // Skip folded players
     if (data[baseActionKey] === 'fold') continue;
@@ -384,6 +392,7 @@ function getStartingStack(playerId: number, players: Player[]): number {
  * @param playerData - Player data with actions and amounts
  * @param sectionStacks - Section stacks tracking
  * @param inputUnit - The unit used for the input amount
+ * @param maxPlayerIdToConsider - Optional max player ID to consider (for order-aware validation)
  * @returns Validation result with error message if invalid
  */
 export function validateRaiseAmount(
@@ -394,7 +403,8 @@ export function validateRaiseAmount(
   players: Player[],
   playerData: PlayerData,
   sectionStacks: SectionStacks,
-  inputUnit: ChipUnit
+  inputUnit: ChipUnit,
+  maxPlayerIdToConsider?: number
 ): RaiseValidationResult {
   console.log(`🔍 [validateRaiseAmount] Player ${playerId}, raiseToAmount: ${raiseToAmount}, stage: ${stage}, level: ${actionLevel}`);
 
@@ -438,7 +448,8 @@ export function validateRaiseAmount(
 
   // FR-12.2: Must exceed current max bet
   // Exclude THIS player from max bet calculation (don't compare raise against itself)
-  const currentMaxBet = getMaxBet(stage, actionLevel, players, playerData, playerId);
+  // Only consider players who have acted before this player (order-aware validation)
+  const currentMaxBet = getMaxBet(stage, actionLevel, players, playerData, playerId, maxPlayerIdToConsider);
   console.log(`   Current max bet: ${currentMaxBet}`);
 
   if (actualRaiseToAmount <= currentMaxBet) {

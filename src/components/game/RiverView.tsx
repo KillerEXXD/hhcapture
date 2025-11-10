@@ -70,7 +70,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
   const [expandedStackHistories, setExpandedStackHistories] = useState<Record<string, boolean>>({});
 
   // State for tracking pop-up position (above or below) for each player
-  const [popupPositions, setPopupPositions] = useState<Record<string, 'above' | 'below'>>({});
+  const [popupPositions, setPopupPositions] = useState<Record<string, 'above' | 'below' | number>>({});
 
   // State for disabling "Add More Action" button when betting round is complete
   const [isAddMoreActionDisabled, setIsAddMoreActionDisabled] = useState(false);
@@ -324,10 +324,25 @@ export const RiverView: React.FC<RiverViewProps> = ({
 
     // FR-12 VALIDATION: Comprehensive raise/bet validation
     // Run full FR-12 validation for all players with bet/raise actions
+    // ONLY validate sections that haven't been processed yet
     console.log('🔍 [ProcessStack] Running FR-12 validation for all raise/bet amounts...');
+    console.log('📋 Current visible levels:', currentLevels);
+    console.log('✅ Processed sections:', processedSections);
     const validationErrors: string[] = [];
 
     currentLevels.forEach((actionLevel) => {
+      const sectionKey = `river_${actionLevel}`;
+      console.log(`\n🔍 Checking section: ${sectionKey}`);
+      console.log(`   - Is processed? ${processedSections[sectionKey]}`);
+
+      // Skip validation for sections that are already processed
+      if (processedSections[sectionKey]) {
+        console.log(`⏭️  Skipping validation for ${sectionKey} (already processed)`);
+        return;
+      }
+
+      console.log(`✔️  Validating ${sectionKey}...`);
+
       const suffix = actionLevel === 'base' ? '' : actionLevel === 'more' ? '_moreAction' : '_moreAction2';
 
       players.forEach((player) => {
@@ -352,7 +367,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
             return; // Skip FR-12 validation if basic validation fails
           }
 
-          // Run FR-12 validation
+          // Run FR-12 validation (order-aware: only consider raises from players who acted before this player)
           const validationResult = validateRaiseAmount(
             player.id,
             raiseToAmount,
@@ -361,7 +376,8 @@ export const RiverView: React.FC<RiverViewProps> = ({
             players,
             playerData,
             sectionStacks,
-            unit || defaultUnit
+            unit || defaultUnit,
+            player.id // Only consider raises from players with ID <= this player's ID
           );
 
           if (!validationResult.isValid) {
