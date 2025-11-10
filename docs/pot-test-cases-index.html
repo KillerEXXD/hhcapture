@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pot Test Cases Index</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        .summary-box {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+        .summary-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-item .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .summary-item .label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .batch-list {
+            display: grid;
+            gap: 20px;
+        }
+        .batch-card {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .batch-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.2);
+        }
+        .batch-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .batch-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .batch-link {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        .batch-link:hover {
+            background: #0056b3;
+        }
+        .distribution {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        .distribution-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .distribution-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+        .distribution-item {
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🃏 Poker Pot Calculation Test Suite</h1>
+        <div class="subtitle">Comprehensive test cases for tournament poker pot calculations</div>
+
+        <div class="summary-box">
+            <div class="summary-title">📊 Test Suite Summary</div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="number">300</div>
+                    <div class="label">Total Test Cases</div>
+                </div>
+                <div class="summary-item">
+                    <div class="number">3</div>
+                    <div class="label">Batch Files</div>
+                </div>
+                <div class="summary-item">
+                    <div class="number">100</div>
+                    <div class="label">Cases per Batch</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="batch-list">
+            <div class="batch-card" onclick="window.location.href='pot-test-cases-batch-1.html'">
+                <div class="batch-title">📁 Batch 1</div>
+                <div class="batch-subtitle">Test Cases TC-1 through TC-100</div>
+                <a href="pot-test-cases-batch-1.html" class="batch-link">Open Batch 1 →</a>
+
+                <div class="distribution">
+                    <div class="distribution-title">Distribution:</div>
+                    <div class="distribution-grid">
+                        <div class="distribution-item">• 15 Heads-up (2P)</div>
+                        <div class="distribution-item">• 20 Simple cases</div>
+                        <div class="distribution-item">• 30 Short-handed (3-6P)</div>
+                        <div class="distribution-item">• 40 Medium cases</div>
+                        <div class="distribution-item">• 55 Full ring (7-9P)</div>
+                        <div class="distribution-item">• 40 Complex cases</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="batch-card" onclick="window.location.href='pot-test-cases-batch-2.html'">
+                <div class="batch-title">📁 Batch 2</div>
+                <div class="batch-subtitle">Test Cases TC-101 through TC-200</div>
+                <a href="pot-test-cases-batch-2.html" class="batch-link">Open Batch 2 →</a>
+
+                <div class="distribution">
+                    <div class="distribution-title">Distribution:</div>
+                    <div class="distribution-grid">
+                        <div class="distribution-item">• 15 Heads-up (2P)</div>
+                        <div class="distribution-item">• 20 Simple cases</div>
+                        <div class="distribution-item">• 30 Short-handed (3-6P)</div>
+                        <div class="distribution-item">• 40 Medium cases</div>
+                        <div class="distribution-item">• 55 Full ring (7-9P)</div>
+                        <div class="distribution-item">• 40 Complex cases</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="batch-card" onclick="window.location.href='pot-test-cases-batch-3.html'">
+                <div class="batch-title">📁 Batch 3</div>
+                <div class="batch-subtitle">Test Cases TC-201 through TC-300</div>
+                <a href="pot-test-cases-batch-3.html" class="batch-link">Open Batch 3 →</a>
+
+                <div class="distribution">
+                    <div class="distribution-title">Distribution:</div>
+                    <div class="distribution-grid">
+                        <div class="distribution-item">• 10 Heads-up (2P)</div>
+                        <div class="distribution-item">• 20 Simple cases</div>
+                        <div class="distribution-item">• 20 Short-handed (3-6P)</div>
+                        <div class="distribution-item">• 40 Medium cases</div>
+                        <div class="distribution-item">• 70 Full ring (7-9P)</div>
+                        <div class="distribution-item">• 40 Complex cases</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-box" style="margin-top: 30px;">
+            <div class="summary-title">ℹ️ About This Test Suite</div>
+            <p style="line-height: 1.6; color: #666; margin: 0;">
+                This comprehensive test suite contains 300 poker pot calculation test cases designed to validate
+                tournament poker rules including BB ante posting, side pots, all-in scenarios, and multi-street betting.
+                Each test case includes interactive features for copying player data, pasting actual outputs, and
+                comparing expected vs actual results.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
