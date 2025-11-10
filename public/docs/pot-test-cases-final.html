@@ -686,7 +686,7 @@ Charlie BB 9900
 
         <!-- TEST CASE 2 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-2.2</div>
                     <div class="test-name">One All-In Creates Side Pot</div>
@@ -694,9 +694,11 @@ Charlie BB 9900
                 <div class="badges">
                     <span class="badge medium">Medium</span>
                     <span class="badge category">Single All-In</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -838,11 +840,12 @@ Bob BB 9300
                 <div class="notes-title">Notes</div>
                 <div class="notes-text">Charlie all-in 300. Alice raises 600. Bob calls 600. Main pot capped at Charlie's 300 (all 3 eligible). Side pot for additional 300 from Alice and Bob only.</div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 3 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-3.1</div>
                     <div class="test-name">Two All-Ins at Different Amounts</div>
@@ -850,9 +853,11 @@ Bob BB 9300
                 <div class="badges">
                     <span class="badge high">High</span>
                     <span class="badge category">Multiple All-Ins</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -1001,11 +1006,12 @@ David BB 8000
                 <div class="notes-title">Notes</div>
                 <div class="notes-text">Two all-ins: Charlie at 500, Bob at 1,900 (after posting ante and blind). Main pot capped at 500 (4 players). Side pot for additional 1,400 from Alice, Bob, David (3 players). Charlie can only win main pot (2,100 max). Bob can win up to 6,300.</div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 4 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-5.1</div>
                     <div class="test-name">Preflop to Flop - Pot Carries Forward</div>
@@ -1013,9 +1019,11 @@ David BB 8000
                 <div class="badges">
                     <span class="badge medium">Medium</span>
                     <span class="badge category">Multi-Street</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -1157,11 +1165,12 @@ Charlie BB 9200
                     Alice's 300 preflop contribution stays in pot as dead money. Only Bob and Charlie can win the full 2,000 pot.
                 </div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 5 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-5.2</div>
                     <div class="test-name">Preflop All-In Continues to River</div>
@@ -1169,9 +1178,11 @@ Charlie BB 9200
                 <div class="badges">
                     <span class="badge high">High</span>
                     <span class="badge category">Multi-Street All-In</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -1322,11 +1333,12 @@ Bob BB 5000</pre>
                     Side pot grows each street (200 from preflop excess + 10,000 from flop/turn). Bob can only win main pot (14,800 max). Alice/Charlie can win full pot (25,000).
                 </div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 6 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-6.1</div>
                     <div class="test-name">8 Players - Multi-Round Betting All Streets</div>
@@ -1334,9 +1346,11 @@ Bob BB 5000</pre>
                 <div class="badges">
                     <span class="badge high">Very High</span>
                     <span class="badge category">Full Table</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -1541,11 +1555,12 @@ Henry CO 10000
                     8 players. Preflop uses Base, More 1, More 2 sections with multiple raises. 5 players fold. Charlie and Frank battle through flop and turn with raises. All betting rounds used across all streets.
                 </div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 7 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-7.1</div>
                     <div class="test-name">8 Players - Multiple All-Ins Creating 3 Side Pots</div>
@@ -1553,9 +1568,11 @@ Henry CO 10000
                 <div class="badges">
                     <span class="badge high">Very High</span>
                     <span class="badge category">Full Table All-In</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -1772,11 +1789,12 @@ Grace BB 10000
                     8 players, 4 all-ins at different levels (500, 2000, 5000). Henry raises to 10000, Frank calls. Creates main pot + 3 side pots. Each all-in player can only win up to their contribution level across all pots. Frank and Henry can win entire pot. No action after flop since multiple all-ins.
                 </div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 8 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-8.1</div>
                     <div class="test-name">8 Players - Aggressive Multi-Street Betting with Flop Raise War</div>
@@ -1784,9 +1802,11 @@ Grace BB 10000
                 <div class="badges">
                     <span class="badge high">Very High</span>
                     <span class="badge category">Active Betting</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -2000,11 +2020,12 @@ Henry CO 14000
                     8 players start. Preflop has raise/calls then Bob 3-bets. 4 players call. Flop has aggressive raise war: Bob bets, Charlie raises, Frank re-raises. Charlie calls. Turn and River continue with betting and calling. Demonstrates heavy action across all streets with multiple More sections.
                 </div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 9 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-9.1</div>
                     <div class="test-name">6 Players - Heavy Betting Every Street with Multiple Callers</div>
@@ -2012,9 +2033,11 @@ Henry CO 14000
                 <div class="badges">
                     <span class="badge high">High</span>
                     <span class="badge category">Multi-Way Pot</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -2212,11 +2235,12 @@ Eve BB 11750
                     6 players see flop. Every street has betting and raising. Flop: 5 players active with raise. Turn: Bob raises, 3 callers. River: Alice bets, Frank raises, 2 call. Heavy action throughout with multiple players staying in. Demonstrates complex multi-way pot with aggressive betting.
                 </div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 10 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-10.1</div>
                     <div class="test-name">7 Players - Turn and River Raise Wars</div>
@@ -2224,9 +2248,11 @@ Eve BB 11750
                 <div class="badges">
                     <span class="badge high">Very High</span>
                     <span class="badge category">Late Street Action</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -2421,11 +2447,12 @@ Grace MP 19600
                     7 players. Preflop: Eve raises, 5 call. Flop: Bob bets, 4 call. Turn explodes with raise war: Bob bets, Charlie raises, Eve goes all-in for 18,800. Frank and Bob fold. Charlie calls all-in matching Eve's 18,800. Both players commit their entire 20K stacks (400 PF + 800 Flop + 18800 Turn). Demonstrates heavy turn aggression with all-in showdown.
                 </div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 11 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-11.1</div>
                     <div class="test-name">Heads-Up Preflop All-In</div>
@@ -2433,9 +2460,11 @@ Grace MP 19600
                 <div class="badges">
                     <span class="badge low">Simple</span>
                     <span class="badge category">Heads-Up</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">50</div></div>
@@ -2566,11 +2595,12 @@ Alice BB 8500
                 <div class="notes-title">Notes</div>
                 <div class="notes-text">Heads-up all-in preflop. Alice raises, Bob shoves for 2,500 total (2,400 live after posting ante and blind). Alice matches Bob's 2,400 live. Main Pot = (2 × 2,400) + 100 ante = 4,900. Winner takes all 4,900 chips. Bob eliminated, tournament over.</div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 12 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-12.1</div>
                     <div class="test-name">3-Player Side Pot with Different Winners</div>
@@ -2578,9 +2608,11 @@ Alice BB 8500
                 <div class="badges">
                     <span class="badge medium">Medium</span>
                     <span class="badge category">Side Pot</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">250</div></div>
@@ -2748,11 +2780,12 @@ Michael BB 4500
                 <div class="notes-title">⚠️ Split Pot Winners</div>
                 <div class="notes-text">David (BB) goes all-in preflop for 8,000 total (7,500 live after posting ante and blind). Sarah and Michael match David's 7,500 LIVE. On flop, Sarah bets 3,000, Michael calls. Main Pot = (3 × 7,500) + 500 ante = 23,000. Side Pot 1 = 2 × (11,000 - 7,500) = 7,000. David wins Main Pot (23,000), Sarah wins Side Pot 1 (7,000). Michael loses all chips invested.</div>
             </div>
+            </div>
         </div>
 
         <!-- TEST CASE 13 -->
         <div class="test-case">
-            <div class="test-header">
+            <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-13.1</div>
                     <div class="test-name">6-Player Complex Multi-Street with 3 Side Pots</div>
@@ -2760,9 +2793,11 @@ Michael BB 4500
                 <div class="badges">
                     <span class="badge high">Complex</span>
                     <span class="badge category">Multi-Side Pots</span>
+                    <span class="collapse-icon">▼</span>
                 </div>
             </div>
 
+            <div class="test-content">
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
                 <div class="blind-item"><label>Small Blind</label><div class="value">1,000</div></div>
@@ -2990,6 +3025,7 @@ Frank BB 430000
                 <div class="notes-text">
                     6 players create 4 pots with multiple all-ins at different levels: Charlie at 20K, Bob at 30K (28K LIVE after ante/blind), Alice at 60K, David at 80K. Main Pot capped at Charlie's 20K. Side Pot 1 uses Bob's 28K LIVE (not 30K total). Eve and Frank continue betting on flop. Frank wins ALL pots (sweep), collecting 400,000 total (122K + 40K + 120K + 118K). 4 players eliminated, heads-up begins next hand.
                 </div>
+            </div>
             </div>
         </div>
 
