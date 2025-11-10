@@ -7,6 +7,9 @@ import { useActionHandler } from './hooks/useActionHandler';
 import { StackSetupView } from './components/StackSetupView';
 import { PreFlopView } from './components/game/PreFlopView';
 import { FlopView } from './components/game/FlopView';
+import { TurnView } from './components/game/TurnView';
+import { RiverView } from './components/game/RiverView';
+import PotCalculationDemo from './pages/PotCalculationDemo';
 
 function App() {
   // Initialize game state
@@ -71,6 +74,11 @@ function App() {
     alert('Export functionality coming soon!');
   }, [state]);
 
+  // Render Pot Calculation Demo
+  if (state.currentView === 'pot-demo') {
+    return <PotCalculationDemo />;
+  }
+
   // Render current view
   if (state.currentView === 'stack') {
     return (
@@ -115,7 +123,37 @@ function App() {
     );
   }
 
-  // Placeholder for other game views (turn, river)
+  // Render Turn view
+  if (state.currentView === 'turn' || state.currentView === 'turn-more' || state.currentView === 'turn-more2') {
+    return (
+      <TurnView
+        state={state}
+        actions={actions}
+        cardManagement={cardManagement}
+        potCalculation={potCalculation}
+        onClearAll={handleClearAll}
+        onExport={handleExport}
+        formatStack={formatStack}
+      />
+    );
+  }
+
+  // Render River view
+  if (state.currentView === 'river' || state.currentView === 'river-more' || state.currentView === 'river-more2') {
+    return (
+      <RiverView
+        state={state}
+        actions={actions}
+        cardManagement={cardManagement}
+        potCalculation={potCalculation}
+        onClearAll={handleClearAll}
+        onExport={handleExport}
+        formatStack={formatStack}
+      />
+    );
+  }
+
+  // Placeholder for unknown views
   return (
     <div className="p-2 max-w-full mx-auto bg-gray-50 min-h-screen">
       <div className="bg-white rounded-lg shadow-lg p-3">

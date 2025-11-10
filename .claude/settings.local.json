@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push:*)",
+      "Bash(npm test:*)",
+      "Bash(python generate_test_cases.py:*)",
+      "Bash(\"C:\\Apps\\HUDR\\HHTool_Modular\\docs\\pot-test-cases-final-new.html\")",
+      "Bash(cat:*)",
+      "Bash(for i in {1..300})",
+      "Bash(do grep -q \"TC-$i\\.1\" \"C:\\Apps\\HUDR\\HHTool_Modular\\docs\\pot-test-cases-final.html\")",
+      "Bash(echo:*)",
+      "Bash(done)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

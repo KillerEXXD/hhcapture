@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pot Calculation UI - V3 with Player List in Header</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        /* Total Pot Summary Card */
+        .total-pot-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .total-pot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-pot-label {
+            font-size: 18px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .total-pot-amount {
+            font-size: 48px;
+            font-weight: 900;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .total-pot-breakdown {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        /* Pot Container */
+        .pot-container {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .pot-container:hover {
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Pot Header */
+        .pot-header {
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .pot-container.main-pot .pot-header {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+
+        .pot-container.side-pot-1 .pot-header {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        }
+
+        .pot-container.side-pot-2 .pot-header {
+            background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
+        }
+
+        .pot-header:hover {
+            opacity: 0.95;
+        }
+
+        .pot-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .pot-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .pot-icon {
+            font-size: 32px;
+        }
+
+        .pot-title-section h3 {
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 4px;
+        }
+
+        .pot-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 600;
+        }
+
+        .pot-header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .pot-amount {
+            font-size: 32px;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .eligible-count {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+
+        .expand-icon {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+            stroke: white;
+        }
+
+        .pot-container.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Player List in Header */
+        .player-list-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .player-list-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .player-chips-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .player-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: white;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1f2937;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .player-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .player-chip.all-in {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            padding: 5px 11px;
+        }
+
+        .player-chip.excluded {
+            background: #f3f4f6;
+            color: #9ca3af;
+            opacity: 0.7;
+        }
+
+        .player-chip-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .player-chip-name {
+            font-size: 13px;
+        }
+
+        .player-chip-badge {
+            font-size: 9px;
+            background: #dc2626;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        /* Pot Body */
+        .pot-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .pot-container.expanded .pot-body {
+            max-height: 3000px;
+            transition: max-height 0.6s ease-in;
+        }
+
+        .pot-body-inner {
+            padding: 24px;
+            background: #f9fafb;
+        }
+
+        /* Calculation Explanation Section */
+        .calculation-explanation {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bfdbfe 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .calculation-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calculation-formula {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .calculation-formula .math-var {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .calculation-formula .math-op {
+            color: #059669;
+            font-weight: 700;
+        }
+
+        .calculation-result {
+            font-size: 14px;
+            color: #1e40af;
+            font-weight: 600;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        /* Player Contributions Grid */
+        .players-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .player-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .player-card:hover {
+            border-color: #9333ea;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.15);
+        }
+
+        .player-card.all-in {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: #f59e0b;
+        }
+
+        .player-card.excluded {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            opacity: 0.7;
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .player-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .player-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .player-position {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .player-badge {
+            background: #dc2626;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-left: auto;
+        }
+
+        .contribution-amount {
+            font-size: 18px;
+            font-weight: 800;
+            color: #16a34a;
+            text-align: center;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .excluded-reason {
+            font-size: 11px;
+            color: #6b7280;
+            font-style: italic;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        /* Street Breakdown */
+        .street-breakdown {
+            border-top: 2px solid #e5e7eb;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .street-contributions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .street-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .street-card:hover {
+            border-color: #9333ea;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);
+        }
+
+        .street-card.preflop {
+            border-left: 4px solid #9333ea;
+        }
+
+        .street-card.flop {
+            border-left: 4px solid #2563eb;
+        }
+
+        .street-card.turn {
+            border-left: 4px solid #dc2626;
+        }
+
+        .street-card.river {
+            border-left: 4px solid #16a34a;
+        }
+
+        .street-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .street-amount {
+            font-size: 20px;
+            font-weight: 800;
+            color: #16a34a;
+        }
+
+        .street-detail {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 16px;
+        }
+
+        .info-box-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-box-content {
+            font-size: 12px;
+            color: #78350f;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .players-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .street-contributions {
+                grid-template-columns: 1fr;
+            }
+
+            .pot-amount {
+                font-size: 24px;
+            }
+
+            .total-pot-amount {
+                font-size: 36px;
+            }
+
+            .player-list-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pot-container {
+            animation: slideIn 0.4s ease-out forwards;
+        }
+
+        .pot-container:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .pot-container:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .pot-container:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>💰 Pot Calculation Display (V3)</h1>
+            <p>Player list shown in pot header for quick reference</p>
+        </div>
+
+        <!-- Total Pot Summary -->
+        <div class="total-pot-card">
+            <div class="total-pot-header">
+                <div class="total-pot-label">Total Pot</div>
+                <div class="total-pot-amount">$19,000</div>
+            </div>
+            <div class="total-pot-breakdown">
+                Main Pot: $12,500 | Side Pot 1: $4,800 | Side Pot 2: $1,700
+            </div>
+        </div>
+
+        <!-- MAIN POT -->
+        <div class="pot-container main-pot expanded">
+            <div class="pot-header" onclick="togglePot(this)">
+                <!-- Top Section: Title, Amount, Expand -->
+                <div class="pot-header-top">
+                    <div class="pot-header-left">
+                        <div class="pot-icon">🏆</div>
+                        <div class="pot-title-section">
+                            <h3>Main Pot</h3>
+                            <div class="pot-subtitle">All active players eligible</div>
+                        </div>
+                    </div>
+                    <div class="pot-header-right">
+                        <div>
+                            <div class="pot-amount">$12,500</div>
+                            <div class="eligible-count">5 players</div>
+                        </div>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Player List in Header -->
+                <div class="player-list-header">
+                    <span class="player-list-label">Eligible:</span>
+                    <div class="player-chips-container">
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">A</div>
+                            <span class="player-chip-name">Alice</span>
+                        </div>
+                        <div class="player-chip all-in">
+                            <div class="player-chip-avatar">B</div>
+                            <span class="player-chip-name">Bob</span>
+                            <span class="player-chip-badge">ALL-IN</span>
+                        </div>
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">C</div>
+                            <span class="player-chip-name">Charlie</span>
+                        </div>
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">D</div>
+                            <span class="player-chip-name">David</span>
+                        </div>
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">E</div>
+                            <span class="player-chip-name">Emma</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pot-body">
+                <div class="pot-body-inner">
+                    <!-- Calculation Explanation -->
+                    <div class="calculation-explanation">
+                        <div class="calculation-title">📊 How this pot was calculated</div>
+                        <div class="calculation-formula">
+                            Main Pot = <span class="math-var">Smallest Stack</span> <span class="math-op">×</span> <span class="math-var">Active Players</span><br>
+                            Main Pot = <span class="math-var">$2,500</span> <span class="math-op">×</span> <span class="math-var">5 players</span><br>
+                        </div>
+                        <div class="calculation-result">
+                            = $12,500 (capped at smallest contribution)
+                        </div>
+                    </div>
+
+                    <!-- Street Breakdown -->
+                    <div class="street-breakdown">
+                        <h4 class="section-title">📈 Contributions by Street</h4>
+                        <div class="street-contributions">
+                            <div class="street-card preflop">
+                                <div class="street-name">Preflop</div>
+                                <div class="street-amount">$11,000</div>
+                                <div class="street-detail">All players contributed</div>
+                            </div>
+                            <div class="street-card flop">
+                                <div class="street-name">Flop</div>
+                                <div class="street-amount">$1,500</div>
+                                <div class="street-detail">2 active players bet</div>
+                            </div>
+                            <div class="street-card turn">
+                                <div class="street-name">Turn</div>
+                                <div class="street-amount">$0</div>
+                                <div class="street-detail">All checked</div>
+                            </div>
+                            <div class="street-card river">
+                                <div class="street-name">River</div>
+                                <div class="street-amount">$0</div>
+                                <div class="street-detail">All checked</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <div class="info-box-title">ℹ️ About Main Pot</div>
+                        <div class="info-box-content">
+                            The main pot is capped at the smallest all-in amount ($2,500 from Bob). All five players contributed this amount, making the main pot $12,500. Any contributions above this threshold go into side pots.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIDE POT 1 -->
+        <div class="pot-container side-pot-1">
+            <div class="pot-header" onclick="togglePot(this)">
+                <!-- Top Section -->
+                <div class="pot-header-top">
+                    <div class="pot-header-left">
+                        <div class="pot-icon">💼</div>
+                        <div class="pot-title-section">
+                            <h3>Side Pot 1</h3>
+                            <div class="pot-subtitle">Players above 1st all-in</div>
+                        </div>
+                    </div>
+                    <div class="pot-header-right">
+                        <div>
+                            <div class="pot-amount">$4,800</div>
+                            <div class="eligible-count">4 players</div>
+                        </div>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Player List in Header -->
+                <div class="player-list-header">
+                    <span class="player-list-label">Eligible:</span>
+                    <div class="player-chips-container">
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">A</div>
+                            <span class="player-chip-name">Alice</span>
+                        </div>
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">C</div>
+                            <span class="player-chip-name">Charlie</span>
+                        </div>
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">D</div>
+                            <span class="player-chip-name">David</span>
+                        </div>
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">E</div>
+                            <span class="player-chip-name">Emma</span>
+                        </div>
+                        <div class="player-chip excluded">
+                            <div class="player-chip-avatar">B</div>
+                            <span class="player-chip-name">Bob (excluded)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pot-body">
+                <div class="pot-body-inner">
+                    <!-- Calculation Explanation -->
+                    <div class="calculation-explanation">
+                        <div class="calculation-title">📊 How this pot was calculated</div>
+                        <div class="calculation-formula">
+                            Side Pot 1 = (<span class="math-var">Next Smallest</span> <span class="math-op">-</span> <span class="math-var">Main Pot Cap</span>) <span class="math-op">×</span> <span class="math-var">Eligible Players</span><br>
+                            Side Pot 1 = (<span class="math-var">$3,700</span> <span class="math-op">-</span> <span class="math-var">$2,500</span>) <span class="math-op">×</span> <span class="math-var">4 players</span><br>
+                        </div>
+                        <div class="calculation-result">
+                            = $1,200 × 4 = $4,800
+                        </div>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <div class="info-box-title">ℹ️ About Side Pot 1</div>
+                        <div class="info-box-content">
+                            This pot contains contributions from players who put in more than Bob's all-in amount ($2,500). Bob is excluded because he was all-in for less.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIDE POT 2 -->
+        <div class="pot-container side-pot-2">
+            <div class="pot-header" onclick="togglePot(this)">
+                <!-- Top Section -->
+                <div class="pot-header-top">
+                    <div class="pot-header-left">
+                        <div class="pot-icon">💎</div>
+                        <div class="pot-title-section">
+                            <h3>Side Pot 2</h3>
+                            <div class="pot-subtitle">Players above 2nd all-in</div>
+                        </div>
+                    </div>
+                    <div class="pot-header-right">
+                        <div>
+                            <div class="pot-amount">$1,700</div>
+                            <div class="eligible-count">2 players</div>
+                        </div>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Player List in Header -->
+                <div class="player-list-header">
+                    <span class="player-list-label">Eligible:</span>
+                    <div class="player-chips-container">
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">A</div>
+                            <span class="player-chip-name">Alice</span>
+                        </div>
+                        <div class="player-chip">
+                            <div class="player-chip-avatar">C</div>
+                            <span class="player-chip-name">Charlie</span>
+                        </div>
+                        <div class="player-chip excluded">
+                            <div class="player-chip-avatar">B</div>
+                            <span class="player-chip-name">Bob</span>
+                        </div>
+                        <div class="player-chip excluded">
+                            <div class="player-chip-avatar">D</div>
+                            <span class="player-chip-name">David</span>
+                        </div>
+                        <div class="player-chip excluded">
+                            <div class="player-chip-avatar">E</div>
+                            <span class="player-chip-name">Emma</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pot-body">
+                <div class="pot-body-inner">
+                    <!-- Calculation Explanation -->
+                    <div class="calculation-explanation">
+                        <div class="calculation-title">📊 How this pot was calculated</div>
+                        <div class="calculation-formula">
+                            Side Pot 2 = (<span class="math-var">Remaining</span> <span class="math-op">-</span> <span class="math-var">Side Pot 1 Cap</span>) <span class="math-op">×</span> <span class="math-var">Eligible Players</span><br>
+                            Side Pot 2 = (<span class="math-var">$4,550</span> <span class="math-op">-</span> <span class="math-var">$3,700</span>) <span class="math-op">×</span> <span class="math-var">2 players</span><br>
+                        </div>
+                        <div class="calculation-result">
+                            = $850 × 2 = $1,700
+                        </div>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <div class="info-box-title">ℹ️ About Side Pot 2</div>
+                        <div class="info-box-content">
+                            This pot contains the extra contributions from Alice and Charlie who put in more than the second all-in threshold ($3,700). Only these two players can win this pot.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePot(header) {
+            const container = header.closest('.pot-container');
+            container.classList.toggle('expanded');
+        }
+
+        // Initialize - expand first pot by default
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstPot = document.querySelector('.pot-container');
+            if (firstPot) {
+                firstPot.classList.add('expanded');
+            }
+        });
+    </script>
+</body>
+</html>

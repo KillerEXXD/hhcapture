@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pot Calculation Test Cases - Interactive Review</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        select, input {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .test-case-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .test-case-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .test-case-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+
+        .test-case-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .test-case-header:hover {
+            background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+        }
+
+        .test-case-title {
+            flex: 1;
+        }
+
+        .test-case-id {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .test-case-name {
+            font-size: 16px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .test-case-meta {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge.low { background: #c6f6d5; color: #22543d; }
+        .badge.medium { background: #fed7aa; color: #7c2d12; }
+        .badge.high { background: #fecaca; color: #7f1d1d; }
+        .badge.very-high { background: #ddd6fe; color: #5b21b6; }
+
+        .badge.category {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+
+        .expand-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .test-case-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .test-case-body {
+            display: none;
+            padding: 30px;
+        }
+
+        .test-case-card.expanded .test-case-body {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .stack-setup {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .info-box {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .player-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .player-position {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .player-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .player-stack {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .action-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .action-timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .action-street {
+            margin-bottom: 25px;
+        }
+
+        .action-street-header {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .street-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .action-item {
+            position: relative;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 6px;
+            margin-left: 10px;
+        }
+
+        .action-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 18px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+
+        .action-player {
+            font-weight: 700;
+            color: #2d3748;
+            margin-right: 8px;
+        }
+
+        .action-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .action-type.call { background: #c6f6d5; color: #22543d; }
+        .action-type.raise { background: #fed7aa; color: #7c2d12; }
+        .action-type.bet { background: #fecaca; color: #7f1d1d; }
+        .action-type.fold { background: #e2e8f0; color: #4a5568; }
+        .action-type.check { background: #dbeafe; color: #1e3a8a; }
+        .action-type.all-in { background: #ddd6fe; color: #5b21b6; }
+
+        .action-amount {
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .expected-results {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #86efac;
+        }
+
+        .pot-breakdown {
+            display: grid;
+            gap: 15px;
+        }
+
+        .pot-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #22c55e;
+        }
+
+        .pot-card.main { border-left-color: #eab308; }
+        .pot-card.side1 { border-left-color: #3b82f6; }
+        .pot-card.side2 { border-left-color: #8b5cf6; }
+
+        .pot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .pot-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #2d3748;
+        }
+
+        .pot-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .pot-details {
+            display: grid;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .pot-detail-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pot-detail-label {
+            font-weight: 600;
+            color: #718096;
+            min-width: 80px;
+        }
+
+        .pot-detail-value {
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .player-chip {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #dbeafe;
+            color: #1e40af;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .player-chip.excluded {
+            background: #fee2e2;
+            color: #991b1b;
+            text-decoration: line-through;
+        }
+
+        .dead-money-box {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .verification-checklist {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #38bdf8;
+        }
+
+        .checklist-item {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checklist-item::before {
+            content: '✓';
+            width: 20px;
+            height: 20px;
+            background: #38bdf8;
+            color: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .stats-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .notes-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .notes-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .notes-content {
+            color: #78350f;
+            line-height: 1.6;
+        }
+
+        @media print {
+            body { background: white; }
+            .filters, .stats-bar { display: none; }
+            .test-case-card { page-break-inside: avoid; }
+            .test-case-body { display: block !important; }
+            .expand-icon { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Pot Calculation Test Cases</h1>
+            <p class="subtitle">Interactive test case viewer for poker hand history pot calculation validation</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalTests">18</div>
+                <div class="stat-label">Total Test Cases</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="visibleTests">18</div>
+                <div class="stat-label">Visible</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">7</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">4</div>
+                <div class="stat-label">Complexity Levels</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Category:</label>
+                <select id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="basic">Basic - No All-Ins</option>
+                    <option value="single-all-in">Single All-In</option>
+                    <option value="multiple-all-ins">Multiple All-Ins</option>
+                    <option value="dead-money">Dead Money</option>
+                    <option value="multi-street">Multi-Street</option>
+                    <option value="edge-case">Edge Cases</option>
+                    <option value="real-world">Real-World</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Complexity:</label>
+                <select id="complexityFilter">
+                    <option value="">All Levels</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="very-high">Very High</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Search:</label>
+                <input type="text" id="searchInput" placeholder="Search test cases...">
+            </div>
+            <div class="filter-group">
+                <button onclick="expandAll()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Expand All</button>
+                <button onclick="collapseAll()" style="padding: 8px 16px; background: #718096; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Collapse All</button>
+            </div>
+        </div>
+
+        <div class="test-case-list" id="testCaseList">
+            <!-- Test cases will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const testCases = [
+            {
+                id: 'TC-1.1',
+                name: 'Simple Preflop - Everyone Calls',
+                category: 'basic',
+                complexity: 'low',
+                description: 'Basic scenario where all players call to BB. No raises, no all-ins.',
+                stackSetup: {
+                    players: [
+                        { position: 'SB', name: 'Alice', stack: 10000 },
+                        { position: 'BB', name: 'Bob', stack: 10000 },
+                        { position: 'BTN', name: 'Charlie', stack: 10000 }
+                    ],
+                    blinds: { sb: 50, bb: 100 },
+                    ante: 0,
+                    anteOrder: 'BB First'
+                },
+                actions: {
+                    preflopBase: [
+                        { player: 'Alice', action: 'Post Blind', amount: 50 },
+                        { player: 'Bob', action: 'Post Blind', amount: 100 },
+                        { player: 'Charlie', action: 'Call', amount: 100 },
+                        { player: 'Alice', action: 'Call', amount: 100 },
+                        { player: 'Bob', action: 'Check', amount: 0 }
+                    ]
+                },
+                expected: {
+                    totalPot: 300,
+                    mainPot: {
+                        amount: 300,
+                        eligible: ['Alice', 'Bob', 'Charlie'],
+                        excluded: [],
+                        percentage: 100
+                    },
+                    sidePots: [],
+                    deadMoney: { total: 0, ante: 0, foldedBlinds: 0, foldedBets: 0 },
+                    finalStacks: [
+                        { player: 'Alice', stack: 9900, contribution: 100 },
+                        { player: 'Bob', stack: 9900, contribution: 100 },
+                        { player: 'Charlie', stack: 9900, contribution: 100 }
+                    ],
+                    maxWins: [
+                        { player: 'Alice', maxWin: 300 },
+                        { player: 'Bob', maxWin: 300 },
+                        { player: 'Charlie', maxWin: 300 }
+                    ]
+                },
+                notes: 'All players call to 100. No raises. Simple pot split between 3 players.',
+                verification: [
+                    'Total pot = $300',
+                    'Main pot = $300',
+                    'No side pots',
+                    'All 3 players eligible',
+                    'No dead money',
+                    'Each contributed exactly $100'
+                ]
+            },
+            {
+                id: 'TC-1.2',
+                name: 'Preflop Raise - All Call',
+                category: 'basic',
+                complexity: 'low',
+                description: 'UTG raises to 300. All players call. Simple 4-way pot with no all-ins.',
+                stackSetup: {
+                    players: [
+                        { position: 'SB', name: 'Alice', stack: 10000 },
+                        { position: 'BB', name: 'Bob', stack: 10000 },
+                        { position: 'UTG', name: 'Charlie', stack: 10000 },
+                        { position: 'BTN', name: 'David', stack: 10000 }
+                    ],
+                    blinds: { sb: 50, bb: 100 },
+                    ante: 0,
+                    anteOrder: 'BB First'
+                },
+                actions: {
+                    preflopBase: [
+                        { player: 'Alice', action: 'Post Blind', amount: 50 },
+                        { player: 'Bob', action: 'Post Blind', amount: 100 },
+                        { player: 'Charlie', action: 'Raise', amount: 300 },
+                        { player: 'David', action: 'Call', amount: 300 },
+                        { player: 'Alice', action: 'Call', amount: 300 },
+                        { player: 'Bob', action: 'Call', amount: 300 }
+                    ]
+                },
+                expected: {
+                    totalPot: 1200,
+                    mainPot: {
+                        amount: 1200,
+                        eligible: ['Alice', 'Bob', 'Charlie', 'David'],
+                        excluded: [],
+                        percentage: 100
+                    },
+                    sidePots: [],
+                    deadMoney: { total: 0, ante: 0, foldedBlinds: 0, foldedBets: 0 },
+                    finalStacks: [
+                        { player: 'Alice', stack: 9700, contribution: 300 },
+                        { player: 'Bob', stack: 9700, contribution: 300 },
+                        { player: 'Charlie', stack: 9700, contribution: 300 },
+                        { player: 'David', stack: 9700, contribution: 300 }
+                    ],
+                    maxWins: [
+                        { player: 'Alice', maxWin: 1200 },
+                        { player: 'Bob', maxWin: 1200 },
+                        { player: 'Charlie', maxWin: 1200 },
+                        { player: 'David', maxWin: 1200 }
+                    ]
+                },
+                notes: 'UTG raises to 300. All players call. Simple 4-way pot.',
+                verification: [
+                    'Total pot = $1,200',
+                    'Each player contributed $300',
+                    'BB blind counted toward contribution',
+                    'SB blind counted toward contribution'
+                ]
+            },
+            {
+                id: 'TC-2.2',
+                name: 'One All-In Creates Side Pot',
+                category: 'single-all-in',
+                complexity: 'medium',
+                description: 'Charlie all-in for 300. Alice raises to 600. Bob calls 600. Creates main pot and side pot.',
+                stackSetup: {
+                    players: [
+                        { position: 'SB', name: 'Alice', stack: 10000 },
+                        { position: 'BB', name: 'Bob', stack: 10000 },
+                        { position: 'BTN', name: 'Charlie', stack: 300 }
+                    ],
+                    blinds: { sb: 50, bb: 100 },
+                    ante: 0,
+                    anteOrder: 'BB First'
+                },
+                actions: {
+                    preflopBase: [
+                        { player: 'Alice', action: 'Post Blind', amount: 50 },
+                        { player: 'Bob', action: 'Post Blind', amount: 100 },
+                        { player: 'Charlie', action: 'All-in', amount: 300 },
+                        { player: 'Alice', action: 'Raise', amount: 600 },
+                        { player: 'Bob', action: 'Call', amount: 600 }
+                    ]
+                },
+                expected: {
+                    totalPot: 1500,
+                    mainPot: {
+                        amount: 900,
+                        eligible: ['Alice', 'Bob', 'Charlie'],
+                        excluded: [],
+                        percentage: 60
+                    },
+                    sidePots: [
+                        {
+                            name: 'Side Pot 1',
+                            amount: 600,
+                            eligible: ['Alice', 'Bob'],
+                            excluded: ['Charlie'],
+                            percentage: 40
+                        }
+                    ],
+                    deadMoney: { total: 0, ante: 0, foldedBlinds: 0, foldedBets: 0 },
+                    finalStacks: [
+                        { player: 'Alice', stack: 9400, contribution: 600 },
+                        { player: 'Bob', stack: 9400, contribution: 600 },
+                        { player: 'Charlie', stack: 0, contribution: 300 }
+                    ],
+                    maxWins: [
+                        { player: 'Alice', maxWin: 1500 },
+                        { player: 'Bob', maxWin: 1500 },
+                        { player: 'Charlie', maxWin: 900 }
+                    ]
+                },
+                notes: 'Charlie all-in 300. Alice raises to 600. Bob calls 600. Creates main pot (3×300=900) and side pot (2×300=600).',
+                verification: [
+                    'Total pot = $1,500',
+                    'Main pot = $900 (60%)',
+                    'Side pot 1 = $600 (40%)',
+                    'Main pot eligible: Alice, Bob, Charlie (3 players)',
+                    'Side pot eligible: Alice, Bob only (2 players)',
+                    'Charlie excluded from side pot',
+                    'Charlie can only win $900 max'
+                ]
+            },
+            {
+                id: 'TC-3.1',
+                name: 'Two All-Ins at Different Amounts',
+                category: 'multiple-all-ins',
+                complexity: 'high',
+                description: 'Two all-ins: Charlie at 500 and Bob at 2000. Creates main pot + 1 side pot.',
+                stackSetup: {
+                    players: [
+                        { position: 'SB', name: 'Alice', stack: 10000 },
+                        { position: 'BB', name: 'Bob', stack: 2000 },
+                        { position: 'UTG', name: 'Charlie', stack: 500 },
+                        { position: 'BTN', name: 'David', stack: 10000 }
+                    ],
+                    blinds: { sb: 50, bb: 100 },
+                    ante: 0,
+                    anteOrder: 'BB First'
+                },
+                actions: {
+                    preflopBase: [
+                        { player: 'Alice', action: 'Post Blind', amount: 50 },
+                        { player: 'Bob', action: 'Post Blind', amount: 100 },
+                        { player: 'Charlie', action: 'All-in', amount: 500 },
+                        { player: 'David', action: 'Raise', amount: 1000 },
+                        { player: 'Alice', action: 'Call', amount: 2000 },
+                        { player: 'Bob', action: 'All-in', amount: 2000 },
+                        { player: 'David', action: 'Call', amount: 2000 }
+                    ]
+                },
+                expected: {
+                    totalPot: 6500,
+                    mainPot: {
+                        amount: 2000,
+                        eligible: ['Alice', 'Bob', 'Charlie', 'David'],
+                        excluded: [],
+                        percentage: 30.8
+                    },
+                    sidePots: [
+                        {
+                            name: 'Side Pot 1',
+                            amount: 4500,
+                            eligible: ['Alice', 'Bob', 'David'],
+                            excluded: ['Charlie'],
+                            percentage: 69.2
+                        }
+                    ],
+                    deadMoney: { total: 0, ante: 0, foldedBlinds: 0, foldedBets: 0 },
+                    finalStacks: [
+                        { player: 'Alice', stack: 8000, contribution: 2000 },
+                        { player: 'Bob', stack: 0, contribution: 2000 },
+                        { player: 'Charlie', stack: 0, contribution: 500 },
+                        { player: 'David', stack: 8000, contribution: 2000 }
+                    ],
+                    maxWins: [
+                        { player: 'Alice', maxWin: 6500 },
+                        { player: 'Bob', maxWin: 6500 },
+                        { player: 'Charlie', maxWin: 2000 },
+                        { player: 'David', maxWin: 6500 }
+                    ]
+                },
+                notes: 'Two all-ins: Charlie at 500 and Bob at 2000. Creates main pot + 1 side pot.',
+                verification: [
+                    'Total pot = $6,500',
+                    'Main pot = $2,000 (4×500)',
+                    'Side pot 1 = $4,500 (3×1500)',
+                    'Charlie can win $2,000 max',
+                    'Bob can win $6,500 max',
+                    'Math validates: $2,000 + $4,500 = $6,500'
+                ]
+            },
+            {
+                id: 'TC-5.1',
+                name: 'Preflop to Flop - Pot Carries Forward',
+                category: 'multi-street',
+                complexity: 'medium',
+                description: 'Preflop: 3 players call to 300 (pot = 900). Flop: Alice folds. Bob bets 500. Charlie calls. Pot accumulates across streets.',
+                stackSetup: {
+                    players: [
+                        { position: 'SB', name: 'Alice', stack: 10000 },
+                        { position: 'BB', name: 'Bob', stack: 10000 },
+                        { position: 'BTN', name: 'Charlie', stack: 10000 }
+                    ],
+                    blinds: { sb: 50, bb: 100 },
+                    ante: 0,
+                    anteOrder: 'BB First'
+                },
+                actions: {
+                    preflopBase: [
+                        { player: 'Alice', action: 'Post Blind', amount: 50 },
+                        { player: 'Bob', action: 'Post Blind', amount: 100 },
+                        { player: 'Charlie', action: 'Raise', amount: 300 },
+                        { player: 'Alice', action: 'Call', amount: 300 },
+                        { player: 'Bob', action: 'Call', amount: 300 }
+                    ],
+                    flopBase: [
+                        { player: 'Alice', action: 'Check', amount: 0 },
+                        { player: 'Bob', action: 'Bet', amount: 500 },
+                        { player: 'Charlie', action: 'Call', amount: 500 },
+                        { player: 'Alice', action: 'Fold', amount: 0 }
+                    ]
+                },
+                expected: {
+                    totalPot: 1900,
+                    mainPot: {
+                        amount: 1900,
+                        eligible: ['Bob', 'Charlie'],
+                        excluded: ['Alice'],
+                        percentage: 100
+                    },
+                    sidePots: [],
+                    deadMoney: { total: 300, ante: 0, foldedBlinds: 0, foldedBets: 300 },
+                    finalStacks: [
+                        { player: 'Alice', stack: 9700, contribution: 300 },
+                        { player: 'Bob', stack: 9200, contribution: 800 },
+                        { player: 'Charlie', stack: 9200, contribution: 800 }
+                    ],
+                    maxWins: [
+                        { player: 'Alice', maxWin: 0 },
+                        { player: 'Bob', maxWin: 1900 },
+                        { player: 'Charlie', maxWin: 1900 }
+                    ]
+                },
+                notes: 'Preflop: 3 players call to 300 (pot = 900). Flop: Alice folds. Bob bets 500. Charlie calls. Pot accumulates across streets.',
+                verification: [
+                    'Preflop pot = $900',
+                    'Flop adds $1,000 (500+500)',
+                    'Total pot = $1,900',
+                    "Alice's $300 preflop contribution stays in pot (dead)",
+                    'Only Bob and Charlie can win'
+                ]
+            }
+        ];
+
+        function renderTestCases(filteredCases = testCases) {
+            const container = document.getElementById('testCaseList');
+            container.innerHTML = '';
+
+            document.getElementById('visibleTests').textContent = filteredCases.length;
+
+            filteredCases.forEach(tc => {
+                const card = createTestCaseCard(tc);
+                container.appendChild(card);
+            });
+        }
+
+        function createTestCaseCard(tc) {
+            const card = document.createElement('div');
+            card.className = 'test-case-card';
+            card.setAttribute('data-category', tc.category);
+            card.setAttribute('data-complexity', tc.complexity);
+
+            card.innerHTML = `
+                <div class="test-case-header" onclick="toggleCard(this)">
+                    <div class="test-case-title">
+                        <div class="test-case-id">${tc.id}</div>
+                        <div class="test-case-name">${tc.name}</div>
+                        <div class="test-case-meta">
+                            <span class="badge ${tc.complexity}">${tc.complexity}</span>
+                            <span class="badge category">${tc.category}</span>
+                        </div>
+                    </div>
+                    <div class="expand-icon">▼</div>
+                </div>
+                <div class="test-case-body">
+                    ${renderTestCaseBody(tc)}
+                </div>
+            `;
+
+            return card;
+        }
+
+        function renderTestCaseBody(tc) {
+            return `
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">📋</span>
+                        Description
+                    </div>
+                    <p style="color: #4a5568; line-height: 1.6;">${tc.description}</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">⚙️</span>
+                        Stack Setup
+                    </div>
+                    <div class="stack-setup">
+                        <div class="info-box">
+                            <div class="info-label">Small Blind</div>
+                            <div class="info-value">$${tc.stackSetup.blinds.sb.toLocaleString()}</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">Big Blind</div>
+                            <div class="info-value">$${tc.stackSetup.blinds.bb.toLocaleString()}</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">Ante</div>
+                            <div class="info-value">$${tc.stackSetup.ante.toLocaleString()}</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">Ante Order</div>
+                            <div class="info-value">${tc.stackSetup.anteOrder}</div>
+                        </div>
+                    </div>
+                    <div class="player-grid" style="margin-top: 20px;">
+                        ${tc.stackSetup.players.map(p => `
+                            <div class="player-card">
+                                <div class="player-position">${p.position}</div>
+                                <div class="player-name">${p.name}</div>
+                                <div class="player-stack">Stack: $${p.stack.toLocaleString()}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">🎮</span>
+                        Actions
+                    </div>
+                    <div class="action-timeline">
+                        ${renderActions(tc.actions)}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">✅</span>
+                        Expected Results
+                    </div>
+                    <div class="expected-results">
+                        <div style="font-size: 24px; font-weight: 700; color: #16a34a; margin-bottom: 20px;">
+                            Total Pot: $${tc.expected.totalPot.toLocaleString()}
+                        </div>
+                        <div class="pot-breakdown">
+                            ${renderPotCard(tc.expected.mainPot, 'Main Pot', 'main')}
+                            ${tc.expected.sidePots.map((sp, i) => renderPotCard(sp, `Side Pot ${i + 1}`, `side${i + 1}`)).join('')}
+                        </div>
+                        ${renderDeadMoney(tc.expected.deadMoney)}
+                        ${renderFinalStacks(tc.expected.finalStacks, tc.expected.maxWins)}
+                    </div>
+                </div>
+
+                ${tc.notes ? `
+                <div class="notes-box">
+                    <div class="notes-title">📝 Notes</div>
+                    <div class="notes-content">${tc.notes}</div>
+                </div>
+                ` : ''}
+
+                <div class="section">
+                    <div class="section-title">
+                        <span class="section-icon">✓</span>
+                        Verification Checklist
+                    </div>
+                    <div class="verification-checklist">
+                        ${tc.verification.map(item => `
+                            <div class="checklist-item">${item}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderActions(actions) {
+            let html = '';
+
+            if (actions.preflopBase) {
+                html += `
+                    <div class="action-street">
+                        <div class="action-street-header">
+                            <span class="street-badge">Preflop Base</span>
+                        </div>
+                        ${actions.preflopBase.map(a => `
+                            <div class="action-item">
+                                <span class="action-player">${a.player}:</span>
+                                <span class="action-type ${a.action.toLowerCase().replace(' ', '-')}">${a.action}</span>
+                                ${a.amount > 0 ? `<span class="action-amount">$${a.amount.toLocaleString()}</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            if (actions.flopBase) {
+                html += `
+                    <div class="action-street">
+                        <div class="action-street-header">
+                            <span class="street-badge">Flop Base</span>
+                        </div>
+                        ${actions.flopBase.map(a => `
+                            <div class="action-item">
+                                <span class="action-player">${a.player}:</span>
+                                <span class="action-type ${a.action.toLowerCase()}">${a.action}</span>
+                                ${a.amount > 0 ? `<span class="action-amount">$${a.amount.toLocaleString()}</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            return html;
+        }
+
+        function renderPotCard(pot, name, type) {
+            return `
+                <div class="pot-card ${type}">
+                    <div class="pot-header">
+                        <div class="pot-name">${name}</div>
+                        <div class="pot-amount">$${pot.amount.toLocaleString()}</div>
+                    </div>
+                    <div class="pot-details">
+                        <div class="pot-detail-row">
+                            <span class="pot-detail-label">Eligible:</span>
+                            <span class="pot-detail-value">
+                                ${pot.eligible.map(p => `<span class="player-chip">${p}</span>`).join('')}
+                            </span>
+                        </div>
+                        ${pot.excluded && pot.excluded.length > 0 ? `
+                        <div class="pot-detail-row">
+                            <span class="pot-detail-label">Excluded:</span>
+                            <span class="pot-detail-value">
+                                ${pot.excluded.map(p => `<span class="player-chip excluded">${p}</span>`).join('')}
+                            </span>
+                        </div>
+                        ` : ''}
+                        <div class="pot-detail-row">
+                            <span class="pot-detail-label">Percentage:</span>
+                            <span class="pot-detail-value">${pot.percentage.toFixed(1)}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDeadMoney(dm) {
+            if (dm.total === 0) return '';
+
+            return `
+                <div class="dead-money-box">
+                    <div style="font-weight: 700; color: #92400e; margin-bottom: 10px;">💀 Dead Money: $${dm.total.toLocaleString()}</div>
+                    <div style="font-size: 14px; color: #78350f;">
+                        <div>Ante: $${dm.ante.toLocaleString()}</div>
+                        <div>Folded Blinds: $${dm.foldedBlinds.toLocaleString()}</div>
+                        <div>Folded Bets: $${dm.foldedBets.toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFinalStacks(stacks, maxWins) {
+            return `
+                <div style="margin-top: 20px;">
+                    <h4 style="font-weight: 700; margin-bottom: 10px; color: #2d3748;">Final Stacks & Contributions</h4>
+                    <div style="display: grid; gap: 10px;">
+                        ${stacks.map((s, i) => `
+                            <div style="background: white; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <span style="font-weight: 700; color: #2d3748;">${s.player}</span>
+                                </div>
+                                <div style="display: flex; gap: 20px; font-size: 14px;">
+                                    <div>
+                                        <span style="color: #718096;">Stack:</span>
+                                        <span style="font-weight: 600; color: #2d3748;">$${s.stack.toLocaleString()}</span>
+                                    </div>
+                                    <div>
+                                        <span style="color: #718096;">Contributed:</span>
+                                        <span style="font-weight: 600; color: #dc2626;">$${s.contribution.toLocaleString()}</span>
+                                    </div>
+                                    <div>
+                                        <span style="color: #718096;">Max Win:</span>
+                                        <span style="font-weight: 600; color: #16a34a;">$${maxWins[i].maxWin.toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleCard(header) {
+            const card = header.closest('.test-case-card');
+            card.classList.toggle('expanded');
+        }
+
+        function expandAll() {
+            document.querySelectorAll('.test-case-card').forEach(card => {
+                card.classList.add('expanded');
+            });
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.test-case-card').forEach(card => {
+                card.classList.remove('expanded');
+            });
+        }
+
+        function filterTestCases() {
+            const category = document.getElementById('categoryFilter').value;
+            const complexity = document.getElementById('complexityFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = testCases.filter(tc => {
+                const matchCategory = !category || tc.category === category;
+                const matchComplexity = !complexity || tc.complexity === complexity;
+                const matchSearch = !search ||
+                    tc.id.toLowerCase().includes(search) ||
+                    tc.name.toLowerCase().includes(search) ||
+                    tc.description.toLowerCase().includes(search);
+
+                return matchCategory && matchComplexity && matchSearch;
+            });
+
+            renderTestCases(filtered);
+        }
+
+        // Event listeners
+        document.getElementById('categoryFilter').addEventListener('change', filterTestCases);
+        document.getElementById('complexityFilter').addEventListener('change', filterTestCases);
+        document.getElementById('searchInput').addEventListener('input', filterTestCases);
+
+        // Initial render
+        renderTestCases();
+    </script>
+</body>
+</html>

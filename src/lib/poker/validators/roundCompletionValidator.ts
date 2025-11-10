@@ -226,20 +226,21 @@ function checkPreflopRoundComplete(
   const maxContribution = Math.max(...contributions.map(c => c.contribution));
   console.log('   Max Contribution:', maxContribution);
 
-  // Check if all players have acted
-  // A player has acted if:
-  // 1. They have an action that's not 'none' or 'no action' (undefined action becomes 'none')
-  // 2. OR they are all-in
-  // 3. OR they already matched the max bet (check contribution)
+  // Check if all players have acted OR already matched the max bet
+  // Players who haven't acted in the current MORE level but already matched from BASE/previous MORE don't need to act
+  // A player needs to act if:
+  // 1. They have no action ('none' or 'no action')
+  // 2. AND they are not all-in
+  // 3. AND they haven't matched the max bet yet
   const playersWithoutAction = contributions.filter(c => {
     const hasNoAction = c.action === 'none' || c.action === 'no action';
     const notAllIn = !c.isAllIn;
-    const matchedBet = c.contribution >= maxContribution;
+    const hasNotMatchedBet = c.contribution < maxContribution;
 
-    console.log(`      ${c.playerName}: hasNoAction=${hasNoAction}, notAllIn=${notAllIn}, matchedBet=${matchedBet}`);
+    console.log(`      ${c.playerName}: hasNoAction=${hasNoAction}, notAllIn=${notAllIn}, hasNotMatchedBet=${hasNotMatchedBet}`);
 
     // Player needs to act if: no action, not all-in, AND hasn't matched the bet
-    return hasNoAction && notAllIn && !matchedBet;
+    return hasNoAction && notAllIn && hasNotMatchedBet;
   });
 
   if (playersWithoutAction.length > 0) {
@@ -297,21 +298,65 @@ function checkPostflopRoundComplete(
   // Get all postflop actions for this action level
   const contributions = activePlayers.map(p => {
     const data = playerData[p.id];
-    const actionKey = `${stage}${suffix}Action`;
-    const amountKey = `${stage}${suffix}Amount`;
 
-    const action = data[actionKey] as string | undefined;
+    // For MORE action levels, we need to get the TOTAL cumulative contribution
+    // including BASE + any previous MORE actions
     let contribution = 0;
+    let currentLevelAction = 'none';
 
-    if (action === 'bet' || action === 'raise' || action === 'call') {
-      contribution = parseFloat((data[amountKey] as string) || '0');
+    // Base action
+    const baseActionKey = `${stage}Action`;
+    const baseAmountKey = `${stage}Amount`;
+    const baseAction = data[baseActionKey] as string | undefined;
+
+    if (baseAction === 'bet' || baseAction === 'raise' || baseAction === 'call') {
+      contribution = parseFloat((data[baseAmountKey] as string) || '0');
+    }
+
+    // If checking MORE action levels, check if player acted in MORE
+    if (actionLevel === 'more') {
+      const moreActionKey = `${stage}_moreActionAction`;
+      const moreAmountKey = `${stage}_moreActionAmount`;
+      const moreAction = data[moreActionKey] as string | undefined;
+
+      if (moreAction === 'bet' || moreAction === 'raise' || moreAction === 'call') {
+        // Player acted in MORE - use their MORE amount (which is TOTAL including BASE)
+        contribution = parseFloat((data[moreAmountKey] as string) || '0');
+        currentLevelAction = moreAction;
+      } else {
+        // Player didn't act in MORE - use their BASE contribution
+        currentLevelAction = 'none';
+      }
+    } else if (actionLevel === 'more2') {
+      // Check MORE2 first, then fall back to MORE, then BASE
+      const more2ActionKey = `${stage}_moreAction2Action`;
+      const more2AmountKey = `${stage}_moreAction2Amount`;
+      const more2Action = data[more2ActionKey] as string | undefined;
+
+      if (more2Action === 'bet' || more2Action === 'raise' || more2Action === 'call') {
+        contribution = parseFloat((data[more2AmountKey] as string) || '0');
+        currentLevelAction = more2Action;
+      } else {
+        // Fall back to MORE
+        const moreActionKey = `${stage}_moreActionAction`;
+        const moreAmountKey = `${stage}_moreActionAmount`;
+        const moreAction = data[moreActionKey] as string | undefined;
+
+        if (moreAction === 'bet' || moreAction === 'raise' || moreAction === 'call') {
+          contribution = parseFloat((data[moreAmountKey] as string) || '0');
+        }
+        currentLevelAction = 'none';
+      }
+    } else {
+      // BASE level
+      currentLevelAction = baseAction || 'none';
     }
 
     return {
       playerId: p.id,
       playerName: p.name,
       contribution,
-      action: action || 'none',
+      action: currentLevelAction,
       isAllIn: checkIfPlayerAllIn(p, stage, actionLevel, playerData)
     };
   });
@@ -348,8 +393,16 @@ function checkPostflopRoundComplete(
     }
   }
 
-  // Check if all players have acted
-  const playersWithoutAction = contributions.filter(c => c.action === 'none' && !c.isAllIn);
+  // Check if all players have acted OR already matched the max bet
+  // Players who haven't acted in the current MORE level but already matched from BASE don't need to act
+  const playersWithoutAction = contributions.filter(c => {
+    const hasNoAction = c.action === 'none';
+    const notAllIn = !c.isAllIn;
+    const hasNotMatchedBet = c.contribution < maxContribution;
+
+    return hasNoAction && notAllIn && hasNotMatchedBet;
+  });
+
   if (playersWithoutAction.length > 0) {
     console.log('   → Players without action:', playersWithoutAction.map(p => p.playerName));
     console.log('   → Round NOT complete (players pending action)');
@@ -397,7 +450,7 @@ function checkIfPlayerFolded(
   actionLevel: ActionLevel,
   playerData: PlayerData
 ): boolean {
-  const data = playerData[player.id];
+  const data = playerData[player.id] || {};
   const suffix = actionLevel === 'base' ? '' : actionLevel === 'more' ? '_moreAction' : '_moreAction2';
 
   // Check all previous stages and current stage

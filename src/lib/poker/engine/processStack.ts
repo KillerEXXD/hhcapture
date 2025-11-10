@@ -150,11 +150,22 @@ export function processStackSynchronous(
       });
     }
   } else {
-    console.log(`\n🎴 ${stage.toUpperCase()} BASE - Using initial stacks for now`);
-    // TODO: In PHASE 2, inherit from previous street's last section
-    players.forEach(p => {
-      currentStacksForSection[p.id] = p.stack;
-    });
+    // Postflop BASE rounds: Use current stacks from sectionStacks (which carry over from previous street)
+    console.log(`\n🎴 ${stage.toUpperCase()} BASE - Using current stacks from sectionStacks`);
+    const currentSectionData = sectionStacks[sectionKey];
+
+    if (currentSectionData && currentSectionData.current) {
+      players.forEach(p => {
+        const currentStack = currentSectionData.current[p.id];
+        currentStacksForSection[p.id] = currentStack !== undefined ? currentStack : p.stack;
+        console.log(`   ${p.name}: Current = ${currentStacksForSection[p.id]} (from ${sectionKey}.current)`);
+      });
+    } else {
+      console.log(`   ⚠️ Section data not found - using initial stacks as fallback`);
+      players.forEach(p => {
+        currentStacksForSection[p.id] = p.stack;
+      });
+    }
   }
 
   // STEP 3: Calculate cumulative "already contributed" amounts

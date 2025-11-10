@@ -46,3 +46,7 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Screenshots (local development only)
+screenshots/
+!screenshots/.gitkeep

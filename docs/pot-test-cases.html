@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pot Calculation Test Cases</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .test-case {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+        }
+        .test-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .test-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        .badges {
+            display: flex;
+            gap: 10px;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.low { background: #d4edda; color: #155724; }
+        .badge.medium { background: #fff3cd; color: #856404; }
+        .badge.high { background: #f8d7da; color: #721c24; }
+        .badge.category { background: #d1ecf1; color: #0c5460; }
+
+        /* Stack Setup - Matching your app */
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .blind-setup {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .blind-item label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .blind-item .value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Player Table - Matching your app */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th {
+            background: #f8f9fa;
+            padding: 10px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #dee2e6;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+
+        /* Actions Section */
+        .actions-section {
+            margin: 20px 0;
+        }
+        .street-block {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .street-name {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 8px;
+        }
+        .action-row {
+            padding: 5px 0;
+            font-size: 14px;
+        }
+        .action-player {
+            font-weight: 600;
+            color: #333;
+        }
+        .action-type {
+            color: #666;
+            margin: 0 5px;
+        }
+        .action-amount {
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        /* Expected Results */
+        .results-section {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .pot-summary {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+        .pot-details {
+            display: grid;
+            gap: 10px;
+        }
+        .pot-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .pot-item.main { border-left-color: #ffc107; }
+        .pot-item.side { border-left-color: #17a2b8; }
+        .pot-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .pot-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: #28a745;
+        }
+        .eligible {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .eligible span {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #d1ecf1;
+            border-radius: 3px;
+            margin-right: 5px;
+            margin-bottom: 3px;
+        }
+        .excluded span {
+            background: #f8d7da;
+            color: #721c24;
+            text-decoration: line-through;
+        }
+
+        /* Notes */
+        .notes {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        .notes-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+        .notes-text {
+            font-size: 14px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pot Calculation Test Cases</h1>
+        <p class="subtitle">Test scenarios for poker tournament pot calculation validation</p>
+
+        <!-- TEST CASE 1 -->
+        <div class="test-case">
+            <div class="test-header">
+                <div>
+                    <div class="test-id">TC-1.1</div>
+                    <div class="test-name">Simple Preflop - Everyone Calls</div>
+                </div>
+                <div class="badges">
+                    <span class="badge low">Low</span>
+                    <span class="badge category">Basic</span>
+                </div>
+            </div>
+
+            <!-- Stack Setup -->
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item">
+                    <label>Small Blind</label>
+                    <div class="value">50</div>
+                </div>
+                <div class="blind-item">
+                    <label>Big Blind</label>
+                    <div class="value">100</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante</label>
+                    <div class="value">0</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante Order</label>
+                    <div class="value">BB First</div>
+                </div>
+            </div>
+
+            <!-- Players Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Position</th>
+                        <th>Name</th>
+                        <th>Starting Stack</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>SB</td>
+                        <td>Alice</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>BB</td>
+                        <td>Bob</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>BTN</td>
+                        <td>Charlie</td>
+                        <td>10,000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Actions -->
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">50</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">100</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Charlie (BTN):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">100</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">100</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Check</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expected Results -->
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 300</div>
+                <div class="pot-details">
+                    <div class="pot-item main">
+                        <div class="pot-name">Main Pot</div>
+                        <div class="pot-amount">300 (100%)</div>
+                        <div class="eligible">
+                            Eligible: <span>Alice</span><span>Bob</span><span>Charlie</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>Final Stacks:</strong>
+                    <table style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Final Stack</th>
+                                <th>Contributed</th>
+                                <th>Max Win</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Alice</td>
+                                <td>9,900</td>
+                                <td>100</td>
+                                <td>300</td>
+                            </tr>
+                            <tr>
+                                <td>Bob</td>
+                                <td>9,900</td>
+                                <td>100</td>
+                                <td>300</td>
+                            </tr>
+                            <tr>
+                                <td>Charlie</td>
+                                <td>9,900</td>
+                                <td>100</td>
+                                <td>300</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="notes">
+                <div class="notes-title">Notes</div>
+                <div class="notes-text">All players call to 100. No raises. Simple pot split between 3 players. No dead money.</div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 2 -->
+        <div class="test-case">
+            <div class="test-header">
+                <div>
+                    <div class="test-id">TC-2.2</div>
+                    <div class="test-name">One All-In Creates Side Pot</div>
+                </div>
+                <div class="badges">
+                    <span class="badge medium">Medium</span>
+                    <span class="badge category">Single All-In</span>
+                </div>
+            </div>
+
+            <!-- Stack Setup -->
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item">
+                    <label>Small Blind</label>
+                    <div class="value">50</div>
+                </div>
+                <div class="blind-item">
+                    <label>Big Blind</label>
+                    <div class="value">100</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante</label>
+                    <div class="value">0</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante Order</label>
+                    <div class="value">BB First</div>
+                </div>
+            </div>
+
+            <!-- Players Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Position</th>
+                        <th>Name</th>
+                        <th>Starting Stack</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>SB</td>
+                        <td>Alice</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>BB</td>
+                        <td>Bob</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>BTN</td>
+                        <td>Charlie</td>
+                        <td>300</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Actions -->
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">50</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">100</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Charlie (BTN):</span>
+                        <span class="action-type">All-in</span>
+                        <span class="action-amount">300</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Raise</span>
+                        <span class="action-amount">600</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">600</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expected Results -->
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 1,500</div>
+                <div class="pot-details">
+                    <div class="pot-item main">
+                        <div class="pot-name">Main Pot</div>
+                        <div class="pot-amount">900 (60%)</div>
+                        <div class="eligible">
+                            Eligible: <span>Alice</span><span>Bob</span><span>Charlie</span>
+                        </div>
+                    </div>
+                    <div class="pot-item side">
+                        <div class="pot-name">Side Pot 1</div>
+                        <div class="pot-amount">600 (40%)</div>
+                        <div class="eligible">
+                            Eligible: <span>Alice</span><span>Bob</span>
+                        </div>
+                        <div class="eligible excluded">
+                            Excluded: <span>Charlie (all-in at 300)</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>Final Stacks:</strong>
+                    <table style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Final Stack</th>
+                                <th>Contributed</th>
+                                <th>Max Win</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Alice</td>
+                                <td>9,400</td>
+                                <td>600</td>
+                                <td>1,500</td>
+                            </tr>
+                            <tr>
+                                <td>Bob</td>
+                                <td>9,400</td>
+                                <td>600</td>
+                                <td>1,500</td>
+                            </tr>
+                            <tr>
+                                <td>Charlie</td>
+                                <td>0</td>
+                                <td>300</td>
+                                <td>900</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="notes">
+                <div class="notes-title">Notes</div>
+                <div class="notes-text">Charlie all-in for 300. Alice raises to 600. Bob calls 600. Creates main pot (3×300=900) and side pot (2×300=600). Charlie can only win main pot.</div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 3 -->
+        <div class="test-case">
+            <div class="test-header">
+                <div>
+                    <div class="test-id">TC-3.1</div>
+                    <div class="test-name">Two All-Ins at Different Amounts</div>
+                </div>
+                <div class="badges">
+                    <span class="badge high">High</span>
+                    <span class="badge category">Multiple All-Ins</span>
+                </div>
+            </div>
+
+            <!-- Stack Setup -->
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item">
+                    <label>Small Blind</label>
+                    <div class="value">50</div>
+                </div>
+                <div class="blind-item">
+                    <label>Big Blind</label>
+                    <div class="value">100</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante</label>
+                    <div class="value">0</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante Order</label>
+                    <div class="value">BB First</div>
+                </div>
+            </div>
+
+            <!-- Players Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Position</th>
+                        <th>Name</th>
+                        <th>Starting Stack</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>SB</td>
+                        <td>Alice</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>BB</td>
+                        <td>Bob</td>
+                        <td>2,000</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>UTG</td>
+                        <td>Charlie</td>
+                        <td>500</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>BTN</td>
+                        <td>David</td>
+                        <td>10,000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Actions -->
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">50</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">100</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Charlie (UTG):</span>
+                        <span class="action-type">All-in</span>
+                        <span class="action-amount">500</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">David (BTN):</span>
+                        <span class="action-type">Raise</span>
+                        <span class="action-amount">1,000</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">2,000</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">All-in</span>
+                        <span class="action-amount">2,000</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">David (BTN):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">2,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expected Results -->
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 6,500</div>
+                <div class="pot-details">
+                    <div class="pot-item main">
+                        <div class="pot-name">Main Pot</div>
+                        <div class="pot-amount">2,000 (30.8%)</div>
+                        <div class="eligible">
+                            Eligible: <span>Alice</span><span>Bob</span><span>Charlie</span><span>David</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            Calculation: 4 players × 500 = 2,000
+                        </div>
+                    </div>
+                    <div class="pot-item side">
+                        <div class="pot-name">Side Pot 1</div>
+                        <div class="pot-amount">4,500 (69.2%)</div>
+                        <div class="eligible">
+                            Eligible: <span>Alice</span><span>Bob</span><span>David</span>
+                        </div>
+                        <div class="eligible excluded">
+                            Excluded: <span>Charlie (all-in at 500)</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            Calculation: 3 players × 1,500 = 4,500
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>Final Stacks:</strong>
+                    <table style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Final Stack</th>
+                                <th>Contributed</th>
+                                <th>Max Win</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Alice</td>
+                                <td>8,000</td>
+                                <td>2,000</td>
+                                <td>6,500</td>
+                            </tr>
+                            <tr>
+                                <td>Bob</td>
+                                <td>0</td>
+                                <td>2,000</td>
+                                <td>6,500</td>
+                            </tr>
+                            <tr>
+                                <td>Charlie</td>
+                                <td>0</td>
+                                <td>500</td>
+                                <td>2,000</td>
+                            </tr>
+                            <tr>
+                                <td>David</td>
+                                <td>8,000</td>
+                                <td>2,000</td>
+                                <td>6,500</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="notes">
+                <div class="notes-title">Notes</div>
+                <div class="notes-text">Two all-ins: Charlie at 500 and Bob at 2,000. Creates main pot (4×500=2,000) and side pot 1 (3×1,500=4,500). Charlie can only win main pot (2,000 max). Bob can win main + side pot 1 (6,500 max).</div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 4 -->
+        <div class="test-case">
+            <div class="test-header">
+                <div>
+                    <div class="test-id">TC-4.1</div>
+                    <div class="test-name">Ante - BB Posts Ante</div>
+                </div>
+                <div class="badges">
+                    <span class="badge medium">Medium</span>
+                    <span class="badge category">Dead Money</span>
+                </div>
+            </div>
+
+            <!-- Stack Setup -->
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item">
+                    <label>Small Blind</label>
+                    <div class="value">50</div>
+                </div>
+                <div class="blind-item">
+                    <label>Big Blind</label>
+                    <div class="value">100</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante</label>
+                    <div class="value">25</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante Order</label>
+                    <div class="value">BB First</div>
+                </div>
+            </div>
+
+            <!-- Players Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Position</th>
+                        <th>Name</th>
+                        <th>Starting Stack</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>SB</td>
+                        <td>Alice</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>BB</td>
+                        <td>Bob</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>BTN</td>
+                        <td>Charlie</td>
+                        <td>10,000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Actions -->
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Post Ante</span>
+                        <span class="action-amount">25</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">50</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">100</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Charlie (BTN):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">100</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">100</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Check</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expected Results -->
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 325</div>
+                <div style="background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
+                    <strong>Dead Money: 25</strong>
+                    <div style="font-size: 13px; margin-top: 5px;">
+                        • Ante: 25 (BB's ante is dead money)<br>
+                        • Folded Blinds: 0<br>
+                        • Folded Bets: 0
+                    </div>
+                </div>
+                <div class="pot-details">
+                    <div class="pot-item main">
+                        <div class="pot-name">Main Pot</div>
+                        <div class="pot-amount">325 (100%)</div>
+                        <div class="eligible">
+                            Eligible: <span>Alice</span><span>Bob</span><span>Charlie</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            Live Contributions: 100 + 100 + 100 = 300<br>
+                            Dead Money (Ante): 25<br>
+                            Total Pot: 325
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>Final Stacks:</strong>
+                    <table style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Final Stack</th>
+                                <th>Live Contribution</th>
+                                <th>Total Lost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Alice</td>
+                                <td>9,900</td>
+                                <td>100</td>
+                                <td>100</td>
+                            </tr>
+                            <tr>
+                                <td>Bob</td>
+                                <td>9,875</td>
+                                <td>100</td>
+                                <td>125 (100 blind + 25 ante)</td>
+                            </tr>
+                            <tr>
+                                <td>Charlie</td>
+                                <td>9,900</td>
+                                <td>100</td>
+                                <td>100</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="notes">
+                <div class="notes-title">⚠️ CRITICAL - Ante Handling</div>
+                <div class="notes-text">
+                    BB posts 25 ante (dead money) + 100 blind. The ante is NOT part of BB's live contribution.
+                    All players must match 100 (BB's blind), NOT 125. BB loses 125 total but only contributes 100 to the pot calculation.
+                </div>
+            </div>
+        </div>
+
+        <!-- TEST CASE 5 -->
+        <div class="test-case">
+            <div class="test-header">
+                <div>
+                    <div class="test-id">TC-5.1</div>
+                    <div class="test-name">Preflop to Flop - Pot Carries Forward</div>
+                </div>
+                <div class="badges">
+                    <span class="badge medium">Medium</span>
+                    <span class="badge category">Multi-Street</span>
+                </div>
+            </div>
+
+            <!-- Stack Setup -->
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item">
+                    <label>Small Blind</label>
+                    <div class="value">50</div>
+                </div>
+                <div class="blind-item">
+                    <label>Big Blind</label>
+                    <div class="value">100</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante</label>
+                    <div class="value">0</div>
+                </div>
+                <div class="blind-item">
+                    <label>Ante Order</label>
+                    <div class="value">BB First</div>
+                </div>
+            </div>
+
+            <!-- Players Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Position</th>
+                        <th>Name</th>
+                        <th>Starting Stack</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>SB</td>
+                        <td>Alice</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>BB</td>
+                        <td>Bob</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>BTN</td>
+                        <td>Charlie</td>
+                        <td>10,000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Actions -->
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">50</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Post Blind</span>
+                        <span class="action-amount">100</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Charlie (BTN):</span>
+                        <span class="action-type">Raise</span>
+                        <span class="action-amount">300</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">300</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">300</span>
+                    </div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Check</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Bob (BB):</span>
+                        <span class="action-type">Bet</span>
+                        <span class="action-amount">500</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Charlie (BTN):</span>
+                        <span class="action-type">Call</span>
+                        <span class="action-amount">500</span>
+                    </div>
+                    <div class="action-row">
+                        <span class="action-player">Alice (SB):</span>
+                        <span class="action-type">Fold</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expected Results -->
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div style="background: #d1ecf1; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                    <strong>After Preflop:</strong> Pot = 900 (3 players × 300)
+                </div>
+                <div class="pot-summary">Final Total Pot: 1,900</div>
+                <div style="background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
+                    <strong>Dead Money: 300</strong>
+                    <div style="font-size: 13px; margin-top: 5px;">
+                        Alice's 300 preflop contribution became dead when she folded on flop
+                    </div>
+                </div>
+                <div class="pot-details">
+                    <div class="pot-item main">
+                        <div class="pot-name">Main Pot</div>
+                        <div class="pot-amount">1,900 (100%)</div>
+                        <div class="eligible">
+                            Eligible: <span>Bob</span><span>Charlie</span>
+                        </div>
+                        <div class="eligible excluded">
+                            Excluded: <span>Alice (folded on flop)</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            Pot Accumulation:<br>
+                            • Preflop pot carried forward: 900<br>
+                            • Flop new contributions: 1,000 (Bob 500 + Charlie 500)<br>
+                            • Total: 1,900
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>Final Stacks:</strong>
+                    <table style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Final Stack</th>
+                                <th>Total Contributed</th>
+                                <th>Max Win</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Alice</td>
+                                <td>9,700</td>
+                                <td>300 (preflop only)</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>Bob</td>
+                                <td>9,200</td>
+                                <td>800 (300 preflop + 500 flop)</td>
+                                <td>1,900</td>
+                            </tr>
+                            <tr>
+                                <td>Charlie</td>
+                                <td>9,200</td>
+                                <td>800 (300 preflop + 500 flop)</td>
+                                <td>1,900</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="notes">
+                <div class="notes-title">⚠️ Multi-Street Pot Accumulation</div>
+                <div class="notes-text">
+                    Preflop pot = 900. On flop, Alice folds after checking. Bob bets 500, Charlie calls 500.
+                    Alice's 300 preflop contribution stays in pot as dead money. Only Bob and Charlie can win the full 1,900 pot.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

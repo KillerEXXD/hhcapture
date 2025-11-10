@@ -37,30 +37,65 @@ export const CommunityCardSelector = forwardRef<HTMLDivElement, CommunityCardSel
 
   // Callback to move to next card selector
   const moveToNextCard = () => {
-    console.log(`[CommunityCardSelector] Moving to next card from ${label}`);
+    console.log(`🔄 [CommunityCardSelector] ========================================`);
+    console.log(`🔄 [CommunityCardSelector] Moving to next element from ${label}`);
+
     // Find next card selector or first player action
     const currentElement = (ref as React.RefObject<HTMLDivElement>)?.current;
-    if (!currentElement) return;
+    if (!currentElement) {
+      console.log(`❌ [CommunityCardSelector] Current element ref is null!`);
+      return;
+    }
 
     // Try to find the next card selector
     const allCardSelectors = Array.from(document.querySelectorAll('[data-community-card]'));
     const currentIndex = allCardSelectors.indexOf(currentElement);
-    console.log(`[CommunityCardSelector] Current index: ${currentIndex}, Total cards: ${allCardSelectors.length}`);
+    console.log(`📊 [CommunityCardSelector] Current index: ${currentIndex}, Total cards: ${allCardSelectors.length}`);
 
     if (currentIndex < allCardSelectors.length - 1) {
       // Move to next card
       const nextCard = allCardSelectors[currentIndex + 1] as HTMLElement;
-      console.log(`[CommunityCardSelector] Focusing next card`);
+      const nextCardLabel = nextCard.getAttribute('data-community-card');
+      console.log(`➡️ [CommunityCardSelector] Moving to next card: ${nextCardLabel}`);
       nextCard.focus();
+      console.log(`✅ [CommunityCardSelector] Focused next card`);
     } else {
-      // Move to first player action
-      console.log(`[CommunityCardSelector] All cards complete, finding first player action`);
-      const firstAction = document.querySelector('[data-action-focus]') as HTMLElement;
-      if (firstAction) {
-        console.log(`[CommunityCardSelector] Focusing first player action`);
-        firstAction.focus();
+      // All cards complete - move to first player action
+      console.log(`🎯 [CommunityCardSelector] All cards complete, finding first player action`);
+
+      // Get all action focus elements
+      const allActionElements = Array.from(document.querySelectorAll('[data-action-focus]'));
+      console.log(`🔍 [CommunityCardSelector] Found ${allActionElements.length} action elements`);
+
+      if (allActionElements.length > 0) {
+        const firstAction = allActionElements[0] as HTMLElement;
+        const actionId = firstAction.getAttribute('data-action-focus');
+        console.log(`🎯 [CommunityCardSelector] First action element: ${actionId}`);
+
+        // Check if first player is all-in (would have tabindex -1 or disabled state)
+        const isDisabled = firstAction.hasAttribute('disabled') || firstAction.getAttribute('tabindex') === '-1';
+        console.log(`❓ [CommunityCardSelector] First player disabled/all-in? ${isDisabled}`);
+
+        if (!isDisabled) {
+          console.log(`✅ [CommunityCardSelector] Focusing first player action: ${actionId}`);
+          firstAction.focus();
+        } else {
+          // First player is all-in, try second player
+          console.log(`⏭️ [CommunityCardSelector] First player is all-in, checking second player`);
+          if (allActionElements.length > 1) {
+            const secondAction = allActionElements[1] as HTMLElement;
+            const secondActionId = secondAction.getAttribute('data-action-focus');
+            console.log(`✅ [CommunityCardSelector] Focusing second player action: ${secondActionId}`);
+            secondAction.focus();
+          } else {
+            console.log(`❌ [CommunityCardSelector] No second player available`);
+          }
+        }
+      } else {
+        console.log(`❌ [CommunityCardSelector] No action elements found!`);
       }
     }
+    console.log(`🔄 [CommunityCardSelector] ========================================`);
   };
 
   const ranksRow1 = ['A', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -145,6 +180,23 @@ export const CommunityCardSelector = forwardRef<HTMLDivElement, CommunityCardSel
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const key = e.key.toLowerCase();
 
+    // Tab key: Move to next card or first player action
+    if (e.key === 'Tab' && !e.shiftKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      moveToNextCard();
+      return;
+    }
+
+    // Shift+Tab: Move to previous card (if needed)
+    if (e.key === 'Tab' && e.shiftKey) {
+      console.log(`⬅️ [CommunityCardSelector] Shift+Tab pressed on ${label}`);
+      e.preventDefault();
+      e.stopPropagation();
+      // Let default behavior handle reverse tab for now
+      return;
+    }
+
     // Rank shortcuts: a, k, q, j, t (for 10), 2-9
     const rankMap: Record<string, string> = {
       a: 'A', k: 'K', q: 'Q', j: 'J', t: '10',
@@ -155,6 +207,7 @@ export const CommunityCardSelector = forwardRef<HTMLDivElement, CommunityCardSel
     if (rankMap[key]) {
       e.preventDefault();
       e.stopPropagation();
+      console.log(`🎴 [CommunityCardSelector] Rank shortcut: ${rankMap[key]}`);
       handleRankSelect(rankMap[key]);
       return;
     }
@@ -167,6 +220,7 @@ export const CommunityCardSelector = forwardRef<HTMLDivElement, CommunityCardSel
     if (suitMap[key]) {
       e.preventDefault();
       e.stopPropagation();
+      console.log(`🃏 [CommunityCardSelector] Suit shortcut: ${suitMap[key]}`);
       handleSuitSelect(suitMap[key]);
       return;
     }

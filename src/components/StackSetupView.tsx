@@ -166,6 +166,9 @@ export function StackSetupView({
       // Infer positions
       const playersWithInferredPositions = inferPlayerPositions(updatedPlayers);
 
+      // Track posted amounts for sectionStacks initialization
+      const postedAmountsMap: Record<number, { postedSB: number; postedBB: number; postedAnte: number; isForcedAllIn: boolean; forcedAllInAmount: number }> = {};
+
       // Calculate posted blinds/ante for each player
       playersWithInferredPositions.forEach(player => {
         if (!player.name || player.stack === 0) return;
@@ -230,6 +233,15 @@ export function StackSetupView({
           }
         }
 
+        // Store posted amounts in map for sectionStacks initialization
+        postedAmountsMap[player.id] = {
+          postedSB,
+          postedBB,
+          postedAnte,
+          isForcedAllIn,
+          forcedAllInAmount
+        };
+
         // Update player data with posted amounts
         actions.updatePlayerData(player.id, 'postedSB', postedSB, '');
         actions.updatePlayerData(player.id, 'postedBB', postedBB, '');
@@ -243,8 +255,37 @@ export function StackSetupView({
       // Set players
       actions.setPlayers(playersWithInferredPositions);
 
-      // Store initial stacks (not needed - stacks are already in players array)
-      // The stackData holds game config, not player stacks
+      // FR-14.1: Initialize "Now" stacks for preflop_base
+      // When Setup Players is clicked, set initial "Now" stack = starting stack - posted blinds/antes
+      console.log('🔍 [StackSetupView] Initializing sectionStacks for', playersWithInferredPositions.length, 'players');
+      const initialSectionStacks: any = {};
+      initialSectionStacks['preflop_base'] = {
+        initial: {},
+        current: {},
+        updated: {}
+      };
+
+      playersWithInferredPositions.forEach(player => {
+        console.log('🔍 [StackSetupView] Player:', player.id, player.name, 'stack:', player.stack);
+        if (player.name && player.stack > 0) {
+          const posted = postedAmountsMap[player.id] || { postedSB: 0, postedBB: 0, postedAnte: 0, isForcedAllIn: false, forcedAllInAmount: 0 };
+          const totalPosted = posted.postedSB + posted.postedBB + posted.postedAnte;
+
+          // Starting stack = player's initial stack (before posting blinds)
+          initialSectionStacks['preflop_base'].initial[player.id] = player.stack;
+
+          // Now stack = starting stack MINUS posted blinds/antes
+          const nowStack = player.stack - totalPosted;
+          initialSectionStacks['preflop_base'].current[player.id] = nowStack;
+          initialSectionStacks['preflop_base'].updated[player.id] = nowStack;
+
+          console.log(`   ✅ Player ${player.id} (${player.name}): starting=${player.stack}, posted=${totalPosted} (SB:${posted.postedSB}, BB:${posted.postedBB}, Ante:${posted.postedAnte}), now=${nowStack}, forcedAllIn=${posted.isForcedAllIn}`);
+        }
+      });
+
+      console.log('🔍 [StackSetupView] Calling setSectionStacks with:', JSON.stringify(initialSectionStacks, null, 2));
+      actions.setSectionStacks(initialSectionStacks);
+      console.log('✅ [StackSetupView] Initialized "Now" stacks for preflop_base')
 
       // Auto-select cards if enabled
       if (state.autoSelectCards) {
@@ -338,6 +379,13 @@ export function StackSetupView({
         <div className="flex justify-between items-center mb-3">
           <h1 className="text-lg font-bold text-gray-800">Stack Setup</h1>
           <div className="flex gap-2">
+            <button
+              onClick={() => actions.setCurrentView('pot-demo' as any)}
+              className="px-2 py-0.5 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors font-semibold"
+              title="View Pot Calculation Display Demo"
+            >
+              🎰 Pot Demo
+            </button>
             <button
               onClick={onClearAll}
               className="px-2 py-0.5 bg-red-500 text-white rounded text-xs hover:bg-red-600 transition-colors"

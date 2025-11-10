@@ -1,0 +1,134 @@
+
+        <!-- TEST CASE 14.1 - Heads-Up: BB Ante Posting Variation -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-14.1</div>
+                    <div class="test-name">Heads-Up BB Ante - SB All-In</div>
+                </div>
+                <div class="badges">
+                    <span class="badge low">Simple</span>
+                    <span class="badge category">BB Ante</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+            </div>
+
+            <div class="test-content">
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">500</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">1,000</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">1,000</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (14)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 500 BB 1000 Ante 1000
+Stack Setup:
+Alice SB 8000
+Bob BB 12000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (14)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 500 BB 1000 Ante 1000
+Stack Setup:
+Alice SB 8000
+Bob BB 12000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">All-in</span> <span class="action-amount">8000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">8000</span></div>
+                </div>
+            </div>
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 17,000</div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 1,000</strong>
+                    <div style="margin-top: 5px;">
+                        Bob posts 1,000 ante (dead money), then 1,000 blind (live money)
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">17,000 (100%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span><span>Bob</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: Alice 8,000 + Bob 8,000 + 1,000 ante = 17,000
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Player (Position)</th><th>Starting Stack</th><th>Final Stack</th><th>Live Contribution</th><th>Total Lost</th><th>Winner</th><th>New Stack</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (SB)</td><td>8,000</td><td>0</td><td>8,000</td><td>8,000</td>
+                            <td>
+                                <span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 0</div>
+                                    <div class="breakdown-line">+ Main Pot: 17,000</div>
+                                    <div class="breakdown-line total">= New Stack: 17,000</div>
+                                </div>
+                            </td>
+                            <td>17,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (BB)</td><td>12,000</td><td>3,000</td><td>8,000</td><td>9,000 (8000 live + 1000 ante)</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>3,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (15)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob SB 3000\nAlice BB 17000`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (15)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 500 BB 1000 Ante 1000
+Stack Setup:
+Bob SB 3000
+Alice BB 17000
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-14" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-14')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-14', `Hand (15)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob SB 3000\nAlice BB 17000`)">
+                            🔍 Compare
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-14" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">Notes</div>
+                <div class="notes-text">Heads-up action with SB pushing all-in. BB has posted ante separately, calls with remaining stack. Alice wins and doubles up through Bob's stack plus ante.</div>
+            </div>
+            </div>
+        </div>
+

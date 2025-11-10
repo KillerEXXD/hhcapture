@@ -341,29 +341,48 @@ For EACH test case, verify:
 - [ ] Folded player contributions remain in pot as dead money
 - [ ] Each player's Max Win matches their contribution level eligibility
 
-## Test Case Distribution Plan (75 Total)
+## Test Case Distribution Plan (300 Total)
+
+### Comprehensive End-to-End Testing Coverage
+
+**Goal**: Cover all edge cases broadly to ensure production-ready pot calculation system
 
 ### By Player Count:
-- 10 Heads-up (2 players)
-- 20 Short-handed (3-6 players)
-- 45 Full ring (7-9 players)
+- 40 Heads-up (2 players)
+- 80 Short-handed (3-6 players)
+- 180 Full ring (7-9 players)
 
 ### By Stack Size:
-- 25 Thousands (5K-50K stacks)
-- 25 Hundreds of Thousands (100K-900K stacks)
-- 25 Millions (1M+ stacks)
+- 100 Thousands (5K-50K stacks)
+- 100 Hundreds of Thousands (100K-900K stacks)
+- 100 Millions (1M+ stacks)
 
 ### By Complexity:
-- 15 Simple (preflop heavy, 0-1 side pots)
-- 30 Medium (multi-street, 1-2 side pots)
-- 30 Complex (multi-street, 3+ side pots, heavy action)
+- 60 Simple (preflop heavy, 0-1 side pots)
+- 120 Medium (multi-street, 1-2 side pots)
+- 120 Complex (multi-street, 3+ side pots, heavy action)
 
-### Existing Test Cases (10):
-- TC-1.1 through TC-10.1 (already created)
-- These will be reviewed and fixed for BB ante errors
+### By Edge Case Categories:
+- 40 BB Ante Posting Variations (Ante First vs BB First, short stacks)
+- 40 Short Stack Scenarios (10-15 BB critical situations)
+- 30 Multiple All-In Combinations (2-4+ all-ins)
+- 30 Side Pot Complexity (0-5 side pots)
+- 30 Multi-Street Actions (preflop through river)
+- 20 Position-Specific Edge Cases (SB/BB/Dealer all-ins)
+- 20 Fold Scenarios (dead money calculations)
+- 20 Transition Scenarios (eliminations, heads-up transitions)
+- 20 Calculation Edge Cases (rounding, percentages)
+- 50 Mixed Complexity Scenarios
 
-### New Test Cases to Create (65):
-- TC-11.1 through TC-75.1
+### Existing Test Cases (13):
+- TC-1.1 through TC-13.1 (already created with all features)
+- ✅ Collapsible UI
+- ✅ Winner badges with expandable breakdowns
+- ✅ Next Hand Preview sections
+- ✅ Comparison sections with paste buttons
+
+### New Test Cases to Create (287):
+- TC-14.1 through TC-300.1
 
 ## Common Pitfalls to Avoid
 
