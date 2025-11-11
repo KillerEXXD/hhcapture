@@ -561,9 +561,12 @@ class TestCaseGenerator:
         return errors
 
     def calculate_pot_and_results(self):
-        """Calculate pot, winners, and final stacks"""
-        total_pot = sum(p.total_contribution for p in self.players)
-        bb_ante = self.ante
+        """Calculate pot with side pots, winners, and final stacks"""
+        # Import the side pot calculator
+        from sidepot_calculator import calculate_side_pots
+
+        # Calculate side pots using the new module
+        pot_results = calculate_side_pots(self.players, self.ante)
 
         winner = self.players[self.winner_idx]
 
@@ -571,9 +574,14 @@ class TestCaseGenerator:
         for i, p in enumerate(self.players):
             final_stack = p.current_stack
             new_stack = final_stack
+            won_amount = 0
 
             if i == self.winner_idx:
-                new_stack = final_stack + total_pot
+                # Winner gets all pots they're eligible for
+                for pot in pot_results['pots']:
+                    if p in pot['eligible']:
+                        won_amount += pot['amount']
+                new_stack = final_stack + won_amount
 
             results.append({
                 'name': p.name,
@@ -583,23 +591,22 @@ class TestCaseGenerator:
                 'contributed': p.total_contribution,
                 'is_winner': i == self.winner_idx,
                 'new_stack': new_stack,
-                'won_amount': total_pot if i == self.winner_idx else 0
+                'won_amount': won_amount
             })
 
         return {
-            'total_pot': total_pot,
-            'bb_ante': bb_ante,
-            'main_pot': total_pot,
-            'side_pots': [],
+            'total_pot': pot_results['total_pot'],
+            'bb_ante': pot_results['bb_ante'],
+            'pots': pot_results['pots'],  # Now contains all pots (main + sides)
             'results': results,
             'winner': winner
         }
 
     def generate_results_html(self, pot_results) -> str:
-        """Generate Expected Results section HTML"""
+        """Generate Expected Results section HTML with side pots"""
         total_pot = pot_results['total_pot']
         bb_ante = pot_results['bb_ante']
-        main_pot = pot_results['main_pot']
+        pots = pot_results['pots']  # Now a list of pots (main + sides)
         results = pot_results['results']
         winner = pot_results['winner']
 
@@ -615,29 +622,56 @@ class TestCaseGenerator:
                     </div>
                 </div>'''
 
-        eligible_players = " ".join([f'<span>{r["name"]}</span>' for r in results])
+        # Generate HTML for all pots (main + side pots)
         live_contributions = sum(p.total_contribution - (bb_ante if p.position == "BB" else 0) for p in self.players)
 
-        pot_section = f'''                <div class="pot-item main">
-                    <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">{fmt(main_pot)} (100%)</div>
-                    <div class="eligible">Eligible: {eligible_players}</div>
+        pot_htmls = []
+        for pot in pots:
+            eligible_html = ' '.join([f'<span>{name}</span>' for name in pot['eligible_names']])
+
+            if pot['type'] == 'main':
+                calc_text = f"Calculation: {fmt(live_contributions)} (live) + {fmt(bb_ante)} (BB ante dead) = {fmt(total_pot)}"
+            else:
+                # For side pots, show the level calculation
+                pot_num = int(pot['type'].replace('side', ''))
+                prev_pot = pots[pot_num - 1] if pot_num > 0 else {'level': 0}
+                prev_level = prev_pot.get('level', 0)
+                level_diff = pot['level'] - prev_level
+                num_players = len(pot['eligible'])
+
+                calc_text = f"Calculation: {fmt(level_diff)} × {num_players} players = {fmt(pot['amount'])}"
+
+            pot_html = f'''                <div class="pot-item {pot['type']}">
+                    <div class="pot-name">{pot['name']}</div>
+                    <div class="pot-amount">{fmt(pot['amount'])} ({pot['percentage']:.1f}%)</div>
+                    <div class="eligible">Eligible: {eligible_html}</div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: {fmt(live_contributions)} (live) + {fmt(bb_ante)} (BB ante dead) = {fmt(total_pot)}
+                        {calc_text}
                     </div>
                 </div>'''
+            pot_htmls.append(pot_html)
 
+        pot_section = '\n'.join(pot_htmls)
+
+        # Generate winner cell showing all pots won
         table_rows = ""
         for r in results:
             if r['is_winner']:
+                # Find which pots this player won
+                eligible_pots = [pot for pot in pots if r['name'] in pot['eligible_names']]
+                pot_names = ' + '.join([pot['name'] for pot in eligible_pots])
+
+                # Build breakdown
+                breakdown_lines = [f'<div class="breakdown-line">Final Stack: {fmt(r["final_stack"])}</div>']
+                for pot in eligible_pots:
+                    breakdown_lines.append(f'<div class="breakdown-line">+ {pot["name"]}: {fmt(pot["amount"])}</div>')
+                breakdown_lines.append(f'<div class="breakdown-line total">= New Stack: {fmt(r["new_stack"])}</div>')
+
                 winner_cell = f'''<span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                    🏆 {pot_names} <span class="expand-icon">▼</span>
                                 </span>
                                 <div class="breakdown-details" style="display:none;">
-                                    <div class="breakdown-line">Final Stack: {fmt(r['final_stack'])}</div>
-                                    <div class="breakdown-line">+ Main Pot: {fmt(r['won_amount'])}</div>
-                                    <div class="breakdown-line total">= New Stack: {fmt(r['new_stack'])}</div>
-                                </div>'''
+                                    {''.join(['                                    ' + line + '\n' for line in breakdown_lines])}                                </div>'''
             else:
                 winner_cell = '<span class="winner-badge loser">-</span>'
 
