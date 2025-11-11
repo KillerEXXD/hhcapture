@@ -1,0 +1,384 @@
+SIDE POT ANALYSIS REPORT
+================================================================================
+
+Total Test Cases: 40
+Issues Found: 18
+Correct: 22
+
+ISSUES FOUND:
+--------------------------------------------------------------------------------
+
+TEST CASE 7
+Status: MISSING SIDE POT
+Players: 2
+BB Ante: 20,000
+
+Contributions:
+  Alice: Total 340,000, Live 340,000
+  Bob: Total 380,000, Live 360,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 700,000
+    Eligible: Alice, Bob
+  Side Pot 1: 20,000
+    Eligible: Bob
+
+--------------------------------------------------------------------------------
+
+TEST CASE 14
+Status: MISSING SIDE POT
+Players: 4
+BB Ante: 5,000
+
+Contributions:
+  Bob: Total 80,000, Live 80,000
+  Alice: Total 90,000, Live 90,000
+  Charlie: Total 95,000, Live 90,000
+  David: Total 90,000, Live 90,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 325,000
+    Eligible: Bob, Alice, Charlie, David
+  Side Pot 1: 30,000
+    Eligible: Alice, Charlie, David
+
+--------------------------------------------------------------------------------
+
+TEST CASE 16
+Status: MISSING SIDE POT
+Players: 4
+BB Ante: 20,000
+
+Contributions:
+  Charlie: Total 300,000, Live 280,000
+  Alice: Total 360,000, Live 360,000
+  Bob: Total 360,000, Live 360,000
+  David: Total 360,000, Live 360,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 1,140,000
+    Eligible: Charlie, Alice, Bob, David
+  Side Pot 1: 240,000
+    Eligible: Alice, Bob, David
+
+--------------------------------------------------------------------------------
+
+TEST CASE 19
+Status: MISSING SIDE POT
+Players: 4
+BB Ante: 20,000
+
+Contributions:
+  Alice: Total 340,000, Live 340,000
+  Bob: Total 360,000, Live 360,000
+  Charlie: Total 380,000, Live 360,000
+  David: Total 360,000, Live 360,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 1,380,000
+    Eligible: Alice, Bob, Charlie, David
+  Side Pot 1: 60,000
+    Eligible: Bob, Charlie, David
+
+--------------------------------------------------------------------------------
+
+TEST CASE 21
+Status: MISSING SIDE POT
+Players: 5
+BB Ante: 2,000,000
+
+Contributions:
+  Charlie: Total 22,000,000, Live 20,000,000
+  Alice: Total 36,000,000, Live 36,000,000
+  Bob: Total 36,000,000, Live 36,000,000
+  David: Total 36,000,000, Live 36,000,000
+  Eve: Total 36,000,000, Live 36,000,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 102,000,000
+    Eligible: Charlie, Alice, Bob, David, Eve
+  Side Pot 1: 64,000,000
+    Eligible: Alice, Bob, David, Eve
+
+--------------------------------------------------------------------------------
+
+TEST CASE 22
+Status: MISSING SIDE POT
+Players: 6
+BB Ante: 1,000,000
+
+Contributions:
+  David: Total 15,000,000, Live 15,000,000
+  Alice: Total 18,000,000, Live 18,000,000
+  Bob: Total 18,000,000, Live 18,000,000
+  Charlie: Total 19,000,000, Live 18,000,000
+  Eve: Total 18,000,000, Live 18,000,000
+  Frank: Total 18,000,000, Live 18,000,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 91,000,000
+    Eligible: David, Alice, Bob, Charlie, Eve, Frank
+  Side Pot 1: 15,000,000
+    Eligible: Alice, Bob, Charlie, Eve, Frank
+
+--------------------------------------------------------------------------------
+
+TEST CASE 23
+Status: MISSING SIDE POT
+Players: 7
+BB Ante: 5,000,000
+
+Contributions:
+  David: Total 50,000,000, Live 50,000,000
+  Alice: Total 90,000,000, Live 90,000,000
+  Bob: Total 90,000,000, Live 90,000,000
+  Charlie: Total 95,000,000, Live 90,000,000
+  Eve: Total 90,000,000, Live 90,000,000
+  Frank: Total 90,000,000, Live 90,000,000
+  Grace: Total 90,000,000, Live 90,000,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 355,000,000
+    Eligible: David, Alice, Bob, Charlie, Eve, Frank, Grace
+  Side Pot 1: 240,000,000
+    Eligible: Alice, Bob, Charlie, Eve, Frank, Grace
+
+--------------------------------------------------------------------------------
+
+TEST CASE 24
+Status: MISSING SIDE POT
+Players: 8
+BB Ante: 5,000,000
+
+Contributions:
+  Bob: Total 60,000,000, Live 60,000,000
+  David: Total 75,000,000, Live 75,000,000
+  Alice: Total 90,000,000, Live 90,000,000
+  Charlie: Total 95,000,000, Live 90,000,000
+  Eve: Total 90,000,000, Live 90,000,000
+  Frank: Total 90,000,000, Live 90,000,000
+  Grace: Total 90,000,000, Live 90,000,000
+  Henry: Total 90,000,000, Live 90,000,000
+
+Correct Pot Structure (3 pots):
+  Main Pot: 485,000,000
+    Eligible: Bob, David, Alice, Charlie, Eve, Frank, Grace, Henry
+  Side Pot 1: 105,000,000
+    Eligible: David, Alice, Charlie, Eve, Frank, Grace, Henry
+  Side Pot 2: 90,000,000
+    Eligible: Alice, Charlie, Eve, Frank, Grace, Henry
+
+--------------------------------------------------------------------------------
+
+TEST CASE 25
+Status: MISSING SIDE POT
+Players: 9
+BB Ante: 2,000,000
+
+Contributions:
+  Alice: Total 22,000,000, Live 22,000,000
+  Henry: Total 24,000,000, Live 24,000,000
+  Bob: Total 36,000,000, Live 36,000,000
+  Charlie: Total 38,000,000, Live 36,000,000
+  David: Total 36,000,000, Live 36,000,000
+  Eve: Total 36,000,000, Live 36,000,000
+  Frank: Total 36,000,000, Live 36,000,000
+  Grace: Total 36,000,000, Live 36,000,000
+  Ivy: Total 36,000,000, Live 36,000,000
+
+Correct Pot Structure (3 pots):
+  Main Pot: 200,000,000
+    Eligible: Alice, Henry, Bob, Charlie, David, Eve, Frank, Grace, Ivy
+  Side Pot 1: 16,000,000
+    Eligible: Henry, Bob, Charlie, David, Eve, Frank, Grace, Ivy
+  Side Pot 2: 84,000,000
+    Eligible: Bob, Charlie, David, Eve, Frank, Grace, Ivy
+
+--------------------------------------------------------------------------------
+
+TEST CASE 26
+Status: MISSING SIDE POT
+Players: 6
+BB Ante: 2,000,000
+
+Contributions:
+  Alice: Total 20,000,000, Live 20,000,000
+  Bob: Total 36,000,000, Live 36,000,000
+  Charlie: Total 38,000,000, Live 36,000,000
+  David: Total 36,000,000, Live 36,000,000
+  Eve: Total 36,000,000, Live 36,000,000
+  Frank: Total 36,000,000, Live 36,000,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 122,000,000
+    Eligible: Alice, Bob, Charlie, David, Eve, Frank
+  Side Pot 1: 80,000,000
+    Eligible: Bob, Charlie, David, Eve, Frank
+
+--------------------------------------------------------------------------------
+
+TEST CASE 27
+Status: MISSING SIDE POT
+Players: 7
+BB Ante: 500,000
+
+Contributions:
+  Frank: Total 7,500,000, Live 7,500,000
+  Alice: Total 9,000,000, Live 9,000,000
+  Bob: Total 9,000,000, Live 9,000,000
+  Charlie: Total 9,500,000, Live 9,000,000
+  David: Total 9,000,000, Live 9,000,000
+  Eve: Total 9,000,000, Live 9,000,000
+  Grace: Total 9,000,000, Live 9,000,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 53,000,000
+    Eligible: Frank, Alice, Bob, Charlie, David, Eve, Grace
+  Side Pot 1: 9,000,000
+    Eligible: Alice, Bob, Charlie, David, Eve, Grace
+
+--------------------------------------------------------------------------------
+
+TEST CASE 29
+Status: MISSING SIDE POT
+Players: 5
+BB Ante: 100,000
+
+Contributions:
+  Alice: Total 1,300,000, Live 1,300,000
+  Bob: Total 1,800,000, Live 1,800,000
+  Charlie: Total 1,900,000, Live 1,800,000
+  David: Total 1,800,000, Live 1,800,000
+  Eve: Total 1,800,000, Live 1,800,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 6,600,000
+    Eligible: Alice, Bob, Charlie, David, Eve
+  Side Pot 1: 2,000,000
+    Eligible: Bob, Charlie, David, Eve
+
+--------------------------------------------------------------------------------
+
+TEST CASE 30
+Status: MISSING SIDE POT
+Players: 9
+BB Ante: 1,000,000
+
+Contributions:
+  Charlie: Total 16,000,000, Live 15,000,000
+  Alice: Total 18,000,000, Live 18,000,000
+  Bob: Total 18,000,000, Live 18,000,000
+  David: Total 18,000,000, Live 18,000,000
+  Eve: Total 18,000,000, Live 18,000,000
+  Frank: Total 18,000,000, Live 18,000,000
+  Grace: Total 18,000,000, Live 18,000,000
+  Henry: Total 18,000,000, Live 18,000,000
+  Ivy: Total 18,000,000, Live 18,000,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 136,000,000
+    Eligible: Charlie, Alice, Bob, David, Eve, Frank, Grace, Henry, Ivy
+  Side Pot 1: 24,000,000
+    Eligible: Alice, Bob, David, Eve, Frank, Grace, Henry, Ivy
+
+--------------------------------------------------------------------------------
+
+TEST CASE 31
+Status: MISSING SIDE POT
+Players: 2
+BB Ante: 5,000
+
+Contributions:
+  Alice: Total 80,000, Live 80,000
+  Bob: Total 95,000, Live 90,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 165,000
+    Eligible: Alice, Bob
+  Side Pot 1: 10,000
+    Eligible: Bob
+
+--------------------------------------------------------------------------------
+
+TEST CASE 33
+Status: MISSING SIDE POT
+Players: 3
+BB Ante: 100,000
+
+Contributions:
+  Charlie: Total 1,600,000, Live 1,500,000
+  Bob: Total 1,700,000, Live 1,700,000
+  Alice: Total 1,800,000, Live 1,800,000
+
+Correct Pot Structure (3 pots):
+  Main Pot: 4,600,000
+    Eligible: Charlie, Bob, Alice
+  Side Pot 1: 400,000
+    Eligible: Bob, Alice
+  Side Pot 2: 100,000
+    Eligible: Alice
+
+--------------------------------------------------------------------------------
+
+TEST CASE 36
+Status: MISSING SIDE POT
+Players: 4
+BB Ante: 500,000
+
+Contributions:
+  David: Total 5,000,000, Live 5,000,000
+  Alice: Total 9,000,000, Live 9,000,000
+  Bob: Total 9,000,000, Live 9,000,000
+  Charlie: Total 9,500,000, Live 9,000,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 20,500,000
+    Eligible: David, Alice, Bob, Charlie
+  Side Pot 1: 12,000,000
+    Eligible: Alice, Bob, Charlie
+
+--------------------------------------------------------------------------------
+
+TEST CASE 38
+Status: MISSING SIDE POT
+Players: 5
+BB Ante: 100,000
+
+Contributions:
+  Alice: Total 1,500,000, Live 1,500,000
+  Charlie: Total 1,600,000, Live 1,500,000
+  Bob: Total 1,800,000, Live 1,800,000
+  David: Total 1,800,000, Live 1,800,000
+  Eve: Total 1,800,000, Live 1,800,000
+
+Correct Pot Structure (2 pots):
+  Main Pot: 7,600,000
+    Eligible: Alice, Charlie, Bob, David, Eve
+  Side Pot 1: 900,000
+    Eligible: Bob, David, Eve
+
+--------------------------------------------------------------------------------
+
+TEST CASE 39
+Status: MISSING SIDE POT
+Players: 6
+BB Ante: 100,000
+
+Contributions:
+  Frank: Total 1,500,000, Live 1,500,000
+  David: Total 1,700,000, Live 1,700,000
+  Alice: Total 1,800,000, Live 1,800,000
+  Bob: Total 1,800,000, Live 1,800,000
+  Charlie: Total 1,900,000, Live 1,800,000
+  Eve: Total 1,800,000, Live 1,800,000
+
+Correct Pot Structure (3 pots):
+  Main Pot: 9,100,000
+    Eligible: Frank, David, Alice, Bob, Charlie, Eve
+  Side Pot 1: 1,000,000
+    Eligible: David, Alice, Bob, Charlie, Eve
+  Side Pot 2: 400,000
+    Eligible: Alice, Bob, Charlie, Eve
+
+--------------------------------------------------------------------------------
+

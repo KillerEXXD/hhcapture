@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Base Test Cases - Validated</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .test-case {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+            cursor: pointer;
+            user-select: none;
+        }
+        .test-header:hover {
+            background: #f8f9fa;
+            margin: -10px -20px 20px -20px;
+            padding: 10px 20px 20px 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .test-content {
+            display: none;
+        }
+        .test-content.expanded {
+            display: block;
+        }
+        .collapse-icon {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+            margin-left: 10px;
+            color: #007bff;
+        }
+        .collapse-icon.expanded {
+            transform: rotate(180deg);
+        }
+        .test-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .test-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        .badges {
+            display: flex;
+            gap: 10px;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.simple { background: #d4edda; color: #155724; }
+        .badge.medium { background: #fff3cd; color: #856404; }
+        .badge.complex { background: #f8d7da; color: #721c24; }
+        .badge.low { background: #d4edda; color: #155724; }
+        .badge.high { background: #f8d7da; color: #721c24; }
+        .badge.category { background: #d1ecf1; color: #0c5460; }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .blind-setup {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .blind-item label {
+            display: block;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .blind-item .value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .player-data-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+        .player-data-box pre {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .copy-instruction {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .actions-section {
+            margin: 15px 0;
+        }
+        .street-block {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .street-name {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .action-row {
+            padding: 4px 0;
+            font-size: 13px;
+        }
+        .action-player {
+            font-weight: 600;
+            color: #333;
+        }
+        .action-type {
+            color: #666;
+            margin: 0 5px;
+        }
+        .action-amount {
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .copy-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+        .copy-btn:active {
+            background: #004085;
+        }
+        .copy-btn.copied {
+            background: #28a745;
+        }
+
+        .paste-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 8px;
+        }
+        .paste-btn:hover {
+            background: #5a6268;
+        }
+
+        .compare-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 8px;
+        }
+        .compare-btn:hover {
+            background: #218838;
+        }
+
+        .next-hand-preview {
+            background: #f8f9fa;
+            border: 2px dashed #6c757d;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .next-hand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .next-hand-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        .next-hand-content {
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+        }
+
+        .comparison-section {
+            margin-top: 15px;
+        }
+        .comparison-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .comparison-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-bottom: 10px;
+            resize: vertical;
+        }
+        .comparison-result {
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .comparison-result.passed {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .comparison-result.failed {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .check-item {
+            padding: 4px 0;
+            margin-left: 10px;
+        }
+        .check-item.pass::before {
+            content: "✅ ";
+        }
+        .check-item.fail::before {
+            content: "❌ ";
+        }
+        .diff {
+            margin-left: 20px;
+            font-size: 12px;
+            color: #721c24;
+        }
+
+        .notes {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        .notes-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        .notes-text {
+            font-size: 13px;
+            color: #856404;
+            line-height: 1.5;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .pot-summary {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+        .pot-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+            margin-bottom: 10px;
+        }
+        .pot-item.main { border-left-color: #ffc107; }
+        .pot-item.side { border-left-color: #17a2b8; }
+        .pot-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        .pot-amount {
+            font-size: 15px;
+            font-weight: 700;
+            color: #28a745;
+        }
+        .eligible {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .eligible span {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #d1ecf1;
+            border-radius: 3px;
+            margin-right: 5px;
+            margin-bottom: 3px;
+        }
+        .excluded span {
+            background: #f8d7da;
+            color: #721c24;
+            text-decoration: line-through;
+        }
+
+        .ante-info-box {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            border-left: 4px solid #ffc107;
+            font-size: 13px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        th {
+            background: #f8f9fa;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #dee2e6;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* Winner Badge & Breakdown */
+        .winner-badge {
+            cursor: pointer;
+            padding: 4px 8px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 4px;
+            font-weight: bold;
+            color: #856404;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+        }
+        .winner-badge:hover {
+            background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+            transform: scale(1.05);
+        }
+        .winner-badge.loser {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: default;
+        }
+        .expand-icon {
+            font-size: 10px;
+            transition: transform 0.3s ease;
+        }
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+        .breakdown-details {
+            margin-top: 8px;
+            padding: 10px;
+            background: #fffbf0;
+            border-left: 3px solid #ffd700;
+            font-size: 12px;
+            border-radius: 4px;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+        .breakdown-line {
+            padding: 3px 0;
+            color: #666;
+        }
+        .breakdown-line.total {
+            font-weight: bold;
+            color: #28a745;
+            padding-top: 6px;
+            border-top: 1px solid #dee2e6;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>30 Base Validated Test Cases</h1>
+        <div class="subtitle">Test Cases 1-30 (Incremental Generation with Validation)</div>
+
+    </div>
+    <script>
+        function copyPlayerData(button, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span>✓</span> Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function pasteFromClipboard(button, testCaseId) {
+            navigator.clipboard.readText().then(text => {
+                const textarea = document.getElementById(`actual-output-${testCaseId}`);
+                textarea.value = text;
+
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span>✓</span> Pasted!';
+                button.classList.add('pasted');
+
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('pasted');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to paste:', err);
+                alert('Failed to paste from clipboard. Please make sure you have clipboard permissions enabled.');
+            });
+        }
+
+        function copyComparisonResult(testCaseId) {
+            const resultDiv = document.getElementById(`comparison-result-${testCaseId}`);
+
+            // Get text and replace newlines with " | " to paste in single Excel cell
+            let text = resultDiv.innerText;
+
+            // Replace newlines with " | " separator for single-cell paste
+            text = text.replace(/\n/g, ' | ');
+
+            // Remove multiple spaces
+            text = text.replace(/\s+/g, ' ');
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Comparison result copied to clipboard! Paste into a single Excel/Sheets cell.');
+            }).catch(err => {
+                console.error('Failed to copy result:', err);
+                alert('Failed to copy comparison result');
+            });
+        }
+
+        function toggleTestCase(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.collapse-icon');
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                content.classList.add('collapsed');
+                icon.classList.remove('expanded');
+                icon.classList.add('collapsed');
+            } else {
+                content.classList.remove('collapsed');
+                content.classList.add('expanded');
+                icon.classList.remove('collapsed');
+                icon.classList.add('expanded');
+            }
+        }
+
+        function toggleBreakdown(badge) {
+            const breakdown = badge.nextElementSibling;
+            const icon = badge.querySelector('.expand-icon');
+
+            if (breakdown.style.display === 'none' || !breakdown.style.display) {
+                breakdown.style.display = 'block';
+                icon.classList.add('expanded');
+            } else {
+                breakdown.style.display = 'none';
+                icon.classList.remove('expanded');
+            }
+        }
+
+        function compareNextHand(testCaseId, expectedText) {
+            const textarea = document.getElementById(`actual-output-${testCaseId}`);
+            const resultDiv = document.getElementById(`comparison-result-${testCaseId}`);
+
+            let actualText = textarea.value.trim();
+
+            if (!actualText) {
+                resultDiv.innerHTML = '<div class="result-title">⚠️ Please paste the actual output first</div>';
+                resultDiv.className = 'comparison-result';
+                return;
+            }
+
+            actualText = actualText.replace(/^["']|["']$/g, '');
+
+            const expected = parseNextHandData(expectedText);
+            const actual = parseNextHandData(actualText);
+
+            const results = [];
+            let allPassed = true;
+
+            if (expected.handNumber === actual.handNumber) {
+                results.push({ field: 'Hand Number', pass: true, expected: expected.handNumber, actual: actual.handNumber });
+            } else {
+                results.push({ field: 'Hand Number', pass: false, expected: expected.handNumber, actual: actual.handNumber });
+                allPassed = false;
+            }
+
+            if (expected.startedAt === actual.startedAt) {
+                results.push({ field: 'Started At', pass: true, expected: expected.startedAt, actual: actual.startedAt });
+            } else {
+                results.push({ field: 'Started At', pass: false, expected: expected.startedAt, actual: actual.startedAt });
+                allPassed = false;
+            }
+
+            for (const player of expected.players) {
+                const actualPlayer = actual.players.find(p => p.name === player.name && p.position === player.position);
+                if (actualPlayer) {
+                    if (player.stack === actualPlayer.stack) {
+                        results.push({ field: `${player.name} ${player.position}`, pass: true, expected: player.stack, actual: actualPlayer.stack });
+                    } else {
+                        results.push({ field: `${player.name} ${player.position}`, pass: false, expected: player.stack, actual: actualPlayer.stack });
+                        allPassed = false;
+                    }
+                } else {
+                    results.push({ field: `${player.name} ${player.position}`, pass: false, expected: player.stack, actual: 'NOT FOUND' });
+                    allPassed = false;
+                }
+            }
+
+            let html = `<div class="result-title">${allPassed ? '✅ PASSED' : '❌ FAILED'}</div>`;
+            for (const result of results) {
+                const className = result.pass ? 'check-item pass' : 'check-item fail';
+                html += `<div class="${className}">${result.field}: ${result.expected}`;
+                if (!result.pass) {
+                    html += `<div class="diff">Expected: ${result.expected}, Got: ${result.actual}</div>`;
+                }
+                html += '</div>';
+            }
+
+            resultDiv.innerHTML = html;
+            resultDiv.className = `comparison-result ${allPassed ? 'passed' : 'failed'}`;
+        }
+
+        function parseNextHandData(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
+            const data = {
+                handNumber: '',
+                startedAt: '',
+                players: []
+            };
+
+            const handMatch = lines[0].match(/Hand \((\d+)\)/);
+            if (handMatch) {
+                data.handNumber = handMatch[1];
+            }
+
+            const timeMatch = lines[1].match(/started_at:\s*(\S+)/);
+            if (timeMatch) {
+                data.startedAt = timeMatch[1];
+            }
+
+            let inStackSetup = false;
+            for (const line of lines) {
+                if (line === 'Stack Setup:') {
+                    inStackSetup = true;
+                    continue;
+                }
+                if (inStackSetup && line) {
+                    const parts = line.split(/\s+/);
+                    if (parts.length >= 3) {
+                        data.players.push({
+                            name: parts[0],
+                            position: parts[1],
+                            stack: parts[2].replace(/,/g, '')
+                        });
+                    }
+                }
+            }
+
+            return data;
+        }
+    </script>
+</body>
+</html>

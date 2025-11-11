@@ -16,10 +16,12 @@ This document defines the complete specification for generating poker hand histo
    - ❌ Negative stacks in Next Hand Preview
 
 2. **`validate_action_order.py`** - Checks for:
-   - ❌ 2-player preflop: SB must act first, BB second
-   - ❌ 2-player postflop: BB must act first, SB second
-   - ❌ 3-player preflop: Dealer → SB → BB
-   - ❌ 3-player postflop: SB → BB → Dealer
+   - ❌ **2-player (Heads-Up) preflop:** SB acts first, BB acts last (SB is also Dealer)
+   - ❌ **2-player (Heads-Up) postflop:** BB acts first, SB/Dealer acts last
+   - ❌ **3-player preflop:** Dealer → SB → BB (left of SB acts first)
+   - ❌ **3-player postflop:** SB → BB → Dealer
+   - ❌ **4+ player preflop:** UTG (no position label) → Dealer → SB → BB (left of BB acts first)
+   - ❌ **4+ player postflop:** SB → BB → UTG → ... → Dealer (SB acts first, Dealer last)
 
 ### Known Validation Script Bugs
 
@@ -895,25 +897,52 @@ This is DIFFERENT from action order!
 **Heads-up:** SB → BB (NO Dealer line)
 
 ### Action Order (Different!)
-**Preflop:** UTG acts first → ... → Dealer → SB → BB acts last
-**Postflop:** SB acts first → BB → UTG → ... → Dealer acts last
+
+⚠️ **CRITICAL:** Action order varies by player count and street!
+
+#### 2 Players (Heads-Up)
+- **Preflop:** SB acts first → BB acts last (SB is also Dealer/Button)
+- **Postflop:** BB acts first → SB/Dealer acts last (Button acts last postflop!)
+
+#### 3 Players
+- **Preflop:** Dealer acts first → SB → BB acts last
+- **Postflop:** SB acts first → BB → Dealer acts last
+
+#### 4+ Players
+- **Preflop:** UTG (no position label) acts first → others → Dealer → SB → BB acts last
+- **Postflop:** SB acts first → BB → UTG → others → Dealer acts last
+
+**Example - 2 players (Heads-Up):**
+```
+Stack Setup Order:      Alice SB → Bob BB (NO Dealer label - SB is Dealer)
+Preflop Action Order:   Alice SB → Bob BB (last)
+Postflop Action Order:  Bob BB → Alice SB (SB/Dealer last!)
+```
 
 **Example - 3 players:**
 ```
-Stack Setup Order:    Michael Dealer → Brendon SB → Lamborenzo BB
-Preflop Action Order: Michael Dealer → Brendon SB → Lamborenzo BB (last)
-Postflop Action Order: Brendon SB → Lamborenzo BB → Michael Dealer (last)
+Stack Setup Order:      Michael Dealer → Brendon SB → Lamborenzo BB
+Preflop Action Order:   Michael Dealer → Brendon SB → Lamborenzo BB (last)
+Postflop Action Order:  Brendon SB → Lamborenzo BB → Michael Dealer (last)
+```
+
+**Example - 4 players:**
+```
+Stack Setup Order:      Alice Dealer → Bob SB → Charlie BB → David (no label = UTG)
+Preflop Action Order:   David UTG → Alice Dealer → Bob SB → Charlie BB (last)
+Postflop Action Order:  Bob SB → Charlie BB → David UTG → Alice Dealer (last)
 ```
 
 ## Action Flow Rules
 
 ### Preflop Action Order
-1. First to act: UTG (or Dealer in 3-handed, SB in heads-up)
-2. Last to act preflop: BB
+1. **2 players (Heads-Up):** SB acts first, BB acts last
+2. **3 players:** Dealer acts first (left of SB), SB second, BB last
+3. **4+ players:** UTG (no position label) acts first (left of BB), then positional order, SB second-to-last, BB last
 
 ### Postflop Action Order (Flop/Turn/River)
-1. First to act: SB (or first active player left of button)
-2. Last to act: Dealer (or last active player)
+1. **2 players (Heads-Up):** BB acts first, SB/Dealer acts last (button acts last!)
+2. **3+ players:** SB acts first, then positional order, Dealer acts last
 
 ### Action Sections
 - **Base**: Initial betting round

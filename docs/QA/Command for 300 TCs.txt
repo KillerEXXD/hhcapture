@@ -1,0 +1,5 @@
+# Give this to the next session:
+"Please read C:\Apps\HUDR\HHTool_Modular\docs\QA\REQUIREMENTS_300_TEST_CASES.md 
+and follow it exactly to generate 300 test cases. The document contains all 
+requirements, validation rules, and step-by-step instructions. Generate ONE 
+test case at a time and validate it before proceeding to the next."

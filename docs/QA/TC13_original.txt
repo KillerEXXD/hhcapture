@@ -1,0 +1,150 @@
+                    <div class="test-id">TC-13</div>
+                    <div class="test-name">4P Medium - With Betting (SB:2,500 BB:5,000)</div>
+                </div>
+                <div class="badges">
+                    <span class="badge medium">Medium</span>
+                    <span class="collapse-icon collapsed">▶</span>
+                </div>
+            </div>
+
+            <div class="test-content collapsed">
+            <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
+<strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
+</div>
+
+
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">2,500</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">5,000</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">5,000</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (13)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nAlice Dealer 130000\nBob SB 265000\nCharlie BB 150000\nDavid 255000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (13)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 2500 BB 5000 Ante 5000
+Stack Setup:
+Alice Dealer 130000
+Bob SB 265000
+Charlie BB 150000
+David 255000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">25,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">25,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">25,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">25,000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base (7♥)</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">50,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">River Base (3♦)</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Check</span></div>
+                </div>
+            </div>
+
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 365,000</div>
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
+                    <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
+                </div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 5,000</strong>
+                    <div style="margin-top: 5px;">
+                        Charlie posts ante (5,000) first → stack becomes 145,000<br>
+                        Charlie posts blind (5,000) → stack becomes 140,000
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">365,000 (100%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span> <span>Charlie</span> <span>David</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 360,000 (live) + 5,000 (BB ante dead) = 365,000
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player (Position)</th>
+                            <th>Starting Stack</th>
+                            <th>Final Stack</th>
+                            <th>Contributed</th>
+                            <th>Winner</th>
+                            <th>New Stack</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (Dealer)</td>
+                            <td>130,000</td>
+                            <td>40,000</td>
+                            <td>90,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>40,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (SB)</td>
+                            <td>265,000</td>
+                            <td>175,000</td>
+                            <td>90,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>175,000</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (BB)</td>
+                            <td>150,000</td>
+                            <td>55,000</td>
+                            <td>95,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>55,000</td>
+                        </tr>
+                        <tr>
+                            <td>David (UTG)</td>
+                            <td>255,000</td>
+                            <td>165,000</td>
+                            <td>90,000</td>
+                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                    <div class="breakdown-line">Final Stack: 165,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 365,000</div>
+                                    <div class="breakdown-line total">= New Stack: 530,000</div>
+                                </div></td>
+                            <td>530,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">

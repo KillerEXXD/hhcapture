@@ -1,0 +1,11 @@
+ACTION ORDER VALIDATION REPORT
+================================================================================
+
+RULES CHECKED:
+1. 2-Player Preflop: SB/Dealer acts first, BB acts second
+2. 2-Player Postflop: BB acts first, SB/Dealer acts second
+3. 3-Player Preflop: Dealer -> SB -> BB
+4. 3-Player Postflop: SB -> BB -> Dealer
+
+================================================================================
+

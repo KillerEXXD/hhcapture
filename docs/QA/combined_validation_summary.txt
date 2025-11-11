@@ -1,0 +1,76 @@
+================================================================================
+COMPREHENSIVE VALIDATION REPORT - 30 Test Cases
+================================================================================
+
+VALIDATION RULES CHECKED:
+1. Negative stacks (Rule #7)
+2. Over-contribution (contributed > starting stack)
+3. 2-Player Preflop: SB/Dealer acts first, BB acts second
+4. 2-Player Postflop: BB acts first, SB/Dealer acts second  
+5. 3-Player Preflop: Dealer -> SB -> BB
+6. 3-Player Postflop: SB -> BB -> Dealer
+
+================================================================================
+OVERALL RESULTS
+================================================================================
+
+Total Test Cases: 30
+
+PASSED ALL VALIDATIONS: 13 test cases (43.3%)
+  TC-13, TC-14, TC-15, TC-16, TC-19, TC-21, TC-22, TC-24, TC-25, TC-26, 
+  TC-27, TC-28, TC-29, TC-30
+
+FAILED VALIDATIONS: 17 test cases (56.7%)
+
+================================================================================
+FAILURE BREAKDOWN BY ISSUE TYPE
+================================================================================
+
+1. ACTION ORDER ERRORS (15 test cases):
+   - 2-Player Postflop Order: 9 cases
+     TC-1, TC-2, TC-3, TC-4, TC-5, TC-6, TC-7, TC-8, TC-17
+     
+   - 3-Player Preflop Order: 6 cases  
+     TC-9, TC-10, TC-11, TC-12, TC-18, TC-20
+
+2. NEGATIVE STACK ERRORS (2 test cases):
+   - TC-11 (also has action order error)
+   - TC-23
+
+================================================================================
+DETAILED FAILURES
+================================================================================
+
+TC-1 through TC-8 (2-Player Cases):
+  ERROR: Postflop - SB acts first (WRONG)
+  SHOULD BE: BB acts first, then SB/Dealer
+
+TC-9, TC-10, TC-12, TC-18, TC-20 (3-Player Cases):
+  ERROR: Preflop - SB acts first (WRONG)
+  SHOULD BE: Dealer acts first, then SB, then BB
+
+TC-11 (3-Player Case):
+  ERROR 1: Preflop - SB acts first (WRONG)
+  ERROR 2: Negative stacks for all players (-15,000)
+  ERROR 3: Over-contribution (90,000 contributed from 75,000 starting)
+
+TC-17 (2-Player Case):
+  ERROR: Postflop - SB acts first (WRONG)
+  SHOULD BE: BB acts first
+
+TC-23 (7-Player Case):
+  ERROR: Negative stacks for all players (-1,500,000)
+  ERROR: Over-contribution (9,000,000 contributed from 7,500,000 starting)
+
+================================================================================
+PRIORITY FIXES NEEDED
+================================================================================
+
+HIGH PRIORITY (Breaks Poker Rules):
+  TC-11, TC-23 - Negative stacks MUST be fixed immediately
+
+MEDIUM PRIORITY (Wrong Action Order):
+  TC-1 to TC-8 (9 cases) - Fix 2-player postflop order
+  TC-9, TC-10, TC-12, TC-18, TC-20 (5 cases) - Fix 3-player preflop order
+
+================================================================================

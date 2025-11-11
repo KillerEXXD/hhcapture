@@ -1,0 +1,196 @@
+40 Test Cases Validation Report
+=======================================================================
+
+Total: 40
+Passed: 0 (0.0%)
+Failed: 40 (100.0%)
+
+Failed Test Cases:
+----------------------------------------------------------------------
+
+TC-1:
+  - Alice: Calculation error (final 0 != starting 19500 - contributed 0 = 19500)
+  - Bob: Calculation error (final 0 != starting 27000 - contributed 0 = 27000)
+
+TC-2:
+  - Alice: Calculation error (final 0 != starting 210000 - contributed 0 = 210000)
+  - Bob: Calculation error (final 0 != starting 300000 - contributed 0 = 300000)
+
+TC-3:
+  - Alice: Calculation error (final 0 != starting 28000 - contributed 0 = 28000)
+  - Bob: Calculation error (final 0 != starting 26500 - contributed 0 = 26500)
+
+TC-4:
+  - Alice: Calculation error (final 0 != starting 4000 - contributed 0 = 4000)
+  - Bob: Calculation error (final 0 != starting 4300 - contributed 0 = 4300)
+
+TC-5:
+  - Alice: Calculation error (final 0 != starting 47000 - contributed 0 = 47000)
+  - Bob: Calculation error (final 0 != starting 44000 - contributed 0 = 44000)
+
+TC-6:
+  - Alice: Calculation error (final 0 != starting 940000 - contributed 0 = 940000)
+  - Bob: Calculation error (final 0 != starting 440000 - contributed 0 = 440000)
+
+TC-7:
+  - Alice: Calculation error (final 0 != starting 340000 - contributed 0 = 340000)
+  - Bob: Calculation error (final 0 != starting 800000 - contributed 0 = 800000)
+
+TC-8:
+  - Alice: Calculation error (final 0 != starting 210000 - contributed 0 = 210000)
+  - Bob: Calculation error (final 0 != starting 280000 - contributed 0 = 280000)
+
+TC-9:
+  - Alice: Calculation error (final 0 != starting 240000 - contributed 0 = 240000)
+  - Bob: Calculation error (final 0 != starting 160000 - contributed 0 = 160000)
+  - Charlie: Calculation error (final 0 != starting 470000 - contributed 0 = 470000)
+
+TC-10:
+  - Alice: Calculation error (final 0 != starting 1040000 - contributed 0 = 1040000)
+  - Bob: Calculation error (final 0 != starting 460000 - contributed 0 = 460000)
+  - Charlie: Calculation error (final 0 != starting 720000 - contributed 0 = 720000)
+
+TC-11:
+  - Alice: Calculation error (final 0 != starting 2600000 - contributed 0 = 2600000)
+  - Bob: Calculation error (final 0 != starting 4800000 - contributed 0 = 4800000)
+  - Charlie: Calculation error (final 0 != starting 4100000 - contributed 0 = 4100000)
+
+TC-12:
+  - Alice: Calculation error (final 0 != starting 400000 - contributed 0 = 400000)
+  - Bob: Calculation error (final 0 != starting 250000 - contributed 0 = 250000)
+  - Charlie: Calculation error (final 0 != starting 210000 - contributed 0 = 210000)
+
+TC-13:
+  - Alice: Calculation error (final 0 != starting 175000 - contributed 0 = 175000)
+  - Bob: Calculation error (final 0 != starting 125000 - contributed 0 = 125000)
+  - Charlie: Calculation error (final 0 != starting 130000 - contributed 0 = 130000)
+  - David: Calculation error (final 0 != starting 275000 - contributed 0 = 275000)
+
+TC-14:
+  - Alice: Calculation error (final 0 != starting 260000 - contributed 0 = 260000)
+  - Bob: Calculation error (final 0 != starting 80000 - contributed 0 = 80000)
+  - Charlie: Calculation error (final 0 != starting 300000 - contributed 0 = 300000)
+  - David: Calculation error (final 0 != starting 90000 - contributed 0 = 90000)
+
+TC-15:
+  - Alice: Calculation error (final 0 != starting 400000 - contributed 0 = 400000)
+  - Bob: Calculation error (final 0 != starting 540000 - contributed 0 = 540000)
+  - Charlie: Calculation error (final 0 != starting 1100000 - contributed 0 = 1100000)
+  - David: Calculation error (final 0 != starting 1200000 - contributed 0 = 1200000)
+
+TC-16:
+  - Alice: Calculation error (final 0 != starting 660000 - contributed 0 = 660000)
+  - Bob: Calculation error (final 0 != starting 880000 - contributed 0 = 880000)
+  - Charlie: Calculation error (final 0 != starting 300000 - contributed 0 = 300000)
+  - David: Calculation error (final 0 != starting 720000 - contributed 0 = 720000)
+
+TC-17:
+  - Alice: Calculation error (final 0 != starting 310000 - contributed 0 = 310000)
+  - Bob: Calculation error (final 0 != starting 400000 - contributed 0 = 400000)
+
+TC-18:
+  - Alice: Calculation error (final 0 != starting 1160000 - contributed 0 = 1160000)
+  - Bob: Calculation error (final 0 != starting 640000 - contributed 0 = 640000)
+  - Charlie: Calculation error (final 0 != starting 540000 - contributed 0 = 540000)
+
+TC-19:
+  - Alice: Calculation error (final 0 != starting 340000 - contributed 0 = 340000)
+  - Bob: Calculation error (final 0 != starting 1100000 - contributed 0 = 1100000)
+  - Charlie: Calculation error (final 0 != starting 960000 - contributed 0 = 960000)
+  - David: Calculation error (final 0 != starting 500000 - contributed 0 = 500000)
+
+TC-20:
+  - Alice: Calculation error (final 0 != starting 720000 - contributed 0 = 720000)
+  - Bob: Calculation error (final 0 != starting 540000 - contributed 0 = 540000)
+  - Charlie: Calculation error (final 0 != starting 900000 - contributed 0 = 900000)
+
+TC-21:
+  - Alice: Calculation error (final 0 != starting 112000000 - contributed 0 = 112000000)
+  - Bob: Calculation error (final 0 != starting 40000000 - contributed 0 = 40000000)
+  - Charlie: Calculation error (final 0 != starting 22000000 - contributed 0 = 22000000)
+  - David: Calculation error (final 0 != starting 84000000 - contributed 0 = 84000000)
+  - Eve: Calculation error (final 0 != starting 64000000 - contributed 0 = 64000000)
+
+TC-22:
+  - Alice: Calculation error (final 0 != starting 41000000 - contributed 0 = 41000000)
+  - Bob: Calculation error (final 0 != starting 33000000 - contributed 0 = 33000000)
+  - Charlie: Calculation error (final 0 != starting 52000000 - contributed 0 = 52000000)
+  - David: Calculation error (final 0 != starting 15000000 - contributed 0 = 15000000)
+  - Eve: Calculation error (final 0 != starting 29000000 - contributed 0 = 29000000)
+  - Frank: Calculation error (final 0 != starting 24000000 - contributed 0 = 24000000)
+
+TC-23:
+  - Alice: Calculation error (final 0 != starting 105000000 - contributed 0 = 105000000)
+  - Bob: Calculation error (final 0 != starting 250000000 - contributed 0 = 250000000)
+  - Charlie: Calculation error (final 0 != starting 300000000 - contributed 0 = 300000000)
+  - David: Calculation error (final 0 != starting 50000000 - contributed 0 = 50000000)
+  - Eve: Calculation error (final 0 != starting 140000000 - contributed 0 = 140000000)
+  - Frank: Calculation error (final 0 != starting 240000000 - contributed 0 = 240000000)
+  - Grace: Calculation error (final 0 != starting 210000000 - contributed 0 = 210000000)
+
+TC-24:
+  - Alice: Calculation error (final 0 != starting 135000000 - contributed 0 = 135000000)
+  - Bob: Calculation error (final 0 != starting 60000000 - contributed 0 = 60000000)
+  - Charlie: Calculation error (final 0 != starting 105000000 - contributed 0 = 105000000)
+  - David: Calculation error (final 0 != starting 75000000 - contributed 0 = 75000000)
+  - Eve: Calculation error (final 0 != starting 165000000 - contributed 0 = 165000000)
+  - Frank: Calculation error (final 0 != starting 235000000 - contributed 0 = 235000000)
+  - Grace: Calculation error (final 0 != starting 110000000 - contributed 0 = 110000000)
+  - Henry: Calculation error (final 0 != starting 120000000 - contributed 0 = 120000000)
+
+TC-25:
+  - Alice: Calculation error (final 0 != starting 22000000 - contributed 0 = 22000000)
+  - Bob: Calculation error (final 0 != starting 68000000 - contributed 0 = 68000000)
+  - Charlie: Calculation error (final 0 != starting 88000000 - contributed 0 = 88000000)
+  - David: Calculation error (final 0 != starting 92000000 - contributed 0 = 92000000)
+  - Eve: Calculation error (final 0 != starting 50000000 - contributed 0 = 50000000)
+  - Frank: Calculation error (final 0 != starting 38000000 - contributed 0 = 38000000)
+  - Grace: Calculation error (final 0 != starting 104000000 - contributed 0 = 104000000)
+  - Henry: Calculation error (final 0 != starting 24000000 - contributed 0 = 24000000)
+  - Ivy: Calculation error (final 0 != starting 78000000 - contributed 0 = 78000000)
+
+TC-26:
+  - Alice: Calculation error (final 0 != starting 20000000 - contributed 0 = 20000000)
+  - Bob: Calculation error (final 0 != starting 46000000 - contributed 0 = 46000000)
+  - Charlie: Calculation error (final 0 != starting 50000000 - contributed 0 = 50000000)
+  - David: Calculation error (final 0 != starting 110000000 - contributed 0 = 110000000)
+  - Eve: Calculation error (final 0 != starting 104000000 - contributed 0 = 104000000)
+  - Frank: Calculation error (final 0 != starting 94000000 - contributed 0 = 94000000)
+
+TC-27:
+  - Alice: Calculation error (final 0 != starting 23500000 - contributed 0 = 23500000)
+  - Bob: Calculation error (final 0 != starting 14000000 - contributed 0 = 14000000)
+  - Charlie: Calculation error (final 0 != starting 16000000 - contributed 0 = 16000000)
+  - David: Calculation error (final 0 != starting 24500000 - contributed 0 = 24500000)
+  - Eve: Calculation error (final 0 != starting 10500000 - contributed 0 = 10500000)
+  - Frank: Calculation error (final 0 != starting 7500000 - contributed 0 = 7500000)
+  - Grace: Calculation error (final 0 != starting 22500000 - contributed 0 = 22500000)
+
+TC-28:
+  - Alice: Calculation error (final 0 != starting 4200000 - contributed 0 = 4200000)
+  - Bob: Calculation error (final 0 != starting 2000000 - contributed 0 = 2000000)
+  - Charlie: Calculation error (final 0 != starting 3300000 - contributed 0 = 3300000)
+  - David: Calculation error (final 0 != starting 5100000 - contributed 0 = 5100000)
+  - Eve: Calculation error (final 0 != starting 5200000 - contributed 0 = 5200000)
+  - Frank: Calculation error (final 0 != starting 4600000 - contributed 0 = 4600000)
+  - Grace: Calculation error (final 0 != starting 4300000 - contributed 0 = 4300000)
+  - Henry: Calculation error (final 0 != starting 2200000 - contributed 0 = 2200000)
+
+TC-29:
+  - Alice: Calculation error (final 0 != starting 1300000 - contributed 0 = 1300000)
+  - Bob: Calculation error (final 0 != starting 5300000 - contributed 0 = 5300000)
+  - Charlie: Calculation error (final 0 != starting 3400000 - contributed 0 = 3400000)
+  - David: Calculation error (final 0 != starting 5800000 - contributed 0 = 5800000)
+  - Eve: Calculation error (final 0 != starting 3800000 - contributed 0 = 3800000)
+
+TC-30:
+  - Alice: Calculation error (final 0 != starting 42000000 - contributed 0 = 42000000)
+  - Bob: Calculation error (final 0 != starting 51000000 - contributed 0 = 51000000)
+  - Charlie: Calculation error (final 0 != starting 16000000 - contributed 0 = 16000000)
+  - David: Calculation error (final 0 != starting 30000000 - contributed 0 = 30000000)
+  - Eve: Calculation error (final 0 != starting 22000000 - contributed 0 = 22000000)
+  - Frank: Calculation error (final 0 != starting 58000000 - contributed 0 = 58000000)
+  - Grace: Calculation error (final 0 != starting 26000000 - contributed 0 = 26000000)
+  - Henry: Calculation error (final 0 != starting 53000000 - contributed 0 = 53000000)
+  - Ivy: Calculation error (final 0 != starting 27000000 - contributed 0 = 27000000)
+
