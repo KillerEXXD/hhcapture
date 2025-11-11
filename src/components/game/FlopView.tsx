@@ -75,8 +75,8 @@ export const FlopView: React.FC<FlopViewProps> = ({
   // State for tracking expanded stack histories
   const [expandedStackHistories, setExpandedStackHistories] = useState<Record<string, boolean>>({});
 
-  // State for tracking pop-up position (above or below) for each player
-  const [popupPositions, setPopupPositions] = useState<Record<string, 'above' | 'below' | number>>({});
+  // State for tracking pop-up position (above or below) and horizontal alignment for each player
+  const [popupPositions, setPopupPositions] = useState<Record<string, 'above' | 'below' | 'center' | 'left' | 'right' | number>>({});
 
   // State for disabling "Add More Action" button when betting round is complete
   const [isAddMoreActionDisabled, setIsAddMoreActionDisabled] = useState(false);
@@ -694,7 +694,19 @@ export const FlopView: React.FC<FlopViewProps> = ({
   };
 
   // Define position order for postflop (action order)
-  const positionOrder: Record<string, number> = {
+  // For heads-up (2 players): BB acts first, then SB/Dealer
+  // For 3+ players: SB acts first, then BB, then others
+  const activePlayers = players.filter(p => p.name && p.stack > 0);
+  const isHeadsUp = activePlayers.length === 2;
+
+  const positionOrder: Record<string, number> = isHeadsUp ? {
+    // Heads-up postflop: BB acts first, SB/Dealer acts last
+    'BB': 1,
+    'SB': 2,
+    'Dealer': 2,  // In heads-up, SB is also Dealer
+    '': 999
+  } : {
+    // 3+ players postflop: Standard order (SB first, Dealer last)
     'SB': 1,
     'BB': 2,
     'UTG': 3,

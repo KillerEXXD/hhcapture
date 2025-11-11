@@ -66,7 +66,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
   const [expandedStackHistories, setExpandedStackHistories] = React.useState<Record<string, boolean>>({});
 
   // State for tracking pop-up position (above or below) for each player
-  const [popupPositions, setPopupPositions] = React.useState<Record<string, 'above' | 'below'>>({});
+  const [popupPositions, setPopupPositions] = React.useState<Record<string, 'above' | 'below' | 'center' | 'left' | 'right' | number>>({});
 
   // State for disabling "Add More Action" button when betting round is complete
   const [isAddMoreActionDisabled, setIsAddMoreActionDisabled] = React.useState(false);
@@ -1548,8 +1548,8 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                                   {/* Floating Card - Stack History */}
                                   {isExpanded && currentStack !== null && (() => {
                                     const position = popupPositions[historyKey] || 'below';
-                                    const horizontalAlign = popupPositions[`${historyKey}_horizontal`] as 'center' | 'left' | 'right' || 'center';
-                                    const leftOffset = popupPositions[`${historyKey}_left`] as number || 0;
+                                    const horizontalAlign = (popupPositions[`${historyKey}_horizontal`] as 'center' | 'left' | 'right') || 'center';
+                                    const leftOffset = (typeof popupPositions[`${historyKey}_left`] === 'number' ? popupPositions[`${historyKey}_left`] : 0) as number;
 
                                     // Base positioning classes
                                     const verticalClasses = position === 'above'
