@@ -487,11 +487,11 @@
                 </div>
                 <div class="badges">
                     <span class="badge simple">Simple</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -522,23 +522,23 @@ Bob BB 49000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">1,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">1,000</span></div>
                     <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">5,000</span></div>
                     <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">5,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">5,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Turn Base (7♥)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">10,000</span></div>
                     <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">10,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">10,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
                     <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
                 </div>
             </div>
 
@@ -562,6 +562,15 @@ Bob BB 49000</pre>
                     <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
                         Calculation: 32,000 (live) + 1,000 (BB ante dead) = 33,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">37,500 (14.0%)</div>
+                    <div class="eligible">Eligible: <span>Bob</span> <span>Charlie</span></div>
+                    <div class="excluded">Excluded: <span class="excluded-player">Alice (capped at 75,000)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: (92,500 - 75,000) + (95,000 - 75,000) = 37,500
                     </div>
                 </div>
                 <table>
@@ -606,18 +615,18 @@ Bob BB 49000</pre>
 
             <div class="next-hand-preview">
                 <div class="next-hand-header">
-                    <div class="next-hand-title">📋 Next Hand Preview</div>
                     <button class="copy-btn" onclick="copyPlayerData(this, `Hand (2)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob SB 65000\nAlice BB 15000`)">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
-                <div class="next-hand-content">
 Hand (2)
+                <div class="next-hand-content">
 started_at: 00:05:40 ended_at: HH:MM:SS
 SB 500 BB 1000 Ante 1000
 Stack Setup:
-Bob SB 65000
 Alice BB 15000
+Bob SB 65000
                 </div>
 
                 <div class="comparison-section">
@@ -660,11 +669,11 @@ Alice BB 15000
                 </div>
                 <div class="badges">
                     <span class="badge simple">Simple</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -696,22 +705,22 @@ Bob BB 5800</pre>
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
                     <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Call</span> <span class="action-amount">100</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
                 </div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">500</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">500</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">500</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">500</span></div>
                 </div>
+                    
                 <div class="street-block">
                     <div class="street-name">Turn Base (7♥)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">1,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">1,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">1,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">1,000</span></div>
                 </div>
+                    
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    
                 </div>
             </div>
 
@@ -787,18 +796,18 @@ Bob BB 5800</pre>
                 <div class="next-hand-content">
 Hand (3)
 started_at: 00:05:40 ended_at: HH:MM:SS
-SB 50 BB 100 Ante 100
 Stack Setup:
+SB 50 BB 100 Ante 100
 Bob SB 7400
 Alice BB 2100
                 </div>
-
                 <div class="comparison-section">
+
                     <div class="comparison-header">🔍 Compare with Actual Output</div>
                     <textarea id="actual-output-tc-2" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
                     <div style="margin-bottom: 10px;">
-                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-2')">
                             📋 Paste from Clipboard
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-2')">
                         </button>
                         <button class="compare-btn" onclick="compareNextHand('tc-2', `Hand (3)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50 BB 100 Ante 100\nStack Setup:\nBob SB 7400\nAlice BB 2100`)">
                             🔍 Compare
@@ -833,11 +842,11 @@ Alice BB 2100
                 </div>
                 <div class="badges">
                     <span class="badge simple">Simple</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -873,23 +882,23 @@ Bob BB 56000</pre>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">5,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">5,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">5,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">5,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Turn Base (7♥)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">10,000</span></div>
                     <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">10,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">10,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
                     <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
                 </div>
             </div>
 
-
             <div class="section-title">Expected Results</div>
+
             <div class="results-section">
                 <div class="pot-summary">Total Pot: 33,000</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
@@ -968,18 +977,18 @@ Alice BB 25000
 
                 <div class="comparison-section">
                     <div class="comparison-header">🔍 Compare with Actual Output</div>
-                    <textarea id="actual-output-tc-3" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
                     <div style="margin-bottom: 10px;">
+                    <textarea id="actual-output-tc-3" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
                         <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-3')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-3', `Hand (4)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob SB 72000\nAlice BB 25000`)">
                             🔍 Compare
+                        <button class="compare-btn" onclick="compareNextHand('tc-3', `Hand (4)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob SB 72000\nAlice BB 25000`)">
                         </button>
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-3')" style="background: #4caf50;">
                             📋 Copy Result
-                        </button>
                     </div>
+                        </button>
                     <div id="comparison-result-tc-3" class="comparison-result"></div>
                 </div>
             </div>
@@ -1006,11 +1015,11 @@ Alice BB 25000
                 </div>
                 <div class="badges">
                     <span class="badge simple">Simple</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -1046,29 +1055,29 @@ Bob BB 20000</pre>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">2,500</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">2,500</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">2,500</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">2,500</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Turn Base (7♥)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">5,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">5,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">5,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">5,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
                 </div>
+                    
             </div>
 
 
-            <div class="section-title">Expected Results</div>
             <div class="results-section">
+            <div class="section-title">Expected Results</div>
                 <div class="pot-summary">Total Pot: 16,500</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
-                </div>
                 <div class="ante-info-box">
+                </div>
                     <strong>BB Ante: 500</strong>
                     <div style="margin-top: 5px;">
                         Bob posts ante (500) first → stack becomes 19,500<br>
@@ -1147,18 +1156,18 @@ Alice BB 32000
                             📋 Paste from Clipboard
                         </button>
                         <button class="compare-btn" onclick="compareNextHand('tc-4', `Hand (5)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250 BB 500 Ante 500\nStack Setup:\nBob SB 11500\nAlice BB 32000`)">
-                            🔍 Compare
                         </button>
+                            🔍 Compare
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-4')" style="background: #4caf50;">
                             📋 Copy Result
                         </button>
-                    </div>
                     <div id="comparison-result-tc-4" class="comparison-result"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="notes">
                 <div class="notes-title">📝 Validation Notes</div>
+            <div class="notes">
                 <div class="notes-text">
                     • Players: 2<br>
                     • Complexity: Simple<br>
@@ -1179,11 +1188,11 @@ Alice BB 32000
                 </div>
                 <div class="badges">
                     <span class="badge simple">Simple</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -1219,18 +1228,18 @@ Bob BB 205000</pre>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">25,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">25,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">25,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">25,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Turn Base (7♥)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">50,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">50,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    
                 </div>
             </div>
 
@@ -1352,11 +1361,11 @@ Alice BB 200000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -1392,18 +1401,18 @@ Bob BB 2950000</pre>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">250,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">250,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">250,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">250,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Turn Base (7♥)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">500,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">500,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">500,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">500,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    
                 </div>
             </div>
 
@@ -1525,11 +1534,11 @@ Alice BB 1350000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -1565,18 +1574,18 @@ Bob BB 120000</pre>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">25,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">25,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">25,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">25,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Turn Base (7♥)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">50,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">50,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    
                 </div>
             </div>
 
@@ -1698,11 +1707,11 @@ Alice BB 125000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -1738,18 +1747,18 @@ Bob BB 560000</pre>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">100,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">100,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">100,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">100,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Turn Base (7♥)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">200,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">200,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">200,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">200,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    
                 </div>
             </div>
 
@@ -1871,11 +1880,11 @@ Alice BB 240000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -1907,9 +1916,10 @@ Charlie BB 380000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Fold</span></div>
                     <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">60,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -2054,17 +2064,17 @@ Alice BB 720000
             <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-10</div>
-                    <div class="test-name">3P Medium - With Betting (SB:2,500 BB:5,000)</div>
+                    <div class="test-name">3P Medium - Alice All-In Creates Side Pot (SB:2,500 BB:5,000)</div>
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
-            <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
-<strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
+            <div class="test-content collapsed">
+            <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 10px; margin: 10px 0; border-radius: 4px;">
+<strong style="color: #856404;">⚠️ CORRECTED - Previously had negative stack error</strong>
 </div>
 
 
@@ -2094,9 +2104,9 @@ Charlie BB 265000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
                     <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -2108,22 +2118,21 @@ Charlie BB 265000</pre>
                     <div class="street-name">Turn Base (7♥)</div>
                     <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">50,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">All-In</span> <span class="action-amount">40,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
                     <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Check</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Check</span></div>
                 </div>
             </div>
 
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 275,000</div>
+                <div class="pot-summary">Total Pot: 265,000</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
-                    <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
+                    <strong style="color: #155724;">✅ CORRECTED POT CALCULATION</strong> - Alice all-in creates Main Pot + Side Pot
                 </div>
                 <div class="ante-info-box">
                     <strong>BB Ante: 5,000</strong>
@@ -2134,10 +2143,18 @@ Charlie BB 265000</pre>
                 </div>
                 <div class="pot-item main">
                     <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">275,000 (100%)</div>
+                    <div class="pot-amount">245,000 (92.5%)</div>
                     <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span> <span>Charlie</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 270,000 (live) + 5,000 (BB ante dead) = 275,000
+                        Calculation: Alice 80,000 × 3 players = 240,000 + 5,000 (BB ante dead) = 245,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">20,000 (7.5%)</div>
+                    <div class="eligible">Eligible: <span>Bob</span> <span>Charlie</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: (Bob 90,000 - 80,000) + (Charlie 90,000 - 80,000) = 10,000 + 10,000 = 20,000
                     </div>
                 </div>
                 <table>
@@ -2155,10 +2172,10 @@ Charlie BB 265000</pre>
                         <tr>
                             <td>Alice (Dealer)</td>
                             <td>80,000</td>
-                            <td>-10,000</td>
-                            <td>90,000</td>
+                            <td>0</td>
+                            <td>80,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>-10,000</td>
+                            <td>0</td>
                         </tr>
                         <tr>
                             <td>Bob (SB)</td>
@@ -2174,14 +2191,15 @@ Charlie BB 265000</pre>
                             <td>170,000</td>
                             <td>95,000</td>
                             <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                    🏆 Main + Side <span class="expand-icon">▼</span>
                                 </span>
                                 <div class="breakdown-details" style="display:none;">
                                     <div class="breakdown-line">Final Stack: 170,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 275,000</div>
-                                    <div class="breakdown-line total">= New Stack: 445,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 245,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 20,000</div>
+                                    <div class="breakdown-line total">= New Stack: 435,000</div>
                                 </div></td>
-                            <td>445,000</td>
+                            <td>435,000</td>
                         </tr>
                     </tbody>
                 </table>
@@ -2191,7 +2209,7 @@ Charlie BB 265000</pre>
             <div class="next-hand-preview">
                 <div class="next-hand-header">
                     <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (11)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 75000\nCharlie SB 445000\nAlice BB -10000`)">
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (11)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 75000\nCharlie SB 435000\nAlice BB 0`)">
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
@@ -2201,8 +2219,8 @@ started_at: 00:05:40 ended_at: HH:MM:SS
 SB 2500 BB 5000 Ante 5000
 Stack Setup:
 Bob Dealer 75000
-Charlie SB 445000
-Alice BB -10000
+Charlie SB 435000
+Alice BB 0
                 </div>
 
                 <div class="comparison-section">
@@ -2212,7 +2230,7 @@ Alice BB -10000
                         <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-10')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-10', `Hand (11)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 75000\nCharlie SB 445000\nAlice BB -10000`)">
+                        <button class="compare-btn" onclick="compareNextHand('tc-10', `Hand (11)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 75000\nCharlie SB 435000\nAlice BB 0`)">
                             🔍 Compare
                         </button>
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-10')" style="background: #4caf50;">
@@ -2245,11 +2263,11 @@ Alice BB -10000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -2281,9 +2299,9 @@ Charlie BB 235000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
                     <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -2295,7 +2313,7 @@ Charlie BB 235000</pre>
                     <div class="street-name">Turn Base (7♥)</div>
                     <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">50,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">All-In</span> <span class="action-amount">35,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
@@ -2308,7 +2326,7 @@ Charlie BB 235000</pre>
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 275,000</div>
+                <div class="pot-summary">Total Pot: 267,500</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
                 </div>
@@ -2321,10 +2339,19 @@ Charlie BB 235000</pre>
                 </div>
                 <div class="pot-item main">
                     <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">275,000 (100%)</div>
+                    <div class="pot-amount">230,000 (86.0%)</div>
                     <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span> <span>Charlie</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 270,000 (live) + 5,000 (BB ante dead) = 275,000
+                        Calculation: 225,000 (live) + 5,000 (BB ante dead) = 230,000
+                    </div>
+                </div>
+                <div class="pot-item side">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">37,500 (14.0%)</div>
+                    <div class="eligible">Eligible: <span>Bob</span> <span>Charlie</span></div>
+                    <div class="excluded">Excluded: <span class="excluded-player">Alice (capped at 75,000)</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: (92,500 - 75,000) + (95,000 - 75,000) = 37,500
                     </div>
                 </div>
                 <table>
@@ -2342,25 +2369,26 @@ Charlie BB 235000</pre>
                         <tr>
                             <td>Alice (Dealer)</td>
                             <td>75,000</td>
-                            <td>-15,000</td>
-                            <td>90,000</td>
+                            <td>0</td>
+                            <td>75,000 (all-in)</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>-15,000</td>
+                            <td>0</td>
                         </tr>
                         <tr>
                             <td>Bob (SB)</td>
                             <td>120,000</td>
-                            <td>30,000</td>
-                            <td>90,000</td>
+                            <td>27,500</td>
+                            <td>92,500</td>
                             <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                    🏆 Main Pot, Side Pot 1 <span class="expand-icon">▼</span>
                                 </span>
                                 <div class="breakdown-details" style="display:none;">
-                                    <div class="breakdown-line">Final Stack: 30,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 275,000</div>
-                                    <div class="breakdown-line total">= New Stack: 305,000</div>
+                                    <div class="breakdown-line">Final Stack: 27,500</div>
+                                    <div class="breakdown-line">+ Main Pot: 230,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 37,500</div>
+                                    <div class="breakdown-line total">= New Stack: 295,000</div>
                                 </div></td>
-                            <td>305,000</td>
+                            <td>295,000</td>
                         </tr>
                         <tr>
                             <td>Charlie (BB)</td>
@@ -2378,7 +2406,7 @@ Charlie BB 235000</pre>
             <div class="next-hand-preview">
                 <div class="next-hand-header">
                     <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (12)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 305000\nCharlie SB 140000\nAlice BB -15000`)">
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (12)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 295000\nCharlie SB 140000\nAlice BB 0`)">
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
@@ -2387,9 +2415,9 @@ Hand (12)
 started_at: 00:05:40 ended_at: HH:MM:SS
 SB 2500 BB 5000 Ante 5000
 Stack Setup:
-Bob Dealer 305000
+Bob Dealer 295000
 Charlie SB 140000
-Alice BB -15000
+Alice BB 0
                 </div>
 
                 <div class="comparison-section">
@@ -2399,7 +2427,7 @@ Alice BB -15000
                         <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-11')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-11', `Hand (12)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 305000\nCharlie SB 140000\nAlice BB -15000`)">
+                        <button class="compare-btn" onclick="compareNextHand('tc-11', `Hand (12)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 295000\nCharlie SB 140000\nAlice BB 0`)">
                             🔍 Compare
                         </button>
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-11')" style="background: #4caf50;">
@@ -2432,11 +2460,11 @@ Alice BB -15000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -2468,9 +2496,9 @@ Charlie BB 1000000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">60,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">60,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -2619,11 +2647,11 @@ Alice BB 1820000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -2656,10 +2684,10 @@ David 2250000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">150,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">150,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">150,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">150,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">150,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">150,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -2820,11 +2848,11 @@ Alice 550000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -2857,10 +2885,10 @@ David 2700000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">150,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">150,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">150,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">150,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">150,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">150,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -3021,11 +3049,11 @@ Alice 4150000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -3058,10 +3086,10 @@ David 920000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">60,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">60,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -3222,11 +3250,11 @@ Alice 2120000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -3259,10 +3287,10 @@ David 5600000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">300,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -3404,18 +3432,18 @@ Alice 4000000
             <div class="notes">
                 <div class="notes-title">📝 Validation Notes</div>
                 <div class="notes-text">
-                    • Players: 4<br>
                     • Complexity: Medium<br>
+                    • Players: 4<br>
                     • Blinds: SB 50,000 / BB 100,000 / Ante 100,000<br>
                     • Button rotation: Previous SB → New Dealer<br>
                     • All players present in next hand: ✅
-                </div>
             </div>
+                </div>
             </div>
         </div>
 
-        <!-- TEST CASE 17 -->
         <div class="test-case">
+        <!-- TEST CASE 17 -->
             <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-17</div>
@@ -3423,11 +3451,11 @@ Alice 4000000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -3458,23 +3486,23 @@ Bob BB 440000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">30,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">30,000</span></div>
                     <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">30,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">50,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">50,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">50,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Turn Base (7♥)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">100,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">100,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Call</span> <span class="action-amount">100,000</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">100,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
-                    <div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div>
+                    <div class="action-row"><span class="action-player">Bob (BB):</span> <span class="action-type">Check</span></div><div class="action-row"><span class="action-player">Alice (SB):</span> <span class="action-type">Check</span></div>
+                    
                 </div>
             </div>
 
@@ -3596,11 +3624,11 @@ Alice BB 620000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -3632,9 +3660,10 @@ Charlie BB 880000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Fold</span></div>
                     <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">60,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">60,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -3783,11 +3812,11 @@ Alice BB 660000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -3820,10 +3849,10 @@ David 420000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">30,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">30,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">30,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">30,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">30,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">30,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -3984,11 +4013,11 @@ Alice 30000
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -4020,9 +4049,9 @@ Charlie BB 165000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -4171,11 +4200,11 @@ Alice BB 85000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -4209,11 +4238,11 @@ Eve 33000000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">3,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (CO):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -4386,11 +4415,11 @@ Alice 23000000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -4425,12 +4454,12 @@ Frank 60000000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">3,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -4615,11 +4644,11 @@ Alice 33000000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -4655,13 +4684,13 @@ Grace 29000000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">1,500,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">1,500,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">1,500,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">1,500,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">1,500,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Call</span> <span class="action-amount">1,500,000</span></div>
                     <div class="action-row"><span class="action-player">Frank (HJ):</span> <span class="action-type">Call</span> <span class="action-amount">1,500,000</span></div>
                     <div class="action-row"><span class="action-player">Grace (CO):</span> <span class="action-type">Call</span> <span class="action-amount">1,500,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">1,500,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -4678,27 +4707,25 @@ Grace 29000000</pre>
                     <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">5,000,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">5,000,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">5,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Call</span> <span class="action-amount">5,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">All-In</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">Frank (HJ):</span> <span class="action-type">Call</span> <span class="action-amount">5,000,000</span></div>
                     <div class="action-row"><span class="action-player">Grace (CO):</span> <span class="action-type">Call</span> <span class="action-amount">5,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">5,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">All-In</span> <span class="action-amount">3,500,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">River Base (3♦)</div>
                     <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Check</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Check</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Check</span></div>
                     <div class="action-row"><span class="action-player">Frank (HJ):</span> <span class="action-type">Check</span></div>
                     <div class="action-row"><span class="action-player">Grace (CO):</span> <span class="action-type">Check</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Check</span></div>
                 </div>
             </div>
 
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 63,500,000</div>
+                <div class="pot-summary">Total Pot: 60,250,000</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
                 </div>
@@ -4732,26 +4759,26 @@ Grace 29000000</pre>
                         <tr>
                             <td>Alice (Dealer)</td>
                             <td>7,500,000</td>
-                            <td>-1,500,000</td>
-                            <td>9,000,000</td>
+                            <td>0</td>
+                            <td>7,500,000 (all-in)</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>-1,500,000</td>
+                            <td>0</td>
                         </tr>
                         <tr>
                             <td>Bob (SB)</td>
                             <td>16,000,000</td>
-                            <td>7,000,000</td>
-                            <td>9,000,000</td>
+                            <td>6,750,000</td>
+                            <td>9,250,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>7,000,000</td>
+                            <td>6,750,000</td>
                         </tr>
                         <tr>
                             <td>Charlie (BB)</td>
                             <td>12,500,000</td>
-                            <td>3,000,000</td>
+                            <td>2,500,000</td>
                             <td>9,500,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>3,000,000</td>
+                            <td>2,500,000</td>
                         </tr>
                         <tr>
                             <td>David (UTG)</td>
@@ -4858,11 +4885,11 @@ Alice -1500000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -4899,14 +4926,14 @@ Henry 235000000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (UTG+1):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Frank (MP):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Grace (HJ):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Henry (CO):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -5115,11 +5142,11 @@ Alice 800000000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -5157,7 +5184,7 @@ Ivy 2600000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">300,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (UTG+1):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
@@ -5165,7 +5192,7 @@ Ivy 2600000</pre>
                     <div class="action-row"><span class="action-player">Grace (MP):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Henry (HJ):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Ivy (CO):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -5386,11 +5413,11 @@ Alice 1200000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -5425,12 +5452,12 @@ Frank 42000000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">3,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
                     <div class="action-row"><span class="action-player">Frank (CO):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">3,000,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -5615,11 +5642,11 @@ Alice 42000000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -5655,13 +5682,13 @@ Grace 190000000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (MP):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Frank (HJ):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Grace (CO):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -5858,11 +5885,11 @@ Alice 5000000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -5899,14 +5926,14 @@ Henry 270000000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (UTG+1):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Frank (MP):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Grace (HJ):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
                     <div class="action-row"><span class="action-player">Henry (CO):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -6115,11 +6142,11 @@ Alice 100000000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -6153,11 +6180,11 @@ Eve 2700000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">300,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (CO):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
@@ -6330,11 +6357,11 @@ Alice 400000
                 </div>
                 <div class="badges">
                     <span class="badge complex">Complex</span>
-                    <span class="collapse-icon expanded">▼</span>
+                    <span class="collapse-icon collapsed">▶</span>
                 </div>
             </div>
 
-            <div class="test-content expanded">
+            <div class="test-content collapsed">
             <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>
 </div>
@@ -6372,7 +6399,7 @@ Ivy 5500000</pre>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">300,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div><div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Eve (UTG+1):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
@@ -6380,7 +6407,7 @@ Ivy 5500000</pre>
                     <div class="action-row"><span class="action-player">Grace (MP):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Henry (HJ):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
                     <div class="action-row"><span class="action-player">Ivy (CO):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">300,000</span></div>
+                    
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base (A♠ K♦ Q♣)</div>
