@@ -161,6 +161,40 @@
 
 ---
 
+### 7. Copy/Paste Functionality Requirements
+
+**CRITICAL REQUIREMENT**:
+
+> "Can you make copying results and copying debug logs to be copied and pasted in single google sheet cell? now it is splitting to multiple rows."
+
+> "The problem is when it starts with == signs, it thinks its a formual and shows error. can you remove the === signs in both copy logs and copy results and make it like --?"
+
+**Copy Functionality Specifications**:
+
+1. **Single-Cell Paste Format**
+   - All copied text must paste into a single Google Sheets cell
+   - Use " | " (space-pipe-space) as separator between lines
+   - No line breaks that would split into multiple rows
+
+2. **Formula Error Prevention**
+   - Replace all "===" with "---" to avoid Google Sheets formula interpretation
+   - Apply to both "Copy Player Data" (Next Hand logs) and "Copy Result" (comparison results)
+
+3. **Implementation**:
+   - `copyPlayerData()` function: Replace "===" with "---" before copying
+   - `copyComparisonResult()` function:
+     - Replace "===" with "---"
+     - Replace newlines with " | "
+     - Remove multiple spaces
+   - Applied to ALL 30 test cases
+
+4. **User Experience**:
+   - Click "Copy" button copies formatted text
+   - Paste into Google Sheets creates single cell with all data
+   - No formula errors from "===" characters
+
+---
+
 ## Implementation Details
 
 ### Progressive Generation Approach
@@ -293,6 +327,7 @@ Total Test Cases: 30
 6. Copy the "Next Hand" output from your app
 7. Click "Paste from Clipboard" in the comparison section
 8. Click "Compare" to validate results
+9. Click "Copy Result" to copy comparison results to clipboard for Google Sheets
 
 ---
 
@@ -304,6 +339,7 @@ Total Test Cases: 30
 | 2025-11-10 | 1.1 | Added stack size requirements (10-60 BB, millions) |
 | 2025-11-10 | 1.2 | Added progressive generation without approval requirement |
 | 2025-11-10 | 2.0 | Final version - All 30 test cases generated and validated ✅ |
+| 2025-11-10 | 2.1 | Added Google Sheets compatibility: single-cell paste and "===" → "---" replacement |
 
 ---
 
@@ -315,5 +351,6 @@ Total Test Cases: 30
 - Stack sizes vary from 10 BB to 60 BB as specified
 - Progressive generation worked without manual intervention
 - All test cases follow TEST_CASE_GENERATION_SPEC.md
+- Copy/paste functions updated for Google Sheets compatibility (single-cell paste, no formula errors)
 
 **Status**: ✅ **COMPLETE - Production Ready**

@@ -6595,6 +6595,9 @@ Alice 2800000
     </div>
     <script>
         function copyPlayerData(button, text) {
+            // Replace === with --- to avoid Google Sheets formula errors
+            text = text.replace(/===/g, '---');
+
             navigator.clipboard.writeText(text).then(() => {
                 const originalText = button.innerHTML;
                 button.innerHTML = '<span>✓</span> Copied!';
@@ -6634,6 +6637,9 @@ Alice 2800000
 
             // Get text and replace newlines with " | " to paste in single Excel cell
             let text = resultDiv.innerText;
+
+            // Replace === with --- to avoid Google Sheets formula errors
+            text = text.replace(/===/g, '---');
 
             // Replace newlines with " | " separator for single-cell paste
             text = text.replace(/
@@ -6728,11 +6734,12 @@ Alice 2800000
             let html = `<div class="result-title">${allPassed ? '✅ PASSED' : '❌ FAILED'}</div>`;
             for (const result of results) {
                 const className = result.pass ? 'check-item pass' : 'check-item fail';
-                html += `<div class="${className}">${result.field}: ${result.expected}`;
-                if (!result.pass) {
-                    html += `<div class="diff">Expected: ${result.expected}, Got: ${result.actual}</div>`;
+                if (result.pass) {
+                    html += `<div class="${className}">${result.field}: ${result.expected}</div>`;
+                } else {
+                    // Format failed results inline for better single-cell paste
+                    html += `<div class="${className}">${result.field}: Expected ${result.expected}, Got ${result.actual}</div>`;
                 }
-                html += '</div>';
             }
 
             resultDiv.innerHTML = html;
