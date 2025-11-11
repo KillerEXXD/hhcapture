@@ -6598,6 +6598,34 @@ Alice 2800000
             // Replace === with --- to avoid Google Sheets formula errors
             text = text.replace(/===/g, '---');
 
+            // Check if clipboard API is available
+            if (!navigator.clipboard) {
+                // Fallback for older browsers or file:// protocol
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<span>✓</span> Copied!';
+                    button.classList.add('copied');
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    document.body.removeChild(textarea);
+                    console.error('Failed to copy:', err);
+                    alert('Failed to copy to clipboard. Error: ' + err.message);
+                }
+                return;
+            }
+
             navigator.clipboard.writeText(text).then(() => {
                 const originalText = button.innerHTML;
                 button.innerHTML = '<span>✓</span> Copied!';
@@ -6609,13 +6637,21 @@ Alice 2800000
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy:', err);
-                alert('Failed to copy to clipboard');
+                alert('Failed to copy to clipboard. Error: ' + err.message + '\n\nTry opening this file via a web server or use Ctrl+C to copy manually.');
             });
         }
 
         function pasteFromClipboard(button, testCaseId) {
+            const textarea = document.getElementById(`actual-output-${testCaseId}`);
+
+            // Check if clipboard API is available
+            if (!navigator.clipboard) {
+                alert('Clipboard API not available. Please use Ctrl+V to paste manually into the text area.');
+                textarea.focus();
+                return;
+            }
+
             navigator.clipboard.readText().then(text => {
-                const textarea = document.getElementById(`actual-output-${testCaseId}`);
                 textarea.value = text;
 
                 const originalText = button.innerHTML;
@@ -6628,7 +6664,8 @@ Alice 2800000
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to paste:', err);
-                alert('Failed to paste from clipboard. Please make sure you have clipboard permissions enabled.');
+                alert('Failed to paste from clipboard. Error: ' + err.message + '\n\nPlease use Ctrl+V to paste manually into the text area.');
+                textarea.focus();
             });
         }
 
@@ -6642,17 +6679,37 @@ Alice 2800000
             text = text.replace(/===/g, '---');
 
             // Replace newlines with " | " separator for single-cell paste
-            text = text.replace(/
-/g, ' | ');
+            text = text.replace(/\n/g, ' | ');
 
             // Remove multiple spaces
             text = text.replace(/\s+/g, ' ');
+
+            // Check if clipboard API is available
+            if (!navigator.clipboard) {
+                // Fallback for older browsers or file:// protocol
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('Comparison result copied to clipboard! Paste into a single Excel/Sheets cell.');
+                } catch (err) {
+                    document.body.removeChild(textarea);
+                    console.error('Failed to copy result:', err);
+                    alert('Failed to copy comparison result. Error: ' + err.message);
+                }
+                return;
+            }
 
             navigator.clipboard.writeText(text).then(() => {
                 alert('Comparison result copied to clipboard! Paste into a single Excel/Sheets cell.');
             }).catch(err => {
                 console.error('Failed to copy result:', err);
-                alert('Failed to copy comparison result');
+                alert('Failed to copy comparison result. Error: ' + err.message + '\n\nTry opening this file via a web server.');
             });
         }
 
