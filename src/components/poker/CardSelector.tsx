@@ -233,6 +233,7 @@ export const CardSelector: React.FC<CardSelectorProps> = ({
           ? 'border-2 border-blue-400 bg-blue-50 ring-2 ring-blue-500'
           : 'border-2 border-gray-300 bg-gray-50'
       }`}
+      style={{ minWidth: '240px' }}
       tabIndex={0}
       data-card-focus={dataCardFocus}
       onKeyDown={handleKeyDown}
