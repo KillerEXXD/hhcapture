@@ -195,6 +195,42 @@
 
 ---
 
+### 8. Default Collapsed State Requirement
+
+**CRITICAL REQUIREMENT**:
+
+> "Can you rename the file to '30_TestCases.html'. Also can you by default keep all the test cases collapsed"
+
+**Collapsed State Specifications**:
+
+1. **Default Display State**
+   - All 30 test cases must be collapsed by default when page loads
+   - Only test case headers are visible initially
+   - Test details are hidden until user clicks to expand
+
+2. **Visual Indicators**:
+   - Collapsed state: Show "▶" (right arrow) icon
+   - Expanded state: Show "▼" (down arrow) icon
+   - Clear visual indication of collapsible nature
+
+3. **Implementation**:
+   - CSS classes: `class="test-content collapsed"` for collapsed state
+   - CSS classes: `class="collapse-icon collapsed"` with "▶" symbol
+   - JavaScript toggles between collapsed/expanded states on click
+
+4. **User Experience**:
+   - Clean initial page view showing all 30 test case titles
+   - Click any header to expand and view full test details
+   - Click again to collapse back to header only
+   - Better performance and easier navigation with many test cases
+
+5. **File Naming**:
+   - Primary file: `30_TestCases.html` (in docs/QA/)
+   - Public copy: `30_TestCases.html` (in public/)
+   - Replaces previous version: `30_base_validated_cases_v2.html`
+
+---
+
 ## Implementation Details
 
 ### Progressive Generation Approach
@@ -267,10 +303,11 @@
 
 ### Primary Files
 
-1. **30_base_validated_cases.html** (6,781 lines)
-   - All 30 test cases
+1. **30_TestCases.html** (6,128 lines)
+   - All 30 test cases with correct action order
+   - Default collapsed state for clean initial view
    - Ready for browser testing
-   - Copy/paste functionality
+   - Copy/paste functionality with Google Sheets compatibility
    - Comparison features
 
 2. **generate_30_progressive.py** (939 lines)
@@ -319,7 +356,7 @@ Total Test Cases: 30
 
 ### To Use Test Cases:
 
-1. Open `30_base_validated_cases.html` in browser
+1. Open `30_TestCases.html` in browser
 2. Expand any test case
 3. Click "Copy Player Data" button
 4. Paste into your poker hand history application
@@ -340,6 +377,9 @@ Total Test Cases: 30
 | 2025-11-10 | 1.2 | Added progressive generation without approval requirement |
 | 2025-11-10 | 2.0 | Final version - All 30 test cases generated and validated ✅ |
 | 2025-11-10 | 2.1 | Added Google Sheets compatibility: single-cell paste and "===" → "---" replacement |
+| 2025-11-10 | 2.2 | Added clipboard fallback for file:// protocol using document.execCommand |
+| 2025-11-10 | 3.0 | Fixed 2-player and 3-player action order rules, regenerated all test cases |
+| 2025-11-10 | 3.1 | Renamed to 30_TestCases.html, default collapsed state for all test cases |
 
 ---
 
@@ -352,5 +392,8 @@ Total Test Cases: 30
 - Progressive generation worked without manual intervention
 - All test cases follow TEST_CASE_GENERATION_SPEC.md
 - Copy/paste functions updated for Google Sheets compatibility (single-cell paste, no formula errors)
+- Clipboard fallback implemented for file:// protocol
+- 2-player and 3-player action order rules fixed and validated
+- Renamed to 30_TestCases.html with default collapsed state
 
 **Status**: ✅ **COMPLETE - Production Ready**
