@@ -1299,19 +1299,46 @@ export const RiverView: React.FC<RiverViewProps> = ({
                                               const buttonElement = e.currentTarget;
                                               const buttonRect = buttonElement.getBoundingClientRect();
 
-                                              // Estimate pop-up height (can be adjusted based on content)
+                                              // Estimate pop-up dimensions
                                               const estimatedPopupHeight = 600; // Approximate height with all sections
+                                              const estimatedPopupWidth = 460; // Max width from style
 
                                               // Calculate available space above and below
                                               const spaceBelow = window.innerHeight - buttonRect.bottom;
                                               const spaceAbove = buttonRect.top;
 
-                                              // Determine optimal position
+                                              // Determine optimal vertical position
                                               const shouldPositionAbove = spaceBelow < estimatedPopupHeight && spaceAbove > spaceBelow;
+
+                                              // Calculate horizontal positioning to prevent cutoff
+                                              const buttonCenter = buttonRect.left + (buttonRect.width / 2);
+                                              const popupHalfWidth = estimatedPopupWidth / 2;
+                                              const spaceLeft = buttonCenter - popupHalfWidth;
+                                              const spaceRight = window.innerWidth - (buttonCenter + popupHalfWidth);
+
+                                              // Determine horizontal alignment
+                                              let horizontalAlign: 'center' | 'left' | 'right' = 'center';
+                                              let leftOffset = 0;
+
+                                              if (spaceLeft < 10) {
+                                                // Too close to left edge - align left
+                                                horizontalAlign = 'left';
+                                                leftOffset = buttonRect.left;
+                                              } else if (spaceRight < 10) {
+                                                // Too close to right edge - align right
+                                                horizontalAlign = 'right';
+                                                leftOffset = buttonRect.right;
+                                              } else {
+                                                // Enough space - center on button
+                                                horizontalAlign = 'center';
+                                                leftOffset = buttonCenter;
+                                              }
 
                                               setPopupPositions(prev => ({
                                                 ...prev,
-                                                [historyKey]: shouldPositionAbove ? 'above' : 'below'
+                                                [historyKey]: shouldPositionAbove ? 'above' : 'below',
+                                                [`${historyKey}_horizontal`]: horizontalAlign,
+                                                [`${historyKey}_left`]: leftOffset
                                               }));
                                             }
                                           }}
@@ -1329,12 +1356,34 @@ export const RiverView: React.FC<RiverViewProps> = ({
                                   {/* Floating Card - Stack History */}
                                   {isExpanded && currentStack !== null && (() => {
                                     const position = popupPositions[historyKey] || 'below';
-                                    const positionClasses = position === 'above'
-                                      ? 'absolute z-[100] bottom-full mb-2 left-1/2 transform -translate-x-1/2'
-                                      : 'absolute z-[100] mt-2 left-1/2 transform -translate-x-1/2';
+                                    const horizontalAlign = popupPositions[`${historyKey}_horizontal`] as 'center' | 'left' | 'right' || 'center';
+                                    const leftOffset = popupPositions[`${historyKey}_left`] as number || 0;
+
+                                    // Base positioning classes
+                                    const verticalClasses = position === 'above'
+                                      ? 'absolute z-[100] bottom-full mb-2'
+                                      : 'absolute z-[100] mt-2';
+
+                                    // Horizontal positioning transform
+                                    let horizontalTransform = '';
+                                    if (horizontalAlign === 'center') {
+                                      horizontalTransform = 'transform -translate-x-1/2';
+                                    } else if (horizontalAlign === 'right') {
+                                      horizontalTransform = 'transform -translate-x-full';
+                                    }
+                                    // left alignment needs no transform
+
+                                    const positionClasses = `${verticalClasses} ${horizontalTransform}`;
 
                                     return (
-                                      <div data-stack-history-card={historyKey} className={positionClasses} style={{ minWidth: '400px', maxWidth: '460px' }}>
+                                      <div
+                                        data-stack-history-card={historyKey}
+                                        className={positionClasses}
+                                        style={{
+                                          minWidth: '400px',
+                                          maxWidth: '460px',
+                                          left: `${leftOffset}px`
+                                        }}>
                                         <div className={`bg-gradient-to-br rounded-xl shadow-2xl border-2 overflow-hidden ${isAllIn ? 'from-red-50 to-orange-50 border-red-400' : 'from-white to-blue-50 border-blue-300'}`}>
                                         {/* Card Header */}
                                         <div className={`bg-gradient-to-r px-3 py-2 flex items-center justify-between ${isAllIn ? 'from-red-600 to-red-700' : 'from-blue-600 to-blue-700'}`}>

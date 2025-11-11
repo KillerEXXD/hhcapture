@@ -1308,14 +1308,15 @@ export const TurnView: React.FC<TurnViewProps> = ({
                                               const buttonElement = e.currentTarget;
                                               const buttonRect = buttonElement.getBoundingClientRect();
 
-                                              // Estimate pop-up height (can be adjusted based on content)
+                                              // Estimate pop-up dimensions
                                               const estimatedPopupHeight = 600; // Approximate height with all sections
+                                              const estimatedPopupWidth = 460; // Max width from style
 
                                               // Calculate available space above and below
                                               const spaceBelow = window.innerHeight - buttonRect.bottom;
                                               const spaceAbove = buttonRect.top;
 
-                                              // Determine optimal position with better logic
+                                              // Determine optimal vertical position with better logic
                                               // Position above if: not enough space below AND more space above
                                               const shouldPositionAbove = spaceBelow < estimatedPopupHeight && spaceAbove > spaceBelow;
 
@@ -1329,10 +1330,32 @@ export const TurnView: React.FC<TurnViewProps> = ({
                                                 topPosition = buttonRect.bottom + 8;
                                               }
 
+                                              // Calculate horizontal positioning to prevent cutoff
+                                              const buttonCenter = buttonRect.left + (buttonRect.width / 2);
+                                              const popupHalfWidth = estimatedPopupWidth / 2;
+                                              const spaceLeft = buttonCenter - popupHalfWidth;
+                                              const spaceRight = window.innerWidth - (buttonCenter + popupHalfWidth);
+
+                                              // Determine horizontal alignment
+                                              let horizontalAlign: 'center' | 'left' | 'right' = 'center';
+                                              let leftOffset = buttonCenter;
+
+                                              if (spaceLeft < 10) {
+                                                // Too close to left edge - align left
+                                                horizontalAlign = 'left';
+                                                leftOffset = Math.max(10, buttonRect.left);
+                                              } else if (spaceRight < 10) {
+                                                // Too close to right edge - align right
+                                                horizontalAlign = 'right';
+                                                leftOffset = Math.min(window.innerWidth - 10, buttonRect.right);
+                                              }
+
                                               setPopupPositions(prev => ({
                                                 ...prev,
                                                 [historyKey]: shouldPositionAbove ? 'above' : 'below',
-                                                [`${historyKey}_top`]: topPosition
+                                                [`${historyKey}_top`]: topPosition,
+                                                [`${historyKey}_horizontal`]: horizontalAlign,
+                                                [`${historyKey}_left`]: leftOffset
                                               }));
                                             }
                                           }}
@@ -1351,7 +1374,19 @@ export const TurnView: React.FC<TurnViewProps> = ({
                                   {isExpanded && currentStack !== null && (() => {
                                     const position = popupPositions[historyKey] || 'below';
                                     const topPosition = popupPositions[`${historyKey}_top`] as number || 0;
-                                    const positionClasses = 'fixed z-[9999] left-1/2 transform -translate-x-1/2';
+                                    const horizontalAlign = popupPositions[`${historyKey}_horizontal`] as 'center' | 'left' | 'right' || 'center';
+                                    const leftOffset = popupPositions[`${historyKey}_left`] as number || 0;
+
+                                    // Horizontal positioning transform
+                                    let horizontalTransform = '';
+                                    if (horizontalAlign === 'center') {
+                                      horizontalTransform = 'transform -translate-x-1/2';
+                                    } else if (horizontalAlign === 'right') {
+                                      horizontalTransform = 'transform -translate-x-full';
+                                    }
+                                    // left alignment needs no transform
+
+                                    const positionClasses = `fixed z-[9999] ${horizontalTransform}`;
 
                                     return (
                                       <div
@@ -1361,6 +1396,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
                                           minWidth: '400px',
                                           maxWidth: '460px',
                                           top: `${topPosition}px`,
+                                          left: `${leftOffset}px`,
                                           maxHeight: 'calc(100vh - 20px)',
                                           overflowY: 'auto'
                                         }}
