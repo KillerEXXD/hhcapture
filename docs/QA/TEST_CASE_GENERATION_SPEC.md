@@ -3,6 +3,105 @@
 ## Project Context
 This document defines the complete specification for generating poker hand history pot calculation test cases for a tournament poker hand collector application.
 
+## 🚨 VALIDATION REQUIREMENTS - MUST CHECK BEFORE ACCEPTING TEST CASES
+
+**CRITICAL:** All test cases MUST pass these validations before being considered complete:
+
+### Automated Validation Scripts
+
+1. **`validate_all_cases.py`** - Checks for:
+   - ❌ Negative final stacks (Final Stack < 0)
+   - ❌ Over-contributions (Contributed > Starting Stack)
+   - ❌ Calculation errors (Final ≠ Starting - Contributed)
+   - ❌ Negative stacks in Next Hand Preview
+
+2. **`validate_action_order.py`** - Checks for:
+   - ❌ 2-player preflop: SB must act first, BB second
+   - ❌ 2-player postflop: BB must act first, SB second
+   - ❌ 3-player preflop: Dealer → SB → BB
+   - ❌ 3-player postflop: SB → BB → Dealer
+
+### Known Validation Script Bugs
+
+⚠️ **IMPORTANT:** `validate_all_cases.py` has a regex bug that can cause false positives:
+
+**Bug:** The pattern `<tr>.*?PlayerName.*?</tr>` with `re.DOTALL` can match across multiple table rows, extracting numbers from multiple players instead of just the target player.
+
+**Result:** The script may report "PASS" even when negative stacks exist in the Expected Results table.
+
+**Workaround:** Always manually verify Expected Results tables by checking:
+```bash
+# Manual verification for each test case
+grep -A 50 "Expected Results" 30_base_validated_cases.html | grep "Final Stack"
+```
+
+Look for any negative values (numbers with minus sign) in the Final Stack column.
+
+### Manual Verification Checklist
+
+For EVERY test case, manually verify:
+
+- [ ] **Actions section:** Any player going all-in must show "All-In X" (not "Call X" or "Bet X")
+- [ ] **Expected Results table:**
+  - [ ] All Final Stack values ≥ 0 (no negative numbers)
+  - [ ] All Contributed values ≤ Starting Stack
+  - [ ] Calculation: Final Stack = Starting Stack - Contributed (for each player)
+  - [ ] Players who went all-in show "(all-in)" notation in Contributed column
+- [ ] **Pot calculations:**
+  - [ ] Main Pot correctly calculated with all-in caps
+  - [ ] Side Pots created when players go all-in for different amounts
+  - [ ] Total Pot = Sum of all contributions
+- [ ] **Next Hand Preview:**
+  - [ ] All players present (including eliminated players with stack 0)
+  - [ ] Winners show New Stack (Final + Pots Won), not Final Stack
+  - [ ] Non-winners show Final Stack
+  - [ ] No negative stack values
+
+### Common Issues Found During Validation (Nov 2025)
+
+**Issue 1: Expected Results Not Updated After Action Fixes**
+- Actions were corrected to show "All-In" instead of "Call/Bet"
+- BUT Expected Results table still showed old negative values
+- **Solution:** After fixing actions, ALWAYS recalculate and update Expected Results table
+
+**Issue 2: Validation Script False Positives**
+- Script reported "30/30 PASS" but manual check found 5 test cases with negative stacks
+- **Root cause:** Regex pattern matching across multiple table rows
+- **Affected test cases:** TC-22, TC-23, TC-25, TC-26, TC-28
+- **Solution:** Always do manual verification in addition to automated validation
+
+**Issue 3: Multiple Files Out of Sync**
+- `30_base_validated_cases.html` had issues
+- `30_TestCases.html` was clean
+- **Solution:** Keep files in sync or clearly document which is the source of truth
+
+### Validation Workflow
+
+```bash
+# Step 1: Run automated validation
+cd docs/QA
+python validate_all_cases.py
+python validate_action_order.py
+
+# Step 2: Manual spot check (even if scripts say PASS)
+# Check for negative stacks in Expected Results
+grep -B 5 "<td>-" 30_base_validated_cases.html | grep -E "(TEST CASE|Final Stack)"
+
+# Step 3: Verify specific test cases manually
+# Open HTML file and visually inspect Expected Results tables
+# Look for any negative numbers in Final Stack column
+
+# Step 4: If issues found, fix systematically:
+# - Fix actions (change to All-In where needed)
+# - Recalculate contributions
+# - Update Final Stack values
+# - Recalculate pots (Main + Side)
+# - Update Next Hand Preview
+# - Re-validate
+```
+
+---
+
 ## ⚠️ CRITICAL ERRORS TO AVOID (Updated from TC-1.1 to TC-13.1 Fixes)
 
 ### 1. Next Hand Preview - Winners Must Show NEW Stack (NOT Final Stack)
@@ -325,6 +424,101 @@ Hand 2: Bob SB, Alice BB  ✅ Players swap positions each hand
 
 ---
 
+### 7. Negative Stacks - Players Cannot Go Below Zero
+
+**CRITICAL ERROR:** Players showing negative stack values when going all-in
+
+**Rule:**
+```
+A player can NEVER have a negative stack in poker.
+When a player goes all-in, their Final Stack = 0 (not negative)
+Maximum contribution = Starting Stack (all chips the player has)
+```
+
+**Example - TC-10 Error Found:**
+```
+WRONG:
+Alice Starting Stack: 80,000
+Alice Contributed: 90,000 ❌ (impossible - she doesn't have 90,000!)
+Alice Final Stack: -10,000 ❌ (negative stack is impossible)
+
+RIGHT:
+Alice Starting Stack: 80,000
+Alice went ALL-IN on Turn: 40,000 (her last chips after Preflop 15k + Flop 25k)
+Alice Total Contributed: 80,000 ✅ (15,000 + 25,000 + 40,000 all-in)
+Alice Final Stack: 0 ✅ (not negative!)
+```
+
+**Why this matters:**
+When a player contributes more than their starting stack, it means:
+1. The player went ALL-IN at some point
+2. Their contribution should be capped at their starting stack
+3. This creates a SIDE POT for players who contributed more
+4. Final stack must be 0, never negative
+
+**Validation Checklist:**
+- [ ] **Check:** For each player, verify Contributed ≤ Starting Stack
+- [ ] **Check:** If Contributed > Starting Stack, flag as error
+- [ ] **Check:** No player has Final Stack < 0
+- [ ] **Check:** If player went all-in, ensure action shows "All-In" (not "Call" or "Bet")
+- [ ] **Check:** All-in players create side pots if others contribute more
+
+**Side Pot Creation:**
+When one player goes all-in for less than others bet:
+```
+Example (from TC-10 fix):
+Alice contributes: 80,000 (all-in)
+Bob contributes: 92,500
+Charlie contributes: 95,000
+
+Main Pot: 80,000 × 3 + BB ante = 245,000 (Alice, Bob, Charlie eligible)
+Side Pot: (92,500 - 80,000) + (95,000 - 80,000) = 30,000 (Bob, Charlie only)
+Total Pot: 275,000 ✅
+```
+
+**What to do when fixing negative stack errors:**
+1. Review the action sequence - where did the player go all-in?
+2. Recalculate contributions:
+   - Preflop: X
+   - Flop: Y
+   - Turn: Z (all-in)
+   - Total = X + Y + Z = Starting Stack
+3. Change action from "Call" or "Bet" to "All-In" with correct amount
+4. Set Final Stack to 0 (not negative)
+5. Recalculate pots - create Main Pot + Side Pot(s) if needed
+6. Update Next Hand Preview to show stack = 0 for eliminated player
+
+**Real Example from TC-10:**
+```
+BEFORE (WRONG):
+Turn Base (7♥):
+- Bob (SB): Bet 50,000
+- Charlie (BB): Call 50,000
+- Alice (Dealer): Call 50,000 ❌ (she only has 40,000 left!)
+
+Expected Results:
+- Alice: Final -10,000 ❌
+
+Next Hand:
+- Alice BB -10,000 ❌
+
+AFTER (CORRECT):
+Turn Base (7♥):
+- Bob (SB): Bet 50,000
+- Charlie (BB): Call 50,000
+- Alice (Dealer): All-In 40,000 ✅
+
+Expected Results:
+- Alice: Final 0 ✅
+- Main Pot: 245,000 (all 3 eligible)
+- Side Pot 1: 30,000 (Bob and Charlie only)
+
+Next Hand:
+- Alice BB 0 ✅
+```
+
+---
+
 ## Critical Calculation Rules
 
 ### 1. BB Ante Posting Order
@@ -402,19 +596,161 @@ Example: BB has 150 chips, BB Blind = 100, Ante = 100
 - Other players still post full antes and match whatever LIVE amount BB posted
 - These scenarios are CRITICAL for proper pot calculation testing
 
-### 2. Pot Calculation Formula
+### 2. Betting Terminology and Contribution Calculation
+
+**CRITICAL: Understanding "Raise TO" vs "Raise BY"**
+
+**Rule:**
+```
+"Raise TO X" = Player's TOTAL bet becomes X (includes all previous bets)
+"Raise BY X" = Player adds X MORE to their current bet
+
+In poker notation:
+- "Raise 15,000" typically means "Raise TO 15,000" (total bet)
+- NOT "Raise BY 15,000" (additional amount)
+```
+
+**Common Mistakes in Contribution Calculation:**
+
+#### Mistake 1: Double-counting blinds in raises
+
+**WRONG:**
+```
+Bob (SB):
+- Posts SB: 2,500
+- Raises to 15,000
+- Contribution: 2,500 + 15,000 = 17,500 ❌
+```
+
+**CORRECT:**
+```
+Bob (SB):
+- Posts SB: 2,500 (already in pot)
+- Raises TO 15,000 (total bet = 15,000, INCLUDES the 2,500 SB)
+- Additional amount: 15,000 - 2,500 = 12,500
+- Total contribution: 15,000 ✅
+```
+
+#### Mistake 2: Double-counting BB blind in calls
+
+**WRONG:**
+```
+Charlie (BB):
+- Posts BB: 5,000
+- Calls 15,000 (to match raise)
+- Contribution: 5,000 + 15,000 = 20,000 ❌
+```
+
+**CORRECT:**
+```
+Charlie (BB):
+- Posts BB: 5,000 (already in pot)
+- Calls TO 15,000 (total bet = 15,000, INCLUDES the 5,000 BB)
+- Additional amount: 15,000 - 5,000 = 10,000
+- Total contribution: 15,000 ✅
+```
+
+#### Mistake 3: Confusing ante with blind contributions
+
+**WRONG:**
+```
+Charlie (BB) with ante:
+- Posts Ante: 5,000 (dead)
+- Posts BB: 5,000 (live)
+- Calls preflop to 15,000
+- Live contribution: 5,000 + 5,000 + 15,000 = 25,000 ❌
+```
+
+**CORRECT:**
+```
+Charlie (BB) with ante:
+- Posts Ante: 5,000 (dead, counted separately)
+- Posts BB: 5,000 (live, already in pot)
+- Calls TO 15,000 (total preflop = 15,000, INCLUDES the BB)
+- Live contribution: 15,000 ✅
+- Total contribution: 15,000 (live) + 5,000 (ante) = 20,000
+```
+
+**Validation Formula:**
+```
+Player's Total Contribution = Starting Stack - Final Stack
+
+If calculated contribution doesn't match this formula,
+there's an error in the action sequence or math.
+```
+
+**Example from TC-10 (CORRECT):**
+```
+Alice (Dealer):
+- Starting: 80,000
+- Preflop: Call 15,000 → Stack: 65,000
+- Flop: Call 25,000 → Stack: 40,000
+- Turn: All-In 40,000 → Stack: 0
+- Total contribution: 80,000 - 0 = 80,000 ✅
+
+Bob (SB):
+- Starting: 165,000
+- SB: 2,500 → Stack: 162,500
+- Preflop: Raise TO 15,000 (adds 12,500) → Stack: 150,000
+- Flop: Bet 25,000 → Stack: 125,000
+- Turn: Bet 50,000 → Stack: 75,000
+- Total contribution: 165,000 - 75,000 = 90,000 ✅
+- Breakdown: 2,500 (SB) + 12,500 (preflop) + 25,000 (flop) + 50,000 (turn) = 90,000 ✅
+
+Charlie (BB):
+- Starting: 265,000
+- Ante: 5,000 (dead) → Stack: 260,000
+- BB: 5,000 (live) → Stack: 255,000
+- Preflop: Call TO 15,000 (adds 10,000) → Stack: 245,000
+- Flop: Call 25,000 → Stack: 220,000
+- Turn: Call 50,000 → Stack: 170,000
+- Total contribution: 265,000 - 170,000 = 95,000 ✅
+- Live breakdown: 5,000 (BB) + 10,000 (preflop) + 25,000 (flop) + 50,000 (turn) = 90,000 ✅
+- Plus ante (dead): 5,000
+- Total: 90,000 (live) + 5,000 (ante) = 95,000 ✅
+```
+
+**Pot Calculation (CORRECT):**
+```
+Live contributions:
+- Alice: 80,000
+- Bob: 90,000
+- Charlie: 90,000
+Total live: 260,000
+
+Dead money:
+- Charlie's ante: 5,000
+
+Total Pot: 260,000 + 5,000 = 265,000 ✅
+
+Main Pot: 80,000 × 3 + 5,000 (ante) = 245,000
+Side Pot 1: (90,000 - 80,000) × 2 = 20,000
+Total: 245,000 + 20,000 = 265,000 ✅
+```
+
+**Validation Checklist:**
+- [ ] For each "Raise TO X" - verify X includes all previous bets from that player
+- [ ] For each "Call TO X" - verify X includes blinds/antes already posted
+- [ ] Total contribution = Starting Stack - Final Stack (must match exactly)
+- [ ] Live contributions (excluding antes) calculated correctly
+- [ ] Antes counted separately as dead money (only once in pot)
+- [ ] Final pot = Sum of all live contributions + BB ante
+
+---
+
+### 3. Pot Calculation Formula
 ```
 Total Pot = Sum of all live contributions + BB Ante (dead money)
 ```
 
-### 3. Final Stack Verification
+### 4. Final Stack Verification
 ```
 Final Stack = Starting Stack - Total Contribution
 Total Contribution = Live Contribution + Ante (if BB)
 Final Stack can NEVER be negative
 ```
 
-### 4. Side Pot Creation Rules
+### 5. Side Pot Creation Rules
 - Sort all-in amounts in ascending order
 - Main pot = smallest all-in × number of players contributing to it + dead money
 - Side pots created for each increasing all-in level
