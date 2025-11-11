@@ -127,7 +127,24 @@ class TestCaseValidator:
             return False, f"{street_name}: Base has {len(base_actions)} actions, but {len(active_players)} active players"
 
         # Rule: Base actions must be in position order
-        position_order = ["SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO", "Dealer"]
+        # Different order for preflop vs postflop
+        num_players = len(active_players)
+
+        if street_name == "Preflop":
+            # Preflop action order
+            if num_players == 2:
+                position_order = ["SB", "Dealer", "BB"]
+            elif num_players == 3:
+                position_order = ["Dealer", "SB", "BB"]
+            else:
+                position_order = ["SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO", "Dealer"]
+        else:
+            # Postflop action order
+            if num_players == 2:
+                position_order = ["BB", "SB", "Dealer"]
+            else:
+                position_order = ["SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO", "Dealer"]
+
         expected_order = sorted(active_players, key=lambda p: position_order.index(p.position))
 
         for i, action in enumerate(base_actions):
@@ -284,50 +301,46 @@ class TestCaseGenerator:
                 player.total_contribution += self.sb
 
     def generate_preflop_simple(self):
-        """Generate simple preflop: everyone calls, BB checks"""
+        """Generate simple preflop: everyone calls, BB checks
+
+        Uses correct preflop action order:
+        - 2-handed: Dealer/SB → BB
+        - 3-handed: Dealer → SB → BB
+        - 4+ players: SB → BB → UTG... → Dealer
+        """
         actions = []
 
-        # UTG and later positions call
-        for player in self.players:
-            if player.position not in ["Dealer", "SB", "BB"]:
+        # Get correct preflop action order
+        action_order = self.get_preflop_action_order(self.players)
+
+        # Everyone calls except last player (BB)
+        for i, player in enumerate(action_order):
+            if i < len(action_order) - 1:
+                # Not BB - call
                 actions.append(Action(player.name, player.position, ActionType.CALL, self.bb))
                 player.street_contribution = self.bb
                 player.current_stack -= (self.bb - player.blind_posted)
                 player.total_contribution += (self.bb - player.blind_posted)
-
-        # Dealer calls (if exists)
-        if self.num_players > 2:
-            dealer = next(p for p in self.players if p.position == "Dealer")
-            actions.append(Action(dealer.name, dealer.position, ActionType.CALL, self.bb))
-            dealer.street_contribution = self.bb
-            dealer.current_stack -= self.bb
-            dealer.total_contribution += self.bb
-
-        # SB calls
-        sb = next(p for p in self.players if p.position == "SB")
-        actions.append(Action(sb.name, sb.position, ActionType.CALL, self.bb))
-        sb.street_contribution = self.bb
-        sb.current_stack -= (self.bb - sb.blind_posted)
-        sb.total_contribution += (self.bb - sb.blind_posted)
-
-        # BB checks
-        bb = next(p for p in self.players if p.position == "BB")
-        actions.append(Action(bb.name, bb.position, ActionType.CHECK))
+            else:
+                # BB checks
+                actions.append(Action(player.name, player.position, ActionType.CHECK))
 
         self.actions["Preflop Base"] = actions
 
     def generate_preflop_with_betting(self):
         """Generate preflop with raise action
 
-        NOTE: Base section uses canonical position order (SB → BB → UTG... → Dealer)
-        NOT actual gameplay order. This is per spec Section 4.
+        NOTE: Preflop uses actual gameplay action order (different from postflop).
+        Rules:
+        - 2-handed: Dealer/SB → BB
+        - 3-handed: Dealer → SB → BB
+        - 4+ players: SB → BB → UTG... → Dealer
         """
         actions = []
         raise_amount = self.bb * 3
 
-        # Base section uses postflop position order (canonical order)
-        # This matches the validation logic
-        action_order = self.get_postflop_action_order(self.players)
+        # Use correct preflop action order
+        action_order = self.get_preflop_action_order(self.players)
 
         # First player raises
         if len(action_order) > 0:
@@ -414,9 +427,44 @@ class TestCaseGenerator:
 
         self.actions["River Base (3♦)"] = actions
 
+    def get_preflop_action_order(self, players: List[Player]) -> List[Player]:
+        """Get correct preflop action order
+
+        Rules:
+        - 2-handed: Dealer/SB → BB (Dealer and SB are same position)
+        - 3-handed: Dealer → SB → BB
+        - 4+ players: SB → BB → UTG → MP → HJ → CO → Dealer
+        """
+        num_players = len(players)
+
+        if num_players == 2:
+            # 2-handed preflop: Dealer/SB first, then BB
+            position_order = ["SB", "Dealer", "BB"]
+        elif num_players == 3:
+            # 3-handed preflop: Dealer → SB → BB
+            position_order = ["Dealer", "SB", "BB"]
+        else:
+            # 4+ players: SB → BB → UTG... → Dealer
+            position_order = ["SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO", "Dealer"]
+
+        return sorted(players, key=lambda p: position_order.index(p.position))
+
     def get_postflop_action_order(self, players: List[Player]) -> List[Player]:
-        """Get correct post-flop action order"""
-        position_order = ["SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO", "Dealer"]
+        """Get correct post-flop action order
+
+        Rules:
+        - 2-handed: BB → Dealer/SB
+        - 3+ players: SB → BB → UTG → MP → HJ → CO → Dealer
+        """
+        num_players = len(players)
+
+        if num_players == 2:
+            # 2-handed postflop: BB first, then Dealer/SB
+            position_order = ["BB", "SB", "Dealer"]
+        else:
+            # 3+ players: standard postflop order
+            position_order = ["SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO", "Dealer"]
+
         return sorted(players, key=lambda p: position_order.index(p.position))
 
     def rotate_button_for_next_hand(self) -> List[Dict]:
