@@ -99,8 +99,9 @@ function checkPreflopRoundComplete(
     let contribution = 0;
 
     if (actionLevel === 'base') {
-      // Include posted blinds and antes
-      const blindsAntes = (data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0);
+      // Include posted blinds ONLY (NOT antes - antes are dead money)
+      // For round completion, only live contributions count
+      const blindsOnly = (data.postedSB || 0) + (data.postedBB || 0);
 
       // Get BASE action (if any)
       const preflopAction = getPreflopAction(p, suffix, playerData);
@@ -110,8 +111,8 @@ function checkPreflopRoundComplete(
         const amount = parseFloat(preflopAction.amount);
         contribution = amount < 1000 ? amount * 1000 : amount;
       } else {
-        // No action, just blinds
-        contribution = blindsAntes;
+        // No action, just blinds (ante is NOT part of live contribution for matching)
+        contribution = blindsOnly;
       }
     } else {
       // More Action rounds: Use the most recent action amount (TOTAL contribution)
@@ -137,7 +138,8 @@ function checkPreflopRoundComplete(
         }
       } else {
         // No action in this More Action round, check previous rounds (most recent first)
-        const blindsAntes = (data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0);
+        // Only count live contributions (blinds only, not antes which are dead money)
+        const blindsOnly = (data.postedSB || 0) + (data.postedBB || 0);
 
         // For More Action 2, check More Action 1 first
         if (actionLevel === 'more2') {
@@ -180,7 +182,7 @@ function checkPreflopRoundComplete(
                 contribution = amount < 1000 ? amount * 1000 : amount;
               }
             } else {
-              contribution = blindsAntes;
+              contribution = blindsOnly;
             }
           }
         } else {
@@ -202,7 +204,7 @@ function checkPreflopRoundComplete(
               contribution = amount < 1000 ? amount * 1000 : amount;
             }
           } else {
-            contribution = blindsAntes;
+            contribution = blindsOnly;
           }
         }
       }
