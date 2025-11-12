@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CrawTrack Driver Mobile</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f5f5;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .driver-name {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .date {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .progress-bar-container {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        
+        .container {
+            padding: 1rem;
+            padding-bottom: 5rem;
+        }
+        
+        .delivery-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .delivery-card.current {
+            border: 2px solid #4facfe;
+            background: linear-gradient(to bottom, #f0f9ff 0%, white 100%);
+        }
+        
+        .delivery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        
+        .stop-number {
+            background: #4facfe;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        
+        .stop-number.completed {
+            background: #10b981;
+        }
+        
+        .restaurant-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+        
+        .delivery-time {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .delivery-address {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .items-section {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .items-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .item-name {
+            color: #333;
+        }
+        
+        .item-qty {
+            font-weight: 600;
+            color: #4facfe;
+        }
+        
+        .special-note {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .note-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 0.25rem;
+        }
+        
+        .note-text {
+            color: #856404;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            padding: 0.875rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #4facfe;
+            border: 2px solid #4facfe;
+        }
+        
+        .btn-secondary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            grid-column: 1 / -1;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+            grid-column: 1 / -1;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-current {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-pending {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .badge-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .completed-section {
+            margin-top: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-text {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #999;
+            cursor: pointer;
+        }
+        
+        .photo-upload {
+            background: #f8f9fa;
+            border: 2px dashed #d0d0d0;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .photo-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .photo-text {
+            color: #666;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const mockData = {
+            driver: {
+                name: 'Carlos Mendez',
+                date: 'Nov 11, 2025'
+            },
+            deliveries: [
+                {
+                    id: 1,
+                    stopNumber: 1,
+                    restaurant: 'The Oyster Bar',
+                    address: '842 Main Street, New Orleans, LA',
+                    contact: 'Maria Rodriguez',
+                    phone: '(504) 555-0123',
+                    time: '8:00 AM - 12:00 PM',
+                    items: [
+                        { name: 'Large Crawfish', quantity: 50, unit: 'lb' }
+                    ],
+                    supplier: 'Gulf Coast Crawfish',
+                    total: 189.44,
+                    specialInstructions: 'Back entrance only',
+                    status: 'current'
+                },
+                {
+                    id: 2,
+                    stopNumber: 2,
+                    restaurant: 'Blue Marlin',
+                    address: '789 Bourbon St, New Orleans, LA',
+                    contact: 'Lisa Chen',
+                    phone: '(504) 555-0125',
+                    time: '8:00 AM - 12:00 PM',
+                    items: [
+                        { name: 'Medium Crawfish', quantity: 40, unit: 'lb' }
+                    ],
+                    supplier: 'Gulf Coast Crawfish',
+                    total: 135.72,
+                    specialInstructions: null,
+                    status: 'pending'
+                },
+                {
+                    id: 3,
+                    stopNumber: 3,
+                    restaurant: 'Harbor Grill',
+                    address: '892 Waterfront Dr, New Orleans, LA',
+                    contact: 'Tom Wilson',
+                    phone: '(504) 555-0126',
+                    time: '11:00 AM - 3:00 PM',
+                    items: [
+                        { name: 'Jumbo Crawfish', quantity: 30, unit: 'lb' }
+                    ],
+                    supplier: 'Gulf Coast Crawfish',
+                    total: 137.48,
+                    specialInstructions: null,
+                    status: 'pending'
+                },
+                {
+                    id: 4,
+                    stopNumber: 4,
+                    restaurant: 'Sunset Bistro',
+                    address: '1247 Beach Rd, New Orleans, LA',
+                    contact: 'Mike Johnson',
+                    phone: '(504) 555-0128',
+                    time: '10:00 AM - 2:00 PM',
+                    items: [
+                        { name: 'Small Crawfish', quantity: 60, unit: 'lb' }
+                    ],
+                    supplier: 'Gulf Coast Crawfish',
+                    total: 177.98,
+                    specialInstructions: null,
+                    status: 'completed',
+                    deliveredAt: '10:18 AM'
+                }
+            ]
+        };
+
+        function DriverApp() {
+            const [deliveries, setDeliveries] = useState(mockData.deliveries);
+            const [showModal, setShowModal] = useState(false);
+            const [selectedDelivery, setSelectedDelivery] = useState(null);
+
+            const markDelivered = (delivery) => {
+                setSelectedDelivery(delivery);
+                setShowModal(true);
+            };
+
+            const confirmDelivery = () => {
+                setDeliveries(prev => prev.map(d => {
+                    if (d.id === selectedDelivery.id) {
+                        return { ...d, status: 'completed', deliveredAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+                    }
+                    if (d.status === 'pending' && d.stopNumber === selectedDelivery.stopNumber + 1) {
+                        return { ...d, status: 'current' };
+                    }
+                    return d;
+                }));
+                setShowModal(false);
+                setSelectedDelivery(null);
+            };
+
+            const completedCount = deliveries.filter(d => d.status === 'completed').length;
+            const totalCount = deliveries.length;
+            const progress = (completedCount / totalCount) * 100;
+
+            const currentDelivery = deliveries.find(d => d.status === 'current');
+            const pendingDeliveries = deliveries.filter(d => d.status === 'pending');
+            const completedDeliveries = deliveries.filter(d => d.status === 'completed');
+
+            return (
+                <div>
+                    {/* Header */}
+                    <div className="header">
+                        <div className="header-top">
+                            <div>
+                                <div className="logo">🚚 CrawTrack Driver</div>
+                                <div className="driver-name">{mockData.driver.name}</div>
+                            </div>
+                            <div className="date">{mockData.driver.date}</div>
+                        </div>
+                        
+                        <div className="progress-bar-container">
+                            <div className="progress-label">
+                                <span>Progress: {completedCount}/{totalCount}</span>
+                                <span>{Math.round(progress)}%</span>
+                            </div>
+                            <div className="progress-bar">
+                                <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="container">
+                        {/* Current Delivery */}
+                        {currentDelivery && (
+                            <>
+                                <div className="section-title">
+                                    🎯 Current Delivery
+                                </div>
+                                <div className="delivery-card current">
+                                    <div className="delivery-header">
+                                        <div className="stop-number">{currentDelivery.stopNumber}</div>
+                                        <span className="badge badge-current">ACTIVE</span>
+                                    </div>
+                                    
+                                    <div className="restaurant-name">{currentDelivery.restaurant}</div>
+                                    <div className="delivery-time">🕐 {currentDelivery.time}</div>
+                                    <div className="delivery-address">📍 {currentDelivery.address}</div>
+                                    
+                                    {currentDelivery.specialInstructions && (
+                                        <div className="special-note">
+                                            <div className="note-title">⚠️ Special Instructions</div>
+                                            <div className="note-text">{currentDelivery.specialInstructions}</div>
+                                        </div>
+                                    )}
+                                    
+                                    <div className="items-section">
+                                        <div className="items-title">Items to Deliver</div>
+                                        {currentDelivery.items.map((item, idx) => (
+                                            <div key={idx} className="item">
+                                                <span className="item-name">{item.name}</span>
+                                                <span className="item-qty">{item.quantity} {item.unit}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    
+                                    <div style={{ marginBottom: '1rem', fontSize: '0.875rem', color: '#666' }}>
+                                        <div>From: {currentDelivery.supplier}</div>
+                                        <div>Contact: {currentDelivery.contact} • {currentDelivery.phone}</div>
+                                    </div>
+                                    
+                                    <div className="action-buttons">
+                                        <button className="btn btn-secondary">
+                                            📍 Navigate
+                                        </button>
+                                        <button className="btn btn-secondary">
+                                            📞 Call
+                                        </button>
+                                        <button 
+                                            className="btn btn-success"
+                                            onClick={() => markDelivered(currentDelivery)}
+                                        >
+                                            ✓ Mark as Delivered
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Upcoming Deliveries */}
+                        {pendingDeliveries.length > 0 && (
+                            <>
+                                <div className="section-title" style={{ marginTop: '2rem' }}>
+                                    📋 Upcoming Stops
+                                </div>
+                                {pendingDeliveries.map(delivery => (
+                                    <div key={delivery.id} className="delivery-card">
+                                        <div className="delivery-header">
+                                            <div className="stop-number">{delivery.stopNumber}</div>
+                                            <span className="badge badge-pending">Pending</span>
+                                        </div>
+                                        
+                                        <div className="restaurant-name">{delivery.restaurant}</div>
+                                        <div className="delivery-time">🕐 {delivery.time}</div>
+                                        <div className="delivery-address">📍 {delivery.address}</div>
+                                        
+                                        <div className="items-section">
+                                            {delivery.items.map((item, idx) => (
+                                                <div key={idx} className="item">
+                                                    <span className="item-name">{item.name}</span>
+                                                    <span className="item-qty">{item.quantity} {item.unit}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </>
+                        )}
+
+                        {/* Completed Deliveries */}
+                        {completedDeliveries.length > 0 && (
+                            <div className="completed-section">
+                                <div className="section-title">
+                                    ✅ Completed Today
+                                </div>
+                                {completedDeliveries.map(delivery => (
+                                    <div key={delivery.id} className="delivery-card">
+                                        <div className="delivery-header">
+                                            <div className="stop-number completed">{delivery.stopNumber}</div>
+                                            <span className="badge badge-completed">Delivered</span>
+                                        </div>
+                                        
+                                        <div className="restaurant-name">{delivery.restaurant}</div>
+                                        <div style={{ fontSize: '0.875rem', color: '#10b981', fontWeight: 600 }}>
+                                            ✓ Delivered at {delivery.deliveredAt}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* All Done */}
+                        {completedCount === totalCount && (
+                            <div className="empty-state">
+                                <div className="empty-icon">🎉</div>
+                                <div className="empty-text">
+                                    <div style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                                        All Deliveries Complete!
+                                    </div>
+                                    <div>Great job today, {mockData.driver.name}!</div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Delivery Confirmation Modal */}
+                    {showModal && selectedDelivery && (
+                        <div className="modal" onClick={() => setShowModal(false)}>
+                            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                                <div className="modal-header">
+                                    <div className="modal-title">Mark as Delivered</div>
+                                    <button className="close-btn" onClick={() => setShowModal(false)}>×</button>
+                                </div>
+
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <div style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                        {selectedDelivery.restaurant}
+                                    </div>
+                                    {selectedDelivery.items.map((item, idx) => (
+                                        <div key={idx} style={{ fontSize: '0.875rem', color: '#666' }}>
+                                            {item.name}: {item.quantity} {item.unit}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="photo-upload">
+                                    <div className="photo-icon">📷</div>
+                                    <div className="photo-text">Tap to take photo proof</div>
+                                </div>
+
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+                                        Recipient Name
+                                    </label>
+                                    <input 
+                                        type="text"
+                                        defaultValue={selectedDelivery.contact}
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.875rem',
+                                            border: '2px solid #e0e0e0',
+                                            borderRadius: '10px',
+                                            fontSize: '1rem'
+                                        }}
+                                    />
+                                </div>
+
+                                <button className="btn btn-success" onClick={confirmDelivery}>
+                                    ✓ Confirm Delivery
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<DriverApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>

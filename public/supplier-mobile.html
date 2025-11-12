@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CrawTrack Supplier Mobile</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f5f5;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .business-name {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem 0;
+        }
+        
+        .stat {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+        
+        .container {
+            padding: 1rem;
+            padding-bottom: 5rem;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid #667eea;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .restaurant-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .order-time {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .order-items {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin: 0.75rem 0;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .order-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .item-name {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .item-qty {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e0e0e0;
+            font-weight: 600;
+        }
+        
+        .total-label {
+            color: #666;
+        }
+        
+        .total-amount {
+            color: #667eea;
+            font-size: 1.125rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-assigned {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #999;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .qty-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .qty-display {
+            flex: 1;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .driver-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+        
+        .driver-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .driver-info {
+            flex: 1;
+        }
+        
+        .driver-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .driver-capacity {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-text {
+            color: #666;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const mockData = {
+            business: {
+                name: 'Gulf Coast Crawfish',
+                owner: 'Bobby Chen'
+            },
+            stats: {
+                pendingOrders: 3,
+                todayOrders: 18,
+                todayRevenue: 4320
+            },
+            orders: [
+                { 
+                    id: 'CR-2025-0548', 
+                    restaurant: 'The Oyster Bar',
+                    restaurantId: 1,
+                    time: '8:00 AM',
+                    items: [
+                        { name: 'Large Crawfish', quantity: 50, unit: 'lb', price: 3.50 }
+                    ],
+                    total: 189.44,
+                    status: 'pending'
+                },
+                { 
+                    id: 'CR-2025-0549', 
+                    restaurant: 'Seafood Palace',
+                    restaurantId: 2,
+                    time: '8:30 AM',
+                    items: [
+                        { name: 'Medium Crawfish', quantity: 75, unit: 'lb', price: 3.15 },
+                        { name: 'Large Crawfish', quantity: 25, unit: 'lb', price: 3.50 }
+                    ],
+                    total: 323.75,
+                    status: 'pending'
+                },
+                { 
+                    id: 'CR-2025-0550', 
+                    restaurant: 'Harbor Grill',
+                    restaurantId: 4,
+                    time: '9:00 AM',
+                    items: [
+                        { name: 'Jumbo Crawfish', quantity: 30, unit: 'lb', price: 4.25 }
+                    ],
+                    total: 137.48,
+                    status: 'pending'
+                }
+            ],
+            drivers: [
+                { 
+                    id: 1, 
+                    name: 'Carlos Mendez', 
+                    phone: '(555) 123-4567',
+                    capacity: 500,
+                    currentLoad: 90
+                },
+                { 
+                    id: 2, 
+                    name: 'Maria Garcia', 
+                    phone: '(555) 234-5678',
+                    capacity: 450,
+                    currentLoad: 120
+                },
+                { 
+                    id: 3, 
+                    name: 'John Davis', 
+                    phone: '(555) 345-6789',
+                    capacity: 400,
+                    currentLoad: 0
+                }
+            ]
+        };
+
+        function SupplierApp() {
+            const [orders, setOrders] = useState(mockData.orders);
+            const [selectedOrder, setSelectedOrder] = useState(null);
+            const [editingQty, setEditingQty] = useState({});
+            const [selectedDriver, setSelectedDriver] = useState(null);
+
+            const handleOrderClick = (order) => {
+                setSelectedOrder(order);
+                const qtyMap = {};
+                order.items.forEach(item => {
+                    qtyMap[item.name] = item.quantity;
+                });
+                setEditingQty(qtyMap);
+                setSelectedDriver(null);
+            };
+
+            const updateQuantity = (itemName, change) => {
+                setEditingQty(prev => ({
+                    ...prev,
+                    [itemName]: Math.max(1, (prev[itemName] || 0) + change)
+                }));
+            };
+
+            const assignOrder = () => {
+                if (!selectedDriver) {
+                    alert('Please select a driver');
+                    return;
+                }
+
+                setOrders(prev => prev.map(order => {
+                    if (order.id === selectedOrder.id) {
+                        return { ...order, status: 'assigned', driverId: selectedDriver };
+                    }
+                    return order;
+                }));
+
+                alert(`Order assigned to ${mockData.drivers.find(d => d.id === selectedDriver).name}!`);
+                setSelectedOrder(null);
+            };
+
+            const pendingOrders = orders.filter(o => o.status === 'pending');
+
+            return (
+                <div>
+                    {/* Header */}
+                    <div className="header">
+                        <div className="header-top">
+                            <div>
+                                <div className="logo">🦞 CrawTrack</div>
+                                <div className="business-name">{mockData.business.name}</div>
+                            </div>
+                        </div>
+                        <div className="stats-bar">
+                            <div className="stat">
+                                <div className="stat-value">{mockData.stats.pendingOrders}</div>
+                                <div className="stat-label">Pending</div>
+                            </div>
+                            <div className="stat">
+                                <div className="stat-value">{mockData.stats.todayOrders}</div>
+                                <div className="stat-label">Today</div>
+                            </div>
+                            <div className="stat">
+                                <div className="stat-value">${(mockData.stats.todayRevenue / 1000).toFixed(1)}k</div>
+                                <div className="stat-label">Revenue</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Orders List */}
+                    <div className="container">
+                        {pendingOrders.length === 0 ? (
+                            <div className="empty-state">
+                                <div className="empty-icon">✅</div>
+                                <div className="empty-text">All orders assigned!</div>
+                            </div>
+                        ) : (
+                            pendingOrders.map(order => (
+                                <div key={order.id} className="order-card" onClick={() => handleOrderClick(order)}>
+                                    <div className="order-header">
+                                        <div>
+                                            <div className="restaurant-name">{order.restaurant}</div>
+                                            <div className="order-time">🕐 {order.time}</div>
+                                        </div>
+                                        <span className="badge badge-pending">Pending</span>
+                                    </div>
+                                    
+                                    <div className="order-items">
+                                        {order.items.map((item, idx) => (
+                                            <div key={idx} className="order-item">
+                                                <span className="item-name">{item.name}</span>
+                                                <span className="item-qty">{item.quantity} {item.unit}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    
+                                    <div className="order-total">
+                                        <span className="total-label">Total</span>
+                                        <span className="total-amount">${order.total.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {/* Assignment Modal */}
+                    {selectedOrder && (
+                        <div className="modal" onClick={() => setSelectedOrder(null)}>
+                            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                                <div className="modal-header">
+                                    <div className="modal-title">Assign Order</div>
+                                    <button className="close-btn" onClick={() => setSelectedOrder(null)}>×</button>
+                                </div>
+
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <div style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                        {selectedOrder.restaurant}
+                                    </div>
+                                    <div style={{ fontSize: '0.875rem', color: '#666' }}>
+                                        Order #{selectedOrder.id}
+                                    </div>
+                                </div>
+
+                                {/* Edit Quantities */}
+                                <div className="form-group">
+                                    <div className="form-label">Adjust Quantities</div>
+                                    {selectedOrder.items.map((item, idx) => (
+                                        <div key={idx} style={{ marginBottom: '1rem' }}>
+                                            <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#666' }}>
+                                                {item.name}
+                                            </div>
+                                            <div className="qty-control">
+                                                <button className="qty-btn" onClick={() => updateQuantity(item.name, -5)}>−</button>
+                                                <div className="qty-display">{editingQty[item.name]} {item.unit}</div>
+                                                <button className="qty-btn" onClick={() => updateQuantity(item.name, 5)}>+</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Select Driver */}
+                                <div className="form-group">
+                                    <div className="form-label">Assign to Driver</div>
+                                    {mockData.drivers.map(driver => {
+                                        const available = driver.capacity - driver.currentLoad;
+                                        return (
+                                            <div 
+                                                key={driver.id}
+                                                className={`driver-option ${selectedDriver === driver.id ? 'selected' : ''}`}
+                                                onClick={() => setSelectedDriver(driver.id)}
+                                            >
+                                                <div className="driver-info">
+                                                    <div className="driver-name">🚚 {driver.name}</div>
+                                                    <div className="driver-capacity">Available: {available} lbs</div>
+                                                </div>
+                                                {selectedDriver === driver.id && (
+                                                    <div style={{ color: '#667eea', fontSize: '1.5rem' }}>✓</div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                <button className="btn btn-primary" onClick={assignOrder}>
+                                    Assign Order
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<SupplierApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
