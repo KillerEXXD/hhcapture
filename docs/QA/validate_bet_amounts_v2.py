@@ -133,6 +133,33 @@ def parse_test_case(tc_num, tc_content):
             elif action_type.lower() == 'call':
                 # For call, the total_amount is what they're calling to
                 amount_to_add = total_amount - player['street_contributed']
+
+                # VALIDATION: Check if call amount matches the current bet
+                # (Important: Players should call to match current_bet, not some theoretical amount)
+                if current_bet > 0 and total_amount != current_bet:
+                    # Player is calling to wrong amount!
+                    # Determine if this is valid (all-in for less) or a bug
+                    can_afford_current_bet = (player['current_stack'] + player['street_contributed']) >= current_bet
+
+                    if total_amount > current_bet:
+                        # Calling MORE than current bet - only valid if they can't afford current_bet
+                        if can_afford_current_bet:
+                            # Bug! Player can afford current_bet but is calling MORE
+                            errors.append(
+                                f"{street_name}: {player_name} calls to {total_amount:,} "
+                                f"but should call to {current_bet:,} (the actual bet). "
+                                f"Overcalling - player has {player['current_stack']:,} and CAN afford correct amount."
+                            )
+                    elif total_amount < current_bet:
+                        # Calling LESS than current bet - only valid if they can't afford current_bet
+                        if can_afford_current_bet:
+                            # Bug! Player can afford current_bet but is calling LESS
+                            errors.append(
+                                f"{street_name}: {player_name} calls to {total_amount:,} "
+                                f"but should call to {current_bet:,} (the actual bet). "
+                                f"Undercalling - player has {player['current_stack']:,} and CAN afford correct amount."
+                            )
+                        # else: Player can't afford current_bet, so calling for less is ok (all-in for less)
             else:
                 continue
 
