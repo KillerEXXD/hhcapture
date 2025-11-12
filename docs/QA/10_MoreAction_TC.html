@@ -468,6 +468,7 @@
             margin-top: 3px;
         }
     </style>
+    <!-- Include same CSS as 40_TestCases_v2.html -->
 </head>
 <body>
     <div class="container">
@@ -490,7 +491,7 @@
             <div class="test-content collapsed">
             <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 4 actions, but 2 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 4 actions, but 3 active players</li>
 </ul></div>
 
 
@@ -503,7 +504,7 @@
             </div>
 
             <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (41)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 250 BB 500 Ante 500\nStack Setup:\nAlice Dealer 20000\nBob SB 28500\nCharlie BB 18000`)">
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (41)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 250 BB 500 Ante 500\nStack Setup:\nAlice Dealer 27000\nBob SB 22500\nCharlie BB 29500`)">
                 <span>📋</span> Copy Player Data
             </button>
             <div class="player-data-box">
@@ -511,50 +512,42 @@
 started_at: 00:02:30 ended_at: 00:05:40
 SB 250 BB 500 Ante 500
 Stack Setup:
-Alice Dealer 20000
-Bob SB 28500
-Charlie BB 18000</pre>
+Alice Dealer 27000
+Bob SB 22500
+Charlie BB 29500</pre>
             </div>
 
             <div class="section-title">Actions</div>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">1,500</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">4,500</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Fold</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">4,500</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">2,500</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">5,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">5,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">5,000</span></div>
                 </div>
             </div>
 
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 10,000</div>
+                <div class="pot-summary">Total Pot: 15,500</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
                 </div>
                 <div class="ante-info-box">
                     <strong>BB Ante: 500</strong>
                     <div style="margin-top: 5px;">
-                        Charlie posts ante (500) first → stack becomes 17,500<br>
-                        Charlie posts blind (500) → stack becomes 17,000
+                        Charlie posts ante (500) first → stack becomes 29,000<br>
+                        Charlie posts blind (500) → stack becomes 28,500
                     </div>
                 </div>
                 <div class="pot-item main">
                     <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">2,000 (20.0%)</div>
-                    <div class="eligible">Eligible: <span>Charlie</span> <span>Alice</span> <span>Bob</span></div>
+                    <div class="pot-amount">15,500 (100.0%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span> <span>Charlie</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 9,500 (live) + 500 (BB ante dead) = 10,000
-                    </div>
-                </div>
-                <div class="pot-item side1">
-                    <div class="pot-name">Side Pot 1</div>
-                    <div class="pot-amount">8,000 (80.0%)</div>
-                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 4,000 × 2 players = 8,000
+                        Calculation: 15,000 (live) + 500 (BB ante dead) = 15,500
                     </div>
                 </div>
                 <table>
@@ -571,35 +564,34 @@ Charlie BB 18000</pre>
                     <tbody>
                         <tr>
                             <td>Alice (Dealer)</td>
-                            <td>20,000</td>
-                            <td>15,500</td>
-                            <td>4,500</td>
+                            <td>27,000</td>
+                            <td>22,000</td>
+                            <td>5,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>15,500</td>
+                            <td>22,000</td>
                         </tr>
                         <tr>
                             <td>Bob (SB)</td>
-                            <td>28,500</td>
-                            <td>24,000</td>
-                            <td>4,500</td>
-                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot + Side Pot 1 <span class="expand-icon">▼</span>
-                                </span>
-                                <div class="breakdown-details" style="display:none;">
-                                                                        <div class="breakdown-line">Final Stack: 24,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 2,000</div>
-                                    <div class="breakdown-line">+ Side Pot 1: 8,000</div>
-                                    <div class="breakdown-line total">= New Stack: 34,000</div>
-                                </div></td>
-                            <td>34,000</td>
+                            <td>22,500</td>
+                            <td>17,500</td>
+                            <td>5,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>17,500</td>
                         </tr>
                         <tr>
                             <td>Charlie (BB)</td>
-                            <td>18,000</td>
-                            <td>17,000</td>
-                            <td>1,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>17,000</td>
+                            <td>29,500</td>
+                            <td>24,000</td>
+                            <td>5,500</td>
+                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                                                        <div class="breakdown-line">Final Stack: 24,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 15,500</div>
+                                    <div class="breakdown-line total">= New Stack: 39,500</div>
+                                </div></td>
+                            <td>39,500</td>
                         </tr>
                     </tbody>
                 </table>
@@ -609,7 +601,7 @@ Charlie BB 18000</pre>
             <div class="next-hand-preview">
                 <div class="next-hand-header">
                     <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (42)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250 BB 500 Ante 500\nStack Setup:\nBob Dealer 34000\nCharlie SB 17000\nAlice BB 15500`)">
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (42)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250 BB 500 Ante 500\nStack Setup:\nBob Dealer 17500\nCharlie SB 39500\nAlice BB 22000`)">
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
@@ -618,9 +610,9 @@ Hand (42)
 started_at: 00:05:40 ended_at: HH:MM:SS
 SB 250 BB 500 Ante 500
 Stack Setup:
-Bob Dealer 34000
-Charlie SB 17000
-Alice BB 15500
+Bob Dealer 17500
+Charlie SB 39500
+Alice BB 22000
                 </div>
 
                 <div class="comparison-section">
@@ -630,7 +622,7 @@ Alice BB 15500
                         <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-41')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-41', `Hand (42)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250 BB 500 Ante 500\nStack Setup:\nBob Dealer 34000\nCharlie SB 17000\nAlice BB 15500`)">
+                        <button class="compare-btn" onclick="compareNextHand('tc-41', `Hand (42)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250 BB 500 Ante 500\nStack Setup:\nBob Dealer 17500\nCharlie SB 39500\nAlice BB 22000`)">
                             🔍 Compare
                         </button>
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-41')" style="background: #4caf50;">
@@ -671,7 +663,8 @@ Alice BB 15500
             <div class="test-content collapsed">
             <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: Flop: Base has 5 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 3 actions, but 2 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Flop: Base has 4 actions, but 2 active players</li>
 </ul></div>
 
 
@@ -684,7 +677,7 @@ Alice BB 15500
             </div>
 
             <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (42)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 500 BB 1000 Ante 1000\nStack Setup:\nAlice Dealer 57000\nBob SB 32000\nCharlie BB 45000`)">
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (42)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 500 BB 1000 Ante 1000\nStack Setup:\nAlice Dealer 43000\nBob SB 37000\nCharlie BB 60000`)">
                 <span>📋</span> Copy Player Data
             </button>
             <div class="player-data-box">
@@ -692,59 +685,56 @@ Alice BB 15500
 started_at: 00:02:30 ended_at: 00:05:40
 SB 500 BB 1000 Ante 1000
 Stack Setup:
-Alice Dealer 57000
-Bob SB 32000
-Charlie BB 45000</pre>
+Alice Dealer 43000
+Bob SB 37000
+Charlie BB 60000</pre>
             </div>
 
             <div class="section-title">Actions</div>
             <div class="actions-section">
                 <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">1,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">1,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Check</span></div>
+                </div>
+                <div class="street-block">
                     <div class="street-name">Flop Base</div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">8,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">16,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">6,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">11,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Fold</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">26,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">11,000</span></div>
                 </div>
             </div>
 
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 44,000</div>
+                <div class="pot-summary">Total Pot: 26,000</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
                 </div>
                 <div class="ante-info-box">
                     <strong>BB Ante: 1,000</strong>
                     <div style="margin-top: 5px;">
-                        Charlie posts ante (1,000) first → stack becomes 44,000<br>
-                        Charlie posts blind (1,000) → stack becomes 43,000
+                        Charlie posts ante (1,000) first → stack becomes 59,000<br>
+                        Charlie posts blind (1,000) → stack becomes 58,000
                     </div>
                 </div>
                 <div class="pot-item main">
                     <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">4,000 (9.1%)</div>
-                    <div class="eligible">Eligible: <span>Charlie</span> <span>Bob</span> <span>Alice</span></div>
+                    <div class="pot-amount">4,000 (15.4%)</div>
+                    <div class="eligible">Eligible: <span>Charlie</span> <span>Alice</span> <span>Bob</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 43,000 (live) + 1,000 (BB ante dead) = 44,000
+                        Calculation: 25,000 (live) + 1,000 (BB ante dead) = 26,000
                     </div>
                 </div>
                 <div class="pot-item side1">
                     <div class="pot-name">Side Pot 1</div>
-                    <div class="pot-amount">30,000 (68.2%)</div>
-                    <div class="eligible">Eligible: <span>Bob</span> <span>Alice</span></div>
+                    <div class="pot-amount">22,000 (84.6%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 15,000 × 2 players = 30,000
-                    </div>
-                </div>
-                <div class="pot-item side2">
-                    <div class="pot-name">Side Pot 2</div>
-                    <div class="pot-amount">10,000 (22.7%)</div>
-                    <div class="eligible">Eligible: <span>Alice</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 10,000 × 1 players = 10,000
+                        Calculation: 11,000 × 2 players = 22,000
                     </div>
                 </div>
                 <table>
@@ -761,36 +751,35 @@ Charlie BB 45000</pre>
                     <tbody>
                         <tr>
                             <td>Alice (Dealer)</td>
-                            <td>57,000</td>
+                            <td>43,000</td>
                             <td>31,000</td>
-                            <td>26,000</td>
+                            <td>12,000</td>
                             <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot + Side Pot 1 + Side Pot 2 <span class="expand-icon">▼</span>
+                                    🏆 Main Pot + Side Pot 1 <span class="expand-icon">▼</span>
                                 </span>
                                 <div class="breakdown-details" style="display:none;">
                                                                         <div class="breakdown-line">Final Stack: 31,000</div>
                                     <div class="breakdown-line">+ Main Pot: 4,000</div>
-                                    <div class="breakdown-line">+ Side Pot 1: 30,000</div>
-                                    <div class="breakdown-line">+ Side Pot 2: 10,000</div>
-                                    <div class="breakdown-line total">= New Stack: 75,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 22,000</div>
+                                    <div class="breakdown-line total">= New Stack: 57,000</div>
                                 </div></td>
-                            <td>75,000</td>
+                            <td>57,000</td>
                         </tr>
                         <tr>
                             <td>Bob (SB)</td>
-                            <td>32,000</td>
-                            <td>16,000</td>
-                            <td>16,000</td>
+                            <td>37,000</td>
+                            <td>25,000</td>
+                            <td>12,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>16,000</td>
+                            <td>25,000</td>
                         </tr>
                         <tr>
                             <td>Charlie (BB)</td>
-                            <td>45,000</td>
-                            <td>43,000</td>
+                            <td>60,000</td>
+                            <td>58,000</td>
                             <td>2,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>43,000</td>
+                            <td>58,000</td>
                         </tr>
                     </tbody>
                 </table>
@@ -800,7 +789,7 @@ Charlie BB 45000</pre>
             <div class="next-hand-preview">
                 <div class="next-hand-header">
                     <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (43)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob Dealer 16000\nCharlie SB 43000\nAlice BB 75000`)">
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (43)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob Dealer 25000\nCharlie SB 58000\nAlice BB 57000`)">
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
@@ -809,9 +798,9 @@ Hand (43)
 started_at: 00:05:40 ended_at: HH:MM:SS
 SB 500 BB 1000 Ante 1000
 Stack Setup:
-Bob Dealer 16000
-Charlie SB 43000
-Alice BB 75000
+Bob Dealer 25000
+Charlie SB 58000
+Alice BB 57000
                 </div>
 
                 <div class="comparison-section">
@@ -821,7 +810,7 @@ Alice BB 75000
                         <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-42')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-42', `Hand (43)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob Dealer 16000\nCharlie SB 43000\nAlice BB 75000`)">
+                        <button class="compare-btn" onclick="compareNextHand('tc-42', `Hand (43)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob Dealer 25000\nCharlie SB 58000\nAlice BB 57000`)">
                             🔍 Compare
                         </button>
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-42')" style="background: #4caf50;">
@@ -851,7 +840,7 @@ Alice BB 75000
             <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-43</div>
-                    <div class="test-name">3P Medium - With Betting (SB:5,000 BB:10,000)</div>
+                    <div class="test-name">3P Medium - With Betting (SB:2,500 BB:5,000)</div>
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
@@ -862,71 +851,94 @@ Alice BB 75000
             <div class="test-content collapsed">
             <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: Turn: Base has 4 actions, but 2 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Flop: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Turn: Base has 5 actions, but 1 active players</li>
 </ul></div>
 
 
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
-                <div class="blind-item"><label>Small Blind</label><div class="value">5,000</div></div>
-                <div class="blind-item"><label>Big Blind</label><div class="value">10,000</div></div>
-                <div class="blind-item"><label>Ante</label><div class="value">10,000</div></div>
+                <div class="blind-item"><label>Small Blind</label><div class="value">2,500</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">5,000</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">5,000</div></div>
                 <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
             </div>
 
             <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (43)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 5000 BB 10000 Ante 10000\nStack Setup:\nAlice Dealer 240000\nBob SB 390000\nCharlie BB 280000`)">
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (43)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nAlice Dealer 180000\nBob SB 110000\nCharlie BB 175000`)">
                 <span>📋</span> Copy Player Data
             </button>
             <div class="player-data-box">
 <pre>Hand (43)
 started_at: 00:02:30 ended_at: 00:05:40
-SB 5000 BB 10000 Ante 10000
+SB 2500 BB 5000 Ante 5000
 Stack Setup:
-Alice Dealer 240000
-Bob SB 390000
-Charlie BB 280000</pre>
+Alice Dealer 180000
+Bob SB 110000
+Charlie BB 175000</pre>
             </div>
 
             <div class="section-title">Actions</div>
             <div class="actions-section">
                 <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">5,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">5,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Check</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">35,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">35,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">35,000</span></div>
+                </div>
+                <div class="street-block">
                     <div class="street-name">Turn Base</div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">80,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">130,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">35,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">65,000</span></div>
                     <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Fold</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">130,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">90,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">70,000</span></div>
                 </div>
             </div>
 
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 280,000</div>
+                <div class="pot-summary">Total Pot: 285,000</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
                 </div>
                 <div class="ante-info-box">
-                    <strong>BB Ante: 10,000</strong>
+                    <strong>BB Ante: 5,000</strong>
                     <div style="margin-top: 5px;">
-                        Charlie posts ante (10,000) first → stack becomes 270,000<br>
-                        Charlie posts blind (10,000) → stack becomes 260,000
+                        Charlie posts ante (5,000) first → stack becomes 170,000<br>
+                        Charlie posts blind (5,000) → stack becomes 165,000
                     </div>
                 </div>
                 <div class="pot-item main">
                     <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">40,000 (14.3%)</div>
-                    <div class="eligible">Eligible: <span>Charlie</span> <span>Alice</span> <span>Bob</span></div>
+                    <div class="pot-amount">125,000 (43.9%)</div>
+                    <div class="eligible">Eligible: <span>Charlie</span> <span>Bob</span> <span>Alice</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 270,000 (live) + 10,000 (BB ante dead) = 280,000
+                        Calculation: 280,000 (live) + 5,000 (BB ante dead) = 285,000
                     </div>
                 </div>
                 <div class="pot-item side1">
                     <div class="pot-name">Side Pot 1</div>
-                    <div class="pot-amount">240,000 (85.7%)</div>
-                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span></div>
+                    <div class="pot-amount">140,000 (49.1%)</div>
+                    <div class="eligible">Eligible: <span>Bob</span> <span>Alice</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 120,000 × 2 players = 240,000
+                        Calculation: 70,000 × 2 players = 140,000
+                    </div>
+                </div>
+                <div class="pot-item side2">
+                    <div class="pot-name">Side Pot 2</div>
+                    <div class="pot-amount">20,000 (7.0%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 20,000 × 1 players = 20,000
                     </div>
                 </div>
                 <table>
@@ -943,35 +955,36 @@ Charlie BB 280000</pre>
                     <tbody>
                         <tr>
                             <td>Alice (Dealer)</td>
-                            <td>240,000</td>
-                            <td>110,000</td>
+                            <td>180,000</td>
+                            <td>50,000</td>
                             <td>130,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>110,000</td>
+                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot + Side Pot 1 + Side Pot 2 <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                                                        <div class="breakdown-line">Final Stack: 50,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 125,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 140,000</div>
+                                    <div class="breakdown-line">+ Side Pot 2: 20,000</div>
+                                    <div class="breakdown-line total">= New Stack: 335,000</div>
+                                </div></td>
+                            <td>335,000</td>
                         </tr>
                         <tr>
                             <td>Bob (SB)</td>
-                            <td>390,000</td>
-                            <td>260,000</td>
-                            <td>130,000</td>
-                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot + Side Pot 1 <span class="expand-icon">▼</span>
-                                </span>
-                                <div class="breakdown-details" style="display:none;">
-                                                                        <div class="breakdown-line">Final Stack: 260,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 40,000</div>
-                                    <div class="breakdown-line">+ Side Pot 1: 240,000</div>
-                                    <div class="breakdown-line total">= New Stack: 540,000</div>
-                                </div></td>
-                            <td>540,000</td>
+                            <td>110,000</td>
+                            <td>0</td>
+                            <td>110,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
                         </tr>
                         <tr>
                             <td>Charlie (BB)</td>
-                            <td>280,000</td>
-                            <td>260,000</td>
-                            <td>20,000</td>
+                            <td>175,000</td>
+                            <td>130,000</td>
+                            <td>45,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>260,000</td>
+                            <td>130,000</td>
                         </tr>
                     </tbody>
                 </table>
@@ -981,18 +994,18 @@ Charlie BB 280000</pre>
             <div class="next-hand-preview">
                 <div class="next-hand-header">
                     <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (44)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 5000 BB 10000 Ante 10000\nStack Setup:\nBob Dealer 540000\nCharlie SB 260000\nAlice BB 110000`)">
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (44)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 0\nCharlie SB 130000\nAlice BB 335000`)">
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
                 <div class="next-hand-content">
 Hand (44)
 started_at: 00:05:40 ended_at: HH:MM:SS
-SB 5000 BB 10000 Ante 10000
+SB 2500 BB 5000 Ante 5000
 Stack Setup:
-Bob Dealer 540000
-Charlie SB 260000
-Alice BB 110000
+Bob Dealer 0
+Charlie SB 130000
+Alice BB 335000
                 </div>
 
                 <div class="comparison-section">
@@ -1002,7 +1015,7 @@ Alice BB 110000
                         <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-43')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-43', `Hand (44)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 5000 BB 10000 Ante 10000\nStack Setup:\nBob Dealer 540000\nCharlie SB 260000\nAlice BB 110000`)">
+                        <button class="compare-btn" onclick="compareNextHand('tc-43', `Hand (44)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500 BB 5000 Ante 5000\nStack Setup:\nBob Dealer 0\nCharlie SB 130000\nAlice BB 335000`)">
                             🔍 Compare
                         </button>
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-43')" style="background: #4caf50;">
@@ -1018,7 +1031,7 @@ Alice BB 110000
                 <div class="notes-text">
                     • Players: 3<br>
                     • Complexity: Medium<br>
-                    • Blinds: SB 5,000 / BB 10,000 / Ante 10,000<br>
+                    • Blinds: SB 2,500 / BB 5,000 / Ante 5,000<br>
                     • Button rotation: Previous SB → New Dealer<br>
                     • All players present in next hand: ✅
                 </div>
@@ -1032,7 +1045,7 @@ Alice BB 110000
             <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-44</div>
-                    <div class="test-name">3P Medium - With Betting (SB:50,000 BB:100,000)</div>
+                    <div class="test-name">3P Medium - With Betting (SB:10,000 BB:20,000)</div>
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
@@ -1043,72 +1056,99 @@ Alice BB 110000
             <div class="test-content collapsed">
             <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: River: Base has 5 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Flop: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Turn: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: River: Base has 3 actions, but 1 active players</li>
 </ul></div>
 
 
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
-                <div class="blind-item"><label>Small Blind</label><div class="value">50,000</div></div>
-                <div class="blind-item"><label>Big Blind</label><div class="value">100,000</div></div>
-                <div class="blind-item"><label>Ante</label><div class="value">100,000</div></div>
+                <div class="blind-item"><label>Small Blind</label><div class="value">10,000</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">20,000</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">20,000</div></div>
                 <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
             </div>
 
             <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (44)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nAlice Dealer 1900000\nBob SB 1600000\nCharlie BB 3800000`)">
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (44)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 10000 BB 20000 Ante 20000\nStack Setup:\nAlice Dealer 1200000\nBob SB 360000\nCharlie BB 740000`)">
                 <span>📋</span> Copy Player Data
             </button>
             <div class="player-data-box">
 <pre>Hand (44)
 started_at: 00:02:30 ended_at: 00:05:40
-SB 50000 BB 100000 Ante 100000
+SB 10000 BB 20000 Ante 20000
 Stack Setup:
-Alice Dealer 1900000
-Bob SB 1600000
-Charlie BB 3800000</pre>
+Alice Dealer 1200000
+Bob SB 360000
+Charlie BB 740000</pre>
             </div>
 
             <div class="section-title">Actions</div>
             <div class="actions-section">
                 <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">20,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">20,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Check</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">140,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">140,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">140,000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">140,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">140,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">140,000</span></div>
+                </div>
+                <div class="street-block">
                     <div class="street-name">River Base</div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">900,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">1,600,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">1,600,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">1,900,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">1,900,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">140,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">60,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Fold</span></div>
                 </div>
             </div>
 
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 5,500,000</div>
+                <div class="pot-summary">Total Pot: 1,120,000</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
                 </div>
                 <div class="ante-info-box">
-                    <strong>BB Ante: 100,000</strong>
+                    <strong>BB Ante: 20,000</strong>
                     <div style="margin-top: 5px;">
-                        Charlie posts ante (100,000) first → stack becomes 3,700,000<br>
-                        Charlie posts blind (100,000) → stack becomes 3,600,000
+                        Charlie posts ante (20,000) first → stack becomes 720,000<br>
+                        Charlie posts blind (20,000) → stack becomes 700,000
                     </div>
                 </div>
                 <div class="pot-item main">
                     <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">4,900,000 (89.1%)</div>
-                    <div class="eligible">Eligible: <span>Bob</span> <span>Alice</span> <span>Charlie</span></div>
+                    <div class="pot-amount">920,000 (82.1%)</div>
+                    <div class="eligible">Eligible: <span>Charlie</span> <span>Bob</span> <span>Alice</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 5,400,000 (live) + 100,000 (BB ante dead) = 5,500,000
+                        Calculation: 1,100,000 (live) + 20,000 (BB ante dead) = 1,120,000
                     </div>
                 </div>
                 <div class="pot-item side1">
                     <div class="pot-name">Side Pot 1</div>
-                    <div class="pot-amount">600,000 (10.9%)</div>
-                    <div class="eligible">Eligible: <span>Alice</span> <span>Charlie</span></div>
+                    <div class="pot-amount">120,000 (10.7%)</div>
+                    <div class="eligible">Eligible: <span>Bob</span> <span>Alice</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 300,000 × 2 players = 600,000
+                        Calculation: 60,000 × 2 players = 120,000
+                    </div>
+                </div>
+                <div class="pot-item side2">
+                    <div class="pot-name">Side Pot 2</div>
+                    <div class="pot-amount">80,000 (7.1%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 80,000 × 1 players = 80,000
                     </div>
                 </div>
                 <table>
@@ -1125,35 +1165,36 @@ Charlie BB 3800000</pre>
                     <tbody>
                         <tr>
                             <td>Alice (Dealer)</td>
-                            <td>1,900,000</td>
-                            <td>0</td>
-                            <td>1,900,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>0</td>
+                            <td>1,200,000</td>
+                            <td>760,000</td>
+                            <td>440,000</td>
+                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot + Side Pot 1 + Side Pot 2 <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                                                        <div class="breakdown-line">Final Stack: 760,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 920,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 120,000</div>
+                                    <div class="breakdown-line">+ Side Pot 2: 80,000</div>
+                                    <div class="breakdown-line total">= New Stack: 1,880,000</div>
+                                </div></td>
+                            <td>1,880,000</td>
                         </tr>
                         <tr>
                             <td>Bob (SB)</td>
-                            <td>1,600,000</td>
+                            <td>360,000</td>
                             <td>0</td>
-                            <td>1,600,000</td>
+                            <td>360,000</td>
                             <td><span class="winner-badge loser">-</span></td>
                             <td>0</td>
                         </tr>
                         <tr>
                             <td>Charlie (BB)</td>
-                            <td>3,800,000</td>
-                            <td>1,800,000</td>
-                            <td>2,000,000</td>
-                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot + Side Pot 1 <span class="expand-icon">▼</span>
-                                </span>
-                                <div class="breakdown-details" style="display:none;">
-                                                                        <div class="breakdown-line">Final Stack: 1,800,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 4,900,000</div>
-                                    <div class="breakdown-line">+ Side Pot 1: 600,000</div>
-                                    <div class="breakdown-line total">= New Stack: 7,300,000</div>
-                                </div></td>
-                            <td>7,300,000</td>
+                            <td>740,000</td>
+                            <td>420,000</td>
+                            <td>320,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>420,000</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1163,18 +1204,18 @@ Charlie BB 3800000</pre>
             <div class="next-hand-preview">
                 <div class="next-hand-header">
                     <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (45)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 0\nCharlie SB 7300000\nAlice BB 0`)">
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (45)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 10000 BB 20000 Ante 20000\nStack Setup:\nBob Dealer 0\nCharlie SB 420000\nAlice BB 1880000`)">
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
                 <div class="next-hand-content">
 Hand (45)
 started_at: 00:05:40 ended_at: HH:MM:SS
-SB 50000 BB 100000 Ante 100000
+SB 10000 BB 20000 Ante 20000
 Stack Setup:
 Bob Dealer 0
-Charlie SB 7300000
-Alice BB 0
+Charlie SB 420000
+Alice BB 1880000
                 </div>
 
                 <div class="comparison-section">
@@ -1184,7 +1225,7 @@ Alice BB 0
                         <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-44')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-44', `Hand (45)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 0\nCharlie SB 7300000\nAlice BB 0`)">
+                        <button class="compare-btn" onclick="compareNextHand('tc-44', `Hand (45)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 10000 BB 20000 Ante 20000\nStack Setup:\nBob Dealer 0\nCharlie SB 420000\nAlice BB 1880000`)">
                             🔍 Compare
                         </button>
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-44')" style="background: #4caf50;">
@@ -1200,7 +1241,7 @@ Alice BB 0
                 <div class="notes-text">
                     • Players: 3<br>
                     • Complexity: Medium<br>
-                    • Blinds: SB 50,000 / BB 100,000 / Ante 100,000<br>
+                    • Blinds: SB 10,000 / BB 20,000 / Ante 20,000<br>
                     • Button rotation: Previous SB → New Dealer<br>
                     • All players present in next hand: ✅
                 </div>
@@ -1225,8 +1266,8 @@ Alice BB 0
             <div class="test-content collapsed">
             <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 7 actions, but 1 active players</li>
-<li style="color: #c62828;">Base/More validation failed: Flop: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 5 actions, but 2 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Flop: Base has 8 actions, but 2 active players</li>
 </ul></div>
 
 
@@ -1239,7 +1280,7 @@ Alice BB 0
             </div>
 
             <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (45)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nAlice Dealer 4400000\nBob SB 4500000\nCharlie BB 3500000\nDavid 3000000`)">
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (45)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nAlice Dealer 2600000\nBob SB 1600000\nCharlie BB 2100000\nDavid 4300000`)">
                 <span>📋</span> Copy Player Data
             </button>
             <div class="player-data-box">
@@ -1247,76 +1288,63 @@ Alice BB 0
 started_at: 00:02:30 ended_at: 00:05:40
 SB 50000 BB 100000 Ante 100000
 Stack Setup:
-Alice Dealer 4400000
-Bob SB 4500000
-Charlie BB 3500000
-David 3000000</pre>
+Alice Dealer 2600000
+Bob SB 1600000
+Charlie BB 2100000
+David 4300000</pre>
             </div>
 
             <div class="section-title">Actions</div>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">400,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">1,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Fold</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">1,000,000</span></div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">1,500,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">1,500,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">1,500,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">500,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">1,100,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">1,100,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">1,100,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">1,100,000</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Flop Base</div>
                     <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">1,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Raise</span> <span class="action-amount">1,900,000</span></div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">500,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">500,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">500,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">1,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">1,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">1,000,000</span></div>
                 </div>
             </div>
 
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 7,550,000</div>
+                <div class="pot-summary">Total Pot: 7,500,000</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
                 </div>
                 <div class="ante-info-box">
                     <strong>BB Ante: 100,000</strong>
                     <div style="margin-top: 5px;">
-                        Charlie posts ante (100,000) first → stack becomes 3,400,000<br>
-                        Charlie posts blind (100,000) → stack becomes 3,300,000
+                        Charlie posts ante (100,000) first → stack becomes 2,000,000<br>
+                        Charlie posts blind (100,000) → stack becomes 1,900,000
                     </div>
                 </div>
                 <div class="pot-item main">
                     <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">300,000 (4.0%)</div>
-                    <div class="eligible">Eligible: <span>Bob</span> <span>David</span> <span>Alice</span> <span>Charlie</span></div>
+                    <div class="pot-amount">6,500,000 (86.7%)</div>
+                    <div class="eligible">Eligible: <span>Bob</span> <span>Charlie</span> <span>Alice</span> <span>David</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 7,450,000 (live) + 100,000 (BB ante dead) = 7,550,000
+                        Calculation: 7,400,000 (live) + 100,000 (BB ante dead) = 7,500,000
                     </div>
                 </div>
                 <div class="pot-item side1">
                     <div class="pot-name">Side Pot 1</div>
-                    <div class="pot-amount">4,350,000 (57.6%)</div>
-                    <div class="eligible">Eligible: <span>David</span> <span>Alice</span> <span>Charlie</span></div>
+                    <div class="pot-amount">1,000,000 (13.3%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span> <span>David</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 1,450,000 × 3 players = 4,350,000
-                    </div>
-                </div>
-                <div class="pot-item side2">
-                    <div class="pot-name">Side Pot 2</div>
-                    <div class="pot-amount">2,000,000 (26.5%)</div>
-                    <div class="eligible">Eligible: <span>Alice</span> <span>Charlie</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 1,000,000 × 2 players = 2,000,000
-                    </div>
-                </div>
-                <div class="pot-item side3">
-                    <div class="pot-name">Side Pot 3</div>
-                    <div class="pot-amount">900,000 (11.9%)</div>
-                    <div class="eligible">Eligible: <span>Charlie</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 900,000 × 1 players = 900,000
+                        Calculation: 500,000 × 2 players = 1,000,000
                     </div>
                 </div>
                 <table>
@@ -1333,44 +1361,43 @@ David 3000000</pre>
                     <tbody>
                         <tr>
                             <td>Alice (Dealer)</td>
-                            <td>4,400,000</td>
-                            <td>1,900,000</td>
-                            <td>2,500,000</td>
-                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot + Side Pot 1 + Side Pot 2 <span class="expand-icon">▼</span>
-                                </span>
-                                <div class="breakdown-details" style="display:none;">
-                                                                        <div class="breakdown-line">Final Stack: 1,900,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 300,000</div>
-                                    <div class="breakdown-line">+ Side Pot 1: 4,350,000</div>
-                                    <div class="breakdown-line">+ Side Pot 2: 2,000,000</div>
-                                    <div class="breakdown-line total">= New Stack: 8,550,000</div>
-                                </div></td>
-                            <td>8,550,000</td>
+                            <td>2,600,000</td>
+                            <td>500,000</td>
+                            <td>2,100,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>500,000</td>
                         </tr>
                         <tr>
                             <td>Bob (SB)</td>
-                            <td>4,500,000</td>
-                            <td>4,450,000</td>
-                            <td>50,000</td>
+                            <td>1,600,000</td>
+                            <td>0</td>
+                            <td>1,600,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>4,450,000</td>
+                            <td>0</td>
                         </tr>
                         <tr>
                             <td>Charlie (BB)</td>
-                            <td>3,500,000</td>
-                            <td>0</td>
-                            <td>3,500,000</td>
+                            <td>2,100,000</td>
+                            <td>400,000</td>
+                            <td>1,700,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>0</td>
+                            <td>400,000</td>
                         </tr>
                         <tr>
                             <td>David (UTG)</td>
-                            <td>3,000,000</td>
-                            <td>1,500,000</td>
-                            <td>1,500,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>1,500,000</td>
+                            <td>4,300,000</td>
+                            <td>2,200,000</td>
+                            <td>2,100,000</td>
+                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot + Side Pot 1 <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                                                        <div class="breakdown-line">Final Stack: 2,200,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 6,500,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 1,000,000</div>
+                                    <div class="breakdown-line total">= New Stack: 9,700,000</div>
+                                </div></td>
+                            <td>9,700,000</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1380,7 +1407,7 @@ David 3000000</pre>
             <div class="next-hand-preview">
                 <div class="next-hand-header">
                     <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (46)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 4450000\nCharlie SB 0\nDavid BB 1500000\nAlice 9450000`)">
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (46)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 0\nCharlie SB 400000\nDavid BB 9700000\nAlice 500000`)">
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
@@ -1389,10 +1416,10 @@ Hand (46)
 started_at: 00:05:40 ended_at: HH:MM:SS
 SB 50000 BB 100000 Ante 100000
 Stack Setup:
-Bob Dealer 4450000
-Charlie SB 0
-David BB 1500000
-Alice 9450000
+Bob Dealer 0
+Charlie SB 400000
+David BB 9700000
+Alice 500000
                 </div>
 
                 <div class="comparison-section">
@@ -1402,7 +1429,7 @@ Alice 9450000
                         <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-45')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-45', `Hand (46)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 4450000\nCharlie SB 0\nDavid BB 1500000\nAlice 9450000`)">
+                        <button class="compare-btn" onclick="compareNextHand('tc-45', `Hand (46)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 0\nCharlie SB 400000\nDavid BB 9700000\nAlice 500000`)">
                             🔍 Compare
                         </button>
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-45')" style="background: #4caf50;">
@@ -1432,7 +1459,7 @@ Alice 9450000
             <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-46</div>
-                    <div class="test-name">4P Medium - With Betting (SB:10,000 BB:20,000)</div>
+                    <div class="test-name">4P Medium - With Betting (SB:50,000 BB:100,000)</div>
                 </div>
                 <div class="badges">
                     <span class="badge medium">Medium</span>
@@ -1443,91 +1470,106 @@ Alice 9450000
             <div class="test-content collapsed">
             <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 8 actions, but 1 active players</li>
-<li style="color: #c62828;">Base/More validation failed: Turn: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 5 actions, but 2 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Flop: Base has 4 actions, but 2 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Turn: Base has 7 actions, but 2 active players</li>
+<li style="color: #c62828;">Base/More validation failed: River: Action order wrong. Expected Charlie, got Bob</li>
 </ul></div>
 
 
             <div class="section-title">Stack Setup</div>
             <div class="blind-setup">
-                <div class="blind-item"><label>Small Blind</label><div class="value">10,000</div></div>
-                <div class="blind-item"><label>Big Blind</label><div class="value">20,000</div></div>
-                <div class="blind-item"><label>Ante</label><div class="value">20,000</div></div>
+                <div class="blind-item"><label>Small Blind</label><div class="value">50,000</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100,000</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100,000</div></div>
                 <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
             </div>
 
             <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (46)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 10000 BB 20000 Ante 20000\nStack Setup:\nAlice Dealer 400000\nBob SB 420000\nCharlie BB 840000\nDavid 1200000`)">
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (46)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nAlice Dealer 4000000\nBob SB 5200000\nCharlie BB 5900000\nDavid 4500000`)">
                 <span>📋</span> Copy Player Data
             </button>
             <div class="player-data-box">
 <pre>Hand (46)
 started_at: 00:02:30 ended_at: 00:05:40
-SB 10000 BB 20000 Ante 20000
+SB 50000 BB 100000 Ante 100000
 Stack Setup:
-Alice Dealer 400000
-Bob SB 420000
-Charlie BB 840000
-David 1200000</pre>
+Alice Dealer 4000000
+Bob SB 5200000
+Charlie BB 5900000
+David 4500000</pre>
             </div>
 
             <div class="section-title">Actions</div>
             <div class="actions-section">
                 <div class="street-block">
                     <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">60,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">180,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">180,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">180,000</span></div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">280,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">280,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">300,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">900,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">900,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">900,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">900,000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">400,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">400,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">400,000</span></div>
                     <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Fold</span></div>
                 </div>
                 <div class="street-block">
                     <div class="street-name">Turn Base</div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">100,000</span></div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">280,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">140,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">1,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Raise</span> <span class="action-amount">1,800,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">1,800,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">2,800,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">2,800,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">2,800,000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">River Base</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">800,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">800,000</span></div>
                 </div>
             </div>
 
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 1,360,000</div>
+                <div class="pot-summary">Total Pot: 13,900,000</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
                 </div>
                 <div class="ante-info-box">
-                    <strong>BB Ante: 20,000</strong>
+                    <strong>BB Ante: 100,000</strong>
                     <div style="margin-top: 5px;">
-                        Charlie posts ante (20,000) first → stack becomes 820,000<br>
-                        Charlie posts blind (20,000) → stack becomes 800,000
+                        Charlie posts ante (100,000) first → stack becomes 5,800,000<br>
+                        Charlie posts blind (100,000) → stack becomes 5,700,000
                     </div>
                 </div>
                 <div class="pot-item main">
                     <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">740,000 (54.4%)</div>
-                    <div class="eligible">Eligible: <span>Alice</span> <span>Charlie</span> <span>Bob</span> <span>David</span></div>
+                    <div class="pot-amount">3,700,000 (26.6%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span> <span>David</span> <span>Bob</span> <span>Charlie</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 1,340,000 (live) + 20,000 (BB ante dead) = 1,360,000
+                        Calculation: 13,800,000 (live) + 100,000 (BB ante dead) = 13,900,000
                     </div>
                 </div>
                 <div class="pot-item side1">
                     <div class="pot-name">Side Pot 1</div>
-                    <div class="pot-amount">480,000 (35.3%)</div>
-                    <div class="eligible">Eligible: <span>Bob</span> <span>David</span></div>
+                    <div class="pot-amount">6,600,000 (47.5%)</div>
+                    <div class="eligible">Eligible: <span>David</span> <span>Bob</span> <span>Charlie</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 240,000 × 2 players = 480,000
+                        Calculation: 2,200,000 × 3 players = 6,600,000
                     </div>
                 </div>
                 <div class="pot-item side2">
                     <div class="pot-name">Side Pot 2</div>
-                    <div class="pot-amount">140,000 (10.3%)</div>
-                    <div class="eligible">Eligible: <span>David</span></div>
+                    <div class="pot-amount">3,600,000 (25.9%)</div>
+                    <div class="eligible">Eligible: <span>Bob</span> <span>Charlie</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 140,000 × 1 players = 140,000
+                        Calculation: 1,800,000 × 2 players = 3,600,000
                     </div>
                 </div>
                 <table>
@@ -1544,44 +1586,44 @@ David 1200000</pre>
                     <tbody>
                         <tr>
                             <td>Alice (Dealer)</td>
-                            <td>400,000</td>
-                            <td>220,000</td>
-                            <td>180,000</td>
+                            <td>4,000,000</td>
+                            <td>3,100,000</td>
+                            <td>900,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>220,000</td>
+                            <td>3,100,000</td>
                         </tr>
                         <tr>
                             <td>Bob (SB)</td>
-                            <td>420,000</td>
-                            <td>0</td>
-                            <td>420,000</td>
+                            <td>5,200,000</td>
+                            <td>300,000</td>
+                            <td>4,900,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>0</td>
+                            <td>300,000</td>
                         </tr>
                         <tr>
                             <td>Charlie (BB)</td>
-                            <td>840,000</td>
-                            <td>640,000</td>
-                            <td>200,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>640,000</td>
-                        </tr>
-                        <tr>
-                            <td>David (UTG)</td>
-                            <td>1,200,000</td>
-                            <td>640,000</td>
-                            <td>560,000</td>
+                            <td>5,900,000</td>
+                            <td>900,000</td>
+                            <td>5,000,000</td>
                             <td><span class="winner-badge" onclick="toggleBreakdown(this)">
                                     🏆 Main Pot + Side Pot 1 + Side Pot 2 <span class="expand-icon">▼</span>
                                 </span>
                                 <div class="breakdown-details" style="display:none;">
-                                                                        <div class="breakdown-line">Final Stack: 640,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 740,000</div>
-                                    <div class="breakdown-line">+ Side Pot 1: 480,000</div>
-                                    <div class="breakdown-line">+ Side Pot 2: 140,000</div>
-                                    <div class="breakdown-line total">= New Stack: 2,000,000</div>
+                                                                        <div class="breakdown-line">Final Stack: 900,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 3,700,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 6,600,000</div>
+                                    <div class="breakdown-line">+ Side Pot 2: 3,600,000</div>
+                                    <div class="breakdown-line total">= New Stack: 14,800,000</div>
                                 </div></td>
-                            <td>2,000,000</td>
+                            <td>14,800,000</td>
+                        </tr>
+                        <tr>
+                            <td>David (UTG)</td>
+                            <td>4,500,000</td>
+                            <td>1,400,000</td>
+                            <td>3,100,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>1,400,000</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1591,19 +1633,19 @@ David 1200000</pre>
             <div class="next-hand-preview">
                 <div class="next-hand-header">
                     <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (47)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 10000 BB 20000 Ante 20000\nStack Setup:\nBob Dealer 0\nCharlie SB 640000\nDavid BB 2000000\nAlice 220000`)">
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (47)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 300000\nCharlie SB 14800000\nDavid BB 1400000\nAlice 3100000`)">
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
                 <div class="next-hand-content">
 Hand (47)
 started_at: 00:05:40 ended_at: HH:MM:SS
-SB 10000 BB 20000 Ante 20000
+SB 50000 BB 100000 Ante 100000
 Stack Setup:
-Bob Dealer 0
-Charlie SB 640000
-David BB 2000000
-Alice 220000
+Bob Dealer 300000
+Charlie SB 14800000
+David BB 1400000
+Alice 3100000
                 </div>
 
                 <div class="comparison-section">
@@ -1613,7 +1655,7 @@ Alice 220000
                         <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-46')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-46', `Hand (47)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 10000 BB 20000 Ante 20000\nStack Setup:\nBob Dealer 0\nCharlie SB 640000\nDavid BB 2000000\nAlice 220000`)">
+                        <button class="compare-btn" onclick="compareNextHand('tc-46', `Hand (47)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 300000\nCharlie SB 14800000\nDavid BB 1400000\nAlice 3100000`)">
                             🔍 Compare
                         </button>
                         <button class="copy-result-btn" onclick="copyComparisonResult('tc-46')" style="background: #4caf50;">
@@ -1629,7 +1671,7 @@ Alice 220000
                 <div class="notes-text">
                     • Players: 4<br>
                     • Complexity: Medium<br>
-                    • Blinds: SB 10,000 / BB 20,000 / Ante 20,000<br>
+                    • Blinds: SB 50,000 / BB 100,000 / Ante 100,000<br>
                     • Button rotation: Previous SB → New Dealer<br>
                     • All players present in next hand: ✅
                 </div>
@@ -1643,605 +1685,6 @@ Alice 220000
             <div class="test-header" onclick="toggleTestCase(this)">
                 <div>
                     <div class="test-id">TC-47</div>
-                    <div class="test-name">3P Complex - With Betting (SB:250,000 BB:500,000)</div>
-                </div>
-                <div class="badges">
-                    <span class="badge complex">Complex</span>
-                    <span class="collapse-icon collapsed">▶</span>
-                </div>
-            </div>
-
-            <div class="test-content collapsed">
-            <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
-<strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: Flop: Base has 4 actions, but 3 active players</li>
-<li style="color: #c62828;">Base/More validation failed: River: Base has 4 actions, but 3 active players</li>
-</ul></div>
-
-
-            <div class="section-title">Stack Setup</div>
-            <div class="blind-setup">
-                <div class="blind-item"><label>Small Blind</label><div class="value">250,000</div></div>
-                <div class="blind-item"><label>Big Blind</label><div class="value">500,000</div></div>
-                <div class="blind-item"><label>Ante</label><div class="value">500,000</div></div>
-                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
-            </div>
-
-            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (47)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 250000 BB 500000 Ante 500000\nStack Setup:\nAlice Dealer 28000000\nBob SB 16500000\nCharlie BB 17000000`)">
-                <span>📋</span> Copy Player Data
-            </button>
-            <div class="player-data-box">
-<pre>Hand (47)
-started_at: 00:02:30 ended_at: 00:05:40
-SB 250000 BB 500000 Ante 500000
-Stack Setup:
-Alice Dealer 28000000
-Bob SB 16500000
-Charlie BB 17000000</pre>
-            </div>
-
-            <div class="section-title">Actions</div>
-            <div class="actions-section">
-                <div class="street-block">
-                    <div class="street-name">Flop Base</div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">2,500,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">6,500,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">6,500,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">6,500,000</span></div>
-                </div>
-                <div class="street-block">
-                    <div class="street-name">River Base</div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">3,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">8,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">8,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">8,000,000</span></div>
-                </div>
-            </div>
-
-
-            <div class="section-title">Expected Results</div>
-            <div class="results-section">
-                <div class="pot-summary">Total Pot: 44,000,000</div>
-                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
-                    <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
-                </div>
-                <div class="ante-info-box">
-                    <strong>BB Ante: 500,000</strong>
-                    <div style="margin-top: 5px;">
-                        Charlie posts ante (500,000) first → stack becomes 16,500,000<br>
-                        Charlie posts blind (500,000) → stack becomes 16,000,000
-                    </div>
-                </div>
-                <div class="pot-item main">
-                    <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">44,000,000 (100.0%)</div>
-                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span> <span>Charlie</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 43,500,000 (live) + 500,000 (BB ante dead) = 44,000,000
-                    </div>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Player (Position)</th>
-                            <th>Starting Stack</th>
-                            <th>Final Stack</th>
-                            <th>Contributed</th>
-                            <th>Winner</th>
-                            <th>New Stack</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Alice (Dealer)</td>
-                            <td>28,000,000</td>
-                            <td>13,500,000</td>
-                            <td>14,500,000</td>
-                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot <span class="expand-icon">▼</span>
-                                </span>
-                                <div class="breakdown-details" style="display:none;">
-                                                                        <div class="breakdown-line">Final Stack: 13,500,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 44,000,000</div>
-                                    <div class="breakdown-line total">= New Stack: 57,500,000</div>
-                                </div></td>
-                            <td>57,500,000</td>
-                        </tr>
-                        <tr>
-                            <td>Bob (SB)</td>
-                            <td>16,500,000</td>
-                            <td>2,000,000</td>
-                            <td>14,500,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>2,000,000</td>
-                        </tr>
-                        <tr>
-                            <td>Charlie (BB)</td>
-                            <td>17,000,000</td>
-                            <td>2,000,000</td>
-                            <td>15,000,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>2,000,000</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-
-            <div class="next-hand-preview">
-                <div class="next-hand-header">
-                    <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (48)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250000 BB 500000 Ante 500000\nStack Setup:\nBob Dealer 2000000\nCharlie SB 2000000\nAlice BB 57500000`)">
-                        <span>📋</span> Copy Next Hand
-                    </button>
-                </div>
-                <div class="next-hand-content">
-Hand (48)
-started_at: 00:05:40 ended_at: HH:MM:SS
-SB 250000 BB 500000 Ante 500000
-Stack Setup:
-Bob Dealer 2000000
-Charlie SB 2000000
-Alice BB 57500000
-                </div>
-
-                <div class="comparison-section">
-                    <div class="comparison-header">🔍 Compare with Actual Output</div>
-                    <textarea id="actual-output-tc-47" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
-                    <div style="margin-bottom: 10px;">
-                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-47')">
-                            📋 Paste from Clipboard
-                        </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-47', `Hand (48)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250000 BB 500000 Ante 500000\nStack Setup:\nBob Dealer 2000000\nCharlie SB 2000000\nAlice BB 57500000`)">
-                            🔍 Compare
-                        </button>
-                        <button class="copy-result-btn" onclick="copyComparisonResult('tc-47')" style="background: #4caf50;">
-                            📋 Copy Result
-                        </button>
-                    </div>
-                    <div id="comparison-result-tc-47" class="comparison-result"></div>
-                </div>
-            </div>
-
-            <div class="notes">
-                <div class="notes-title">📝 Validation Notes</div>
-                <div class="notes-text">
-                    • Players: 3<br>
-                    • Complexity: Complex<br>
-                    • Blinds: SB 250,000 / BB 500,000 / Ante 500,000<br>
-                    • Button rotation: Previous SB → New Dealer<br>
-                    • All players present in next hand: ✅
-                </div>
-            </div>
-            </div>
-        </div>
-
-
-        <!-- TEST CASE 48 -->
-        <div class="test-case">
-            <div class="test-header" onclick="toggleTestCase(this)">
-                <div>
-                    <div class="test-id">TC-48</div>
-                    <div class="test-name">4P Complex - With Betting (SB:1,000,000 BB:2,000,000)</div>
-                </div>
-                <div class="badges">
-                    <span class="badge complex">Complex</span>
-                    <span class="collapse-icon collapsed">▶</span>
-                </div>
-            </div>
-
-            <div class="test-content collapsed">
-            <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
-<strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 7 actions, but 1 active players</li>
-<li style="color: #c62828;">Base/More validation failed: Flop: Base has 4 actions, but 1 active players</li>
-<li style="color: #c62828;">Base/More validation failed: Turn: Base has 2 actions, but 1 active players</li>
-</ul></div>
-
-
-            <div class="section-title">Stack Setup</div>
-            <div class="blind-setup">
-                <div class="blind-item"><label>Small Blind</label><div class="value">1,000,000</div></div>
-                <div class="blind-item"><label>Big Blind</label><div class="value">2,000,000</div></div>
-                <div class="blind-item"><label>Ante</label><div class="value">2,000,000</div></div>
-                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
-            </div>
-
-            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (48)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 1000000 BB 2000000 Ante 2000000\nStack Setup:\nAlice Dealer 110000000\nBob SB 82000000\nCharlie BB 32000000\nDavid 28000000`)">
-                <span>📋</span> Copy Player Data
-            </button>
-            <div class="player-data-box">
-<pre>Hand (48)
-started_at: 00:02:30 ended_at: 00:05:40
-SB 1000000 BB 2000000 Ante 2000000
-Stack Setup:
-Alice Dealer 110000000
-Bob SB 82000000
-Charlie BB 32000000
-David 28000000</pre>
-            </div>
-
-            <div class="section-title">Actions</div>
-            <div class="actions-section">
-                <div class="street-block">
-                    <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">6,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">12,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">12,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Fold</span></div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">20,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">20,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">20,000,000</span></div>
-                </div>
-                <div class="street-block">
-                    <div class="street-name">Flop Base</div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">20,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">40,000,000</span></div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">8,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">40,000,000</span></div>
-                </div>
-                <div class="street-block">
-                    <div class="street-name">Turn Base</div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">20,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">22,000,000</span></div>
-                </div>
-            </div>
-
-
-            <div class="section-title">Expected Results</div>
-            <div class="results-section">
-                <div class="pot-summary">Total Pot: 194,000,000</div>
-                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
-                    <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
-                </div>
-                <div class="ante-info-box">
-                    <strong>BB Ante: 2,000,000</strong>
-                    <div style="margin-top: 5px;">
-                        Charlie posts ante (2,000,000) first → stack becomes 30,000,000<br>
-                        Charlie posts blind (2,000,000) → stack becomes 28,000,000
-                    </div>
-                </div>
-                <div class="pot-item main">
-                    <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">10,000,000 (5.2%)</div>
-                    <div class="eligible">Eligible: <span>Charlie</span> <span>David</span> <span>Alice</span> <span>Bob</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 192,000,000 (live) + 2,000,000 (BB ante dead) = 194,000,000
-                    </div>
-                </div>
-                <div class="pot-item side1">
-                    <div class="pot-name">Side Pot 1</div>
-                    <div class="pot-amount">78,000,000 (40.2%)</div>
-                    <div class="eligible">Eligible: <span>David</span> <span>Alice</span> <span>Bob</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 26,000,000 × 3 players = 78,000,000
-                    </div>
-                </div>
-                <div class="pot-item side2">
-                    <div class="pot-name">Side Pot 2</div>
-                    <div class="pot-amount">104,000,000 (53.6%)</div>
-                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 52,000,000 × 2 players = 104,000,000
-                    </div>
-                </div>
-                <div class="pot-item side3">
-                    <div class="pot-name">Side Pot 3</div>
-                    <div class="pot-amount">2,000,000 (1.0%)</div>
-                    <div class="eligible">Eligible: <span>Bob</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 2,000,000 × 1 players = 2,000,000
-                    </div>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Player (Position)</th>
-                            <th>Starting Stack</th>
-                            <th>Final Stack</th>
-                            <th>Contributed</th>
-                            <th>Winner</th>
-                            <th>New Stack</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Alice (Dealer)</td>
-                            <td>110,000,000</td>
-                            <td>30,000,000</td>
-                            <td>80,000,000</td>
-                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot + Side Pot 1 + Side Pot 2 <span class="expand-icon">▼</span>
-                                </span>
-                                <div class="breakdown-details" style="display:none;">
-                                                                        <div class="breakdown-line">Final Stack: 30,000,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 10,000,000</div>
-                                    <div class="breakdown-line">+ Side Pot 1: 78,000,000</div>
-                                    <div class="breakdown-line">+ Side Pot 2: 104,000,000</div>
-                                    <div class="breakdown-line total">= New Stack: 222,000,000</div>
-                                </div></td>
-                            <td>222,000,000</td>
-                        </tr>
-                        <tr>
-                            <td>Bob (SB)</td>
-                            <td>82,000,000</td>
-                            <td>0</td>
-                            <td>82,000,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td>Charlie (BB)</td>
-                            <td>32,000,000</td>
-                            <td>28,000,000</td>
-                            <td>4,000,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>28,000,000</td>
-                        </tr>
-                        <tr>
-                            <td>David (UTG)</td>
-                            <td>28,000,000</td>
-                            <td>0</td>
-                            <td>28,000,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>0</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-
-            <div class="next-hand-preview">
-                <div class="next-hand-header">
-                    <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (49)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 1000000 BB 2000000 Ante 2000000\nStack Setup:\nBob Dealer 0\nCharlie SB 28000000\nDavid BB 0\nAlice 224000000`)">
-                        <span>📋</span> Copy Next Hand
-                    </button>
-                </div>
-                <div class="next-hand-content">
-Hand (49)
-started_at: 00:05:40 ended_at: HH:MM:SS
-SB 1000000 BB 2000000 Ante 2000000
-Stack Setup:
-Bob Dealer 0
-Charlie SB 28000000
-David BB 0
-Alice 224000000
-                </div>
-
-                <div class="comparison-section">
-                    <div class="comparison-header">🔍 Compare with Actual Output</div>
-                    <textarea id="actual-output-tc-48" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
-                    <div style="margin-bottom: 10px;">
-                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-48')">
-                            📋 Paste from Clipboard
-                        </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-48', `Hand (49)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 1000000 BB 2000000 Ante 2000000\nStack Setup:\nBob Dealer 0\nCharlie SB 28000000\nDavid BB 0\nAlice 224000000`)">
-                            🔍 Compare
-                        </button>
-                        <button class="copy-result-btn" onclick="copyComparisonResult('tc-48')" style="background: #4caf50;">
-                            📋 Copy Result
-                        </button>
-                    </div>
-                    <div id="comparison-result-tc-48" class="comparison-result"></div>
-                </div>
-            </div>
-
-            <div class="notes">
-                <div class="notes-title">📝 Validation Notes</div>
-                <div class="notes-text">
-                    • Players: 4<br>
-                    • Complexity: Complex<br>
-                    • Blinds: SB 1,000,000 / BB 2,000,000 / Ante 2,000,000<br>
-                    • Button rotation: Previous SB → New Dealer<br>
-                    • All players present in next hand: ✅
-                </div>
-            </div>
-            </div>
-        </div>
-
-
-        <!-- TEST CASE 49 -->
-        <div class="test-case">
-            <div class="test-header" onclick="toggleTestCase(this)">
-                <div>
-                    <div class="test-id">TC-49</div>
-                    <div class="test-name">4P Simple - With Betting (SB:500 BB:1,000)</div>
-                </div>
-                <div class="badges">
-                    <span class="badge simple">Simple</span>
-                    <span class="collapse-icon collapsed">▶</span>
-                </div>
-            </div>
-
-            <div class="test-content collapsed">
-            <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
-<strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 7 actions, but 3 active players</li>
-</ul></div>
-
-
-            <div class="section-title">Stack Setup</div>
-            <div class="blind-setup">
-                <div class="blind-item"><label>Small Blind</label><div class="value">500</div></div>
-                <div class="blind-item"><label>Big Blind</label><div class="value">1,000</div></div>
-                <div class="blind-item"><label>Ante</label><div class="value">1,000</div></div>
-                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
-            </div>
-
-            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (49)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 500 BB 1000 Ante 1000\nStack Setup:\nAlice Dealer 38000\nBob SB 58000\nCharlie BB 53000\nDavid 60000`)">
-                <span>📋</span> Copy Player Data
-            </button>
-            <div class="player-data-box">
-<pre>Hand (49)
-started_at: 00:02:30 ended_at: 00:05:40
-SB 500 BB 1000 Ante 1000
-Stack Setup:
-Alice Dealer 38000
-Bob SB 58000
-Charlie BB 53000
-David 60000</pre>
-            </div>
-
-            <div class="section-title">Actions</div>
-            <div class="actions-section">
-                <div class="street-block">
-                    <div class="street-name">Preflop Base</div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">3,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">8,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Fold</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">8,000</span></div>
-                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">11,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">11,000</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">11,000</span></div>
-                </div>
-            </div>
-
-
-            <div class="section-title">Expected Results</div>
-            <div class="results-section">
-                <div class="pot-summary">Total Pot: 34,500</div>
-                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
-                    <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
-                </div>
-                <div class="ante-info-box">
-                    <strong>BB Ante: 1,000</strong>
-                    <div style="margin-top: 5px;">
-                        Charlie posts ante (1,000) first → stack becomes 52,000<br>
-                        Charlie posts blind (1,000) → stack becomes 51,000
-                    </div>
-                </div>
-                <div class="pot-item main">
-                    <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">3,000 (8.7%)</div>
-                    <div class="eligible">Eligible: <span>Bob</span> <span>Alice</span> <span>Charlie</span> <span>David</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 33,500 (live) + 1,000 (BB ante dead) = 34,500
-                    </div>
-                </div>
-                <div class="pot-item side1">
-                    <div class="pot-name">Side Pot 1</div>
-                    <div class="pot-amount">31,500 (91.3%)</div>
-                    <div class="eligible">Eligible: <span>Alice</span> <span>Charlie</span> <span>David</span></div>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 10,500 × 3 players = 31,500
-                    </div>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Player (Position)</th>
-                            <th>Starting Stack</th>
-                            <th>Final Stack</th>
-                            <th>Contributed</th>
-                            <th>Winner</th>
-                            <th>New Stack</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Alice (Dealer)</td>
-                            <td>38,000</td>
-                            <td>27,000</td>
-                            <td>11,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>27,000</td>
-                        </tr>
-                        <tr>
-                            <td>Bob (SB)</td>
-                            <td>58,000</td>
-                            <td>57,500</td>
-                            <td>500</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>57,500</td>
-                        </tr>
-                        <tr>
-                            <td>Charlie (BB)</td>
-                            <td>53,000</td>
-                            <td>41,000</td>
-                            <td>12,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>41,000</td>
-                        </tr>
-                        <tr>
-                            <td>David (UTG)</td>
-                            <td>60,000</td>
-                            <td>49,000</td>
-                            <td>11,000</td>
-                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
-                                    🏆 Main Pot + Side Pot 1 <span class="expand-icon">▼</span>
-                                </span>
-                                <div class="breakdown-details" style="display:none;">
-                                                                        <div class="breakdown-line">Final Stack: 49,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 3,000</div>
-                                    <div class="breakdown-line">+ Side Pot 1: 31,500</div>
-                                    <div class="breakdown-line total">= New Stack: 83,500</div>
-                                </div></td>
-                            <td>83,500</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-
-            <div class="next-hand-preview">
-                <div class="next-hand-header">
-                    <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (50)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob Dealer 57500\nCharlie SB 41000\nDavid BB 83500\nAlice 27000`)">
-                        <span>📋</span> Copy Next Hand
-                    </button>
-                </div>
-                <div class="next-hand-content">
-Hand (50)
-started_at: 00:05:40 ended_at: HH:MM:SS
-SB 500 BB 1000 Ante 1000
-Stack Setup:
-Bob Dealer 57500
-Charlie SB 41000
-David BB 83500
-Alice 27000
-                </div>
-
-                <div class="comparison-section">
-                    <div class="comparison-header">🔍 Compare with Actual Output</div>
-                    <textarea id="actual-output-tc-49" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
-                    <div style="margin-bottom: 10px;">
-                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-49')">
-                            📋 Paste from Clipboard
-                        </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-49', `Hand (50)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nBob Dealer 57500\nCharlie SB 41000\nDavid BB 83500\nAlice 27000`)">
-                            🔍 Compare
-                        </button>
-                        <button class="copy-result-btn" onclick="copyComparisonResult('tc-49')" style="background: #4caf50;">
-                            📋 Copy Result
-                        </button>
-                    </div>
-                    <div id="comparison-result-tc-49" class="comparison-result"></div>
-                </div>
-            </div>
-
-            <div class="notes">
-                <div class="notes-title">📝 Validation Notes</div>
-                <div class="notes-text">
-                    • Players: 4<br>
-                    • Complexity: Simple<br>
-                    • Blinds: SB 500 / BB 1,000 / Ante 1,000<br>
-                    • Button rotation: Previous SB → New Dealer<br>
-                    • All players present in next hand: ✅
-                </div>
-            </div>
-            </div>
-        </div>
-
-
-        <!-- TEST CASE 50 -->
-        <div class="test-case">
-            <div class="test-header" onclick="toggleTestCase(this)">
-                <div>
-                    <div class="test-id">TC-50</div>
                     <div class="test-name">3P Complex - With Betting (SB:500,000 BB:1,000,000)</div>
                 </div>
                 <div class="badges">
@@ -2253,7 +1696,9 @@ Alice 27000
             <div class="test-content collapsed">
             <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
 <strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
-<li style="color: #c62828;">Base/More validation failed: Turn: Base has 4 actions, but 2 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Flop: Base has 4 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Turn: Base has 2 actions, but 1 active players</li>
 </ul></div>
 
 
@@ -2266,58 +1711,69 @@ Alice 27000
             </div>
 
             <div class="copy-instruction">📋 Copy and paste this into the app:</div>
-            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (50)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 500000 BB 1000000 Ante 1000000\nStack Setup:\nAlice Dealer 22000000\nBob SB 48000000\nCharlie BB 55000000`)">
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (47)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 500000 BB 1000000 Ante 1000000\nStack Setup:\nAlice Dealer 48000000\nBob SB 25000000\nCharlie BB 10000000`)">
                 <span>📋</span> Copy Player Data
             </button>
             <div class="player-data-box">
-<pre>Hand (50)
+<pre>Hand (47)
 started_at: 00:02:30 ended_at: 00:05:40
 SB 500000 BB 1000000 Ante 1000000
 Stack Setup:
-Alice Dealer 22000000
-Bob SB 48000000
-Charlie BB 55000000</pre>
+Alice Dealer 48000000
+Bob SB 25000000
+Charlie BB 10000000</pre>
             </div>
 
             <div class="section-title">Actions</div>
             <div class="actions-section">
                 <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">1,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">1,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Check</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">10,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">16,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">8,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">16,000,000</span></div>
+                </div>
+                <div class="street-block">
                     <div class="street-name">Turn Base</div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">6,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">15,000,000</span></div>
-                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Fold</span></div>
-                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">15,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">8,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">8,000,000</span></div>
                 </div>
             </div>
 
 
             <div class="section-title">Expected Results</div>
             <div class="results-section">
-                <div class="pot-summary">Total Pot: 32,000,000</div>
+                <div class="pot-summary">Total Pot: 60,000,000</div>
                 <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
                     <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
                 </div>
                 <div class="ante-info-box">
                     <strong>BB Ante: 1,000,000</strong>
                     <div style="margin-top: 5px;">
-                        Charlie posts ante (1,000,000) first → stack becomes 54,000,000<br>
-                        Charlie posts blind (1,000,000) → stack becomes 53,000,000
+                        Charlie posts ante (1,000,000) first → stack becomes 9,000,000<br>
+                        Charlie posts blind (1,000,000) → stack becomes 8,000,000
                     </div>
                 </div>
                 <div class="pot-item main">
                     <div class="pot-name">Main Pot</div>
-                    <div class="pot-amount">4,000,000 (12.5%)</div>
+                    <div class="pot-amount">28,000,000 (46.7%)</div>
                     <div class="eligible">Eligible: <span>Charlie</span> <span>Alice</span> <span>Bob</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 31,000,000 (live) + 1,000,000 (BB ante dead) = 32,000,000
+                        Calculation: 59,000,000 (live) + 1,000,000 (BB ante dead) = 60,000,000
                     </div>
                 </div>
                 <div class="pot-item side1">
                     <div class="pot-name">Side Pot 1</div>
-                    <div class="pot-amount">28,000,000 (87.5%)</div>
+                    <div class="pot-amount">32,000,000 (53.3%)</div>
                     <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span></div>
                     <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                        Calculation: 14,000,000 × 2 players = 28,000,000
+                        Calculation: 16,000,000 × 2 players = 32,000,000
                     </div>
                 </div>
                 <table>
@@ -2334,35 +1790,35 @@ Charlie BB 55000000</pre>
                     <tbody>
                         <tr>
                             <td>Alice (Dealer)</td>
-                            <td>22,000,000</td>
-                            <td>7,000,000</td>
-                            <td>15,000,000</td>
-                            <td><span class="winner-badge loser">-</span></td>
-                            <td>7,000,000</td>
-                        </tr>
-                        <tr>
-                            <td>Bob (SB)</td>
                             <td>48,000,000</td>
-                            <td>33,000,000</td>
-                            <td>15,000,000</td>
+                            <td>23,000,000</td>
+                            <td>25,000,000</td>
                             <td><span class="winner-badge" onclick="toggleBreakdown(this)">
                                     🏆 Main Pot + Side Pot 1 <span class="expand-icon">▼</span>
                                 </span>
                                 <div class="breakdown-details" style="display:none;">
-                                                                        <div class="breakdown-line">Final Stack: 33,000,000</div>
-                                    <div class="breakdown-line">+ Main Pot: 4,000,000</div>
-                                    <div class="breakdown-line">+ Side Pot 1: 28,000,000</div>
-                                    <div class="breakdown-line total">= New Stack: 65,000,000</div>
+                                                                        <div class="breakdown-line">Final Stack: 23,000,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 28,000,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 32,000,000</div>
+                                    <div class="breakdown-line total">= New Stack: 83,000,000</div>
                                 </div></td>
-                            <td>65,000,000</td>
+                            <td>83,000,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (SB)</td>
+                            <td>25,000,000</td>
+                            <td>0</td>
+                            <td>25,000,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
                         </tr>
                         <tr>
                             <td>Charlie (BB)</td>
-                            <td>55,000,000</td>
-                            <td>53,000,000</td>
-                            <td>2,000,000</td>
+                            <td>10,000,000</td>
+                            <td>0</td>
+                            <td>10,000,000</td>
                             <td><span class="winner-badge loser">-</span></td>
-                            <td>53,000,000</td>
+                            <td>0</td>
                         </tr>
                     </tbody>
                 </table>
@@ -2372,35 +1828,35 @@ Charlie BB 55000000</pre>
             <div class="next-hand-preview">
                 <div class="next-hand-header">
                     <div class="next-hand-title">📋 Next Hand Preview</div>
-                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (51)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500000 BB 1000000 Ante 1000000\nStack Setup:\nBob Dealer 65000000\nCharlie SB 53000000\nAlice BB 7000000`)">
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (48)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500000 BB 1000000 Ante 1000000\nStack Setup:\nBob Dealer 0\nCharlie SB 0\nAlice BB 83000000`)">
                         <span>📋</span> Copy Next Hand
                     </button>
                 </div>
                 <div class="next-hand-content">
-Hand (51)
+Hand (48)
 started_at: 00:05:40 ended_at: HH:MM:SS
 SB 500000 BB 1000000 Ante 1000000
 Stack Setup:
-Bob Dealer 65000000
-Charlie SB 53000000
-Alice BB 7000000
+Bob Dealer 0
+Charlie SB 0
+Alice BB 83000000
                 </div>
 
                 <div class="comparison-section">
                     <div class="comparison-header">🔍 Compare with Actual Output</div>
-                    <textarea id="actual-output-tc-50" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <textarea id="actual-output-tc-47" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
                     <div style="margin-bottom: 10px;">
-                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-50')">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-47')">
                             📋 Paste from Clipboard
                         </button>
-                        <button class="compare-btn" onclick="compareNextHand('tc-50', `Hand (51)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500000 BB 1000000 Ante 1000000\nStack Setup:\nBob Dealer 65000000\nCharlie SB 53000000\nAlice BB 7000000`)">
+                        <button class="compare-btn" onclick="compareNextHand('tc-47', `Hand (48)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500000 BB 1000000 Ante 1000000\nStack Setup:\nBob Dealer 0\nCharlie SB 0\nAlice BB 83000000`)">
                             🔍 Compare
                         </button>
-                        <button class="copy-result-btn" onclick="copyComparisonResult('tc-50')" style="background: #4caf50;">
+                        <button class="copy-result-btn" onclick="copyComparisonResult('tc-47')" style="background: #4caf50;">
                             📋 Copy Result
                         </button>
                     </div>
-                    <div id="comparison-result-tc-50" class="comparison-result"></div>
+                    <div id="comparison-result-tc-47" class="comparison-result"></div>
                 </div>
             </div>
 
@@ -2417,196 +1873,613 @@ Alice BB 7000000
             </div>
         </div>
 
+
+        <!-- TEST CASE 48 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-48</div>
+                    <div class="test-name">4P Complex - With Betting (SB:2,500,000 BB:5,000,000)</div>
+                </div>
+                <div class="badges">
+                    <span class="badge complex">Complex</span>
+                    <span class="collapse-icon collapsed">▶</span>
+                </div>
+            </div>
+
+            <div class="test-content collapsed">
+            <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
+<strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 8 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Flop: Base has 5 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Turn: Base has 5 actions, but 1 active players</li>
+</ul></div>
+
+
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">2,500,000</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">5,000,000</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">5,000,000</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (48)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 2500000 BB 5000000 Ante 5000000\nStack Setup:\nAlice Dealer 260000000\nBob SB 290000000\nCharlie BB 275000000\nDavid 250000000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (48)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 2500000 BB 5000000 Ante 5000000
+Stack Setup:
+Alice Dealer 260000000
+Bob SB 290000000
+Charlie BB 275000000
+David 250000000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">25,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">45,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">45,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">45,000,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">60,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">60,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">60,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">60,000,000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">40,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">85,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">85,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">85,000,000</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Bet</span> <span class="action-amount">30,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Raise</span> <span class="action-amount">75,000,000</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Fold</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">115,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">115,000,000</span></div>
+                </div>
+            </div>
+
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 730,000,000</div>
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
+                    <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
+                </div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 5,000,000</strong>
+                    <div style="margin-top: 5px;">
+                        Charlie posts ante (5,000,000) first → stack becomes 270,000,000<br>
+                        Charlie posts blind (5,000,000) → stack becomes 265,000,000
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">245,000,000 (33.6%)</div>
+                    <div class="eligible">Eligible: <span>Charlie</span> <span>David</span> <span>Alice</span> <span>Bob</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 725,000,000 (live) + 5,000,000 (BB ante dead) = 730,000,000
+                    </div>
+                </div>
+                <div class="pot-item side1">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">255,000,000 (34.9%)</div>
+                    <div class="eligible">Eligible: <span>David</span> <span>Alice</span> <span>Bob</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 85,000,000 × 3 players = 255,000,000
+                    </div>
+                </div>
+                <div class="pot-item side2">
+                    <div class="pot-name">Side Pot 2</div>
+                    <div class="pot-amount">230,000,000 (31.5%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 115,000,000 × 2 players = 230,000,000
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player (Position)</th>
+                            <th>Starting Stack</th>
+                            <th>Final Stack</th>
+                            <th>Contributed</th>
+                            <th>Winner</th>
+                            <th>New Stack</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (Dealer)</td>
+                            <td>260,000,000</td>
+                            <td>0</td>
+                            <td>260,000,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (SB)</td>
+                            <td>290,000,000</td>
+                            <td>30,000,000</td>
+                            <td>260,000,000</td>
+                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot + Side Pot 1 + Side Pot 2 <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                                                        <div class="breakdown-line">Final Stack: 30,000,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 245,000,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 255,000,000</div>
+                                    <div class="breakdown-line">+ Side Pot 2: 230,000,000</div>
+                                    <div class="breakdown-line total">= New Stack: 760,000,000</div>
+                                </div></td>
+                            <td>760,000,000</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (BB)</td>
+                            <td>275,000,000</td>
+                            <td>210,000,000</td>
+                            <td>65,000,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>210,000,000</td>
+                        </tr>
+                        <tr>
+                            <td>David (UTG)</td>
+                            <td>250,000,000</td>
+                            <td>105,000,000</td>
+                            <td>145,000,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>105,000,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (49)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500000 BB 5000000 Ante 5000000\nStack Setup:\nBob Dealer 760000000\nCharlie SB 210000000\nDavid BB 105000000\nAlice 0`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (49)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 2500000 BB 5000000 Ante 5000000
+Stack Setup:
+Bob Dealer 760000000
+Charlie SB 210000000
+David BB 105000000
+Alice 0
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-48" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-48')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-48', `Hand (49)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 2500000 BB 5000000 Ante 5000000\nStack Setup:\nBob Dealer 760000000\nCharlie SB 210000000\nDavid BB 105000000\nAlice 0`)">
+                            🔍 Compare
+                        </button>
+                        <button class="copy-result-btn" onclick="copyComparisonResult('tc-48')" style="background: #4caf50;">
+                            📋 Copy Result
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-48" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">📝 Validation Notes</div>
+                <div class="notes-text">
+                    • Players: 4<br>
+                    • Complexity: Complex<br>
+                    • Blinds: SB 2,500,000 / BB 5,000,000 / Ante 5,000,000<br>
+                    • Button rotation: Previous SB → New Dealer<br>
+                    • All players present in next hand: ✅
+                </div>
+            </div>
+            </div>
+        </div>
+
+
+        <!-- TEST CASE 49 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-49</div>
+                    <div class="test-name">4P Simple - With Betting (SB:250 BB:500)</div>
+                </div>
+                <div class="badges">
+                    <span class="badge simple">Simple</span>
+                    <span class="collapse-icon collapsed">▶</span>
+                </div>
+            </div>
+
+            <div class="test-content collapsed">
+            <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
+<strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 5 actions, but 4 active players</li>
+</ul></div>
+
+
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">250</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">500</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">500</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (49)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 250 BB 500 Ante 500\nStack Setup:\nAlice Dealer 20000\nBob SB 19000\nCharlie BB 15500\nDavid 18000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (49)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 250 BB 500 Ante 500
+Stack Setup:
+Alice Dealer 20000
+Bob SB 19000
+Charlie BB 15500
+David 18000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Raise</span> <span class="action-amount">1,500</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Raise</span> <span class="action-amount">4,500</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">4,500</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">4,500</span></div>
+                    <div class="action-row"><span class="action-player">David (UTG):</span> <span class="action-type">Call</span> <span class="action-amount">4,500</span></div>
+                </div>
+            </div>
+
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 18,500</div>
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
+                    <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
+                </div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 500</strong>
+                    <div style="margin-top: 5px;">
+                        Charlie posts ante (500) first → stack becomes 15,000<br>
+                        Charlie posts blind (500) → stack becomes 14,500
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">18,500 (100.0%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span> <span>Charlie</span> <span>David</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 18,000 (live) + 500 (BB ante dead) = 18,500
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player (Position)</th>
+                            <th>Starting Stack</th>
+                            <th>Final Stack</th>
+                            <th>Contributed</th>
+                            <th>Winner</th>
+                            <th>New Stack</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (Dealer)</td>
+                            <td>20,000</td>
+                            <td>15,500</td>
+                            <td>4,500</td>
+                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                                                        <div class="breakdown-line">Final Stack: 15,500</div>
+                                    <div class="breakdown-line">+ Main Pot: 18,500</div>
+                                    <div class="breakdown-line total">= New Stack: 34,000</div>
+                                </div></td>
+                            <td>34,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (SB)</td>
+                            <td>19,000</td>
+                            <td>14,500</td>
+                            <td>4,500</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>14,500</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (BB)</td>
+                            <td>15,500</td>
+                            <td>10,500</td>
+                            <td>5,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>10,500</td>
+                        </tr>
+                        <tr>
+                            <td>David (UTG)</td>
+                            <td>18,000</td>
+                            <td>13,500</td>
+                            <td>4,500</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>13,500</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (50)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250 BB 500 Ante 500\nStack Setup:\nBob Dealer 14500\nCharlie SB 10500\nDavid BB 13500\nAlice 34000`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (50)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 250 BB 500 Ante 500
+Stack Setup:
+Bob Dealer 14500
+Charlie SB 10500
+David BB 13500
+Alice 34000
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-49" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-49')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-49', `Hand (50)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 250 BB 500 Ante 500\nStack Setup:\nBob Dealer 14500\nCharlie SB 10500\nDavid BB 13500\nAlice 34000`)">
+                            🔍 Compare
+                        </button>
+                        <button class="copy-result-btn" onclick="copyComparisonResult('tc-49')" style="background: #4caf50;">
+                            📋 Copy Result
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-49" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">📝 Validation Notes</div>
+                <div class="notes-text">
+                    • Players: 4<br>
+                    • Complexity: Simple<br>
+                    • Blinds: SB 250 / BB 500 / Ante 500<br>
+                    • Button rotation: Previous SB → New Dealer<br>
+                    • All players present in next hand: ✅
+                </div>
+            </div>
+            </div>
+        </div>
+
+
+        <!-- TEST CASE 50 -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-50</div>
+                    <div class="test-name">3P Complex - With Betting (SB:50,000 BB:100,000)</div>
+                </div>
+                <div class="badges">
+                    <span class="badge complex">Complex</span>
+                    <span class="collapse-icon collapsed">▶</span>
+                </div>
+            </div>
+
+            <div class="test-content collapsed">
+            <div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
+<strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>
+<li style="color: #c62828;">Base/More validation failed: Preflop: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Flop: Base has 3 actions, but 1 active players</li>
+<li style="color: #c62828;">Base/More validation failed: Turn: Base has 2 actions, but 1 active players</li>
+</ul></div>
+
+
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">50,000</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">100,000</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">100,000</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand (50)\nstarted_at: 00:02:30 ended_at: 00:05:40\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nAlice Dealer 4900000\nBob SB 5100000\nCharlie BB 2500000`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand (50)
+started_at: 00:02:30 ended_at: 00:05:40
+SB 50000 BB 100000 Ante 100000
+Stack Setup:
+Alice Dealer 4900000
+Bob SB 5100000
+Charlie BB 2500000</pre>
+            </div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions-section">
+                <div class="street-block">
+                    <div class="street-name">Preflop Base</div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Call</span> <span class="action-amount">100,000</span></div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Call</span> <span class="action-amount">100,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Check</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Flop Base</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">800,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Call</span> <span class="action-amount">800,000</span></div>
+                    <div class="action-row"><span class="action-player">Alice (Dealer):</span> <span class="action-type">Fold</span></div>
+                </div>
+                <div class="street-block">
+                    <div class="street-name">Turn Base</div>
+                    <div class="action-row"><span class="action-player">Bob (SB):</span> <span class="action-type">Bet</span> <span class="action-amount">1,000,000</span></div>
+                    <div class="action-row"><span class="action-player">Charlie (BB):</span> <span class="action-type">Raise</span> <span class="action-amount">1,500,000</span></div>
+                </div>
+            </div>
+
+
+            <div class="section-title">Expected Results</div>
+            <div class="results-section">
+                <div class="pot-summary">Total Pot: 4,500,000</div>
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
+                    <strong style="color: #155724;">✅ VALIDATION PASSED</strong> - All pot calculations and stack distributions are correct.
+                </div>
+                <div class="ante-info-box">
+                    <strong>BB Ante: 100,000</strong>
+                    <div style="margin-top: 5px;">
+                        Charlie posts ante (100,000) first → stack becomes 2,400,000<br>
+                        Charlie posts blind (100,000) → stack becomes 2,300,000
+                    </div>
+                </div>
+                <div class="pot-item main">
+                    <div class="pot-name">Main Pot</div>
+                    <div class="pot-amount">400,000 (8.9%)</div>
+                    <div class="eligible">Eligible: <span>Alice</span> <span>Bob</span> <span>Charlie</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 4,400,000 (live) + 100,000 (BB ante dead) = 4,500,000
+                    </div>
+                </div>
+                <div class="pot-item side1">
+                    <div class="pot-name">Side Pot 1</div>
+                    <div class="pot-amount">3,600,000 (80.0%)</div>
+                    <div class="eligible">Eligible: <span>Bob</span> <span>Charlie</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 1,800,000 × 2 players = 3,600,000
+                    </div>
+                </div>
+                <div class="pot-item side2">
+                    <div class="pot-name">Side Pot 2</div>
+                    <div class="pot-amount">500,000 (11.1%)</div>
+                    <div class="eligible">Eligible: <span>Charlie</span></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                        Calculation: 500,000 × 1 players = 500,000
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player (Position)</th>
+                            <th>Starting Stack</th>
+                            <th>Final Stack</th>
+                            <th>Contributed</th>
+                            <th>Winner</th>
+                            <th>New Stack</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alice (Dealer)</td>
+                            <td>4,900,000</td>
+                            <td>4,800,000</td>
+                            <td>100,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>4,800,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob (SB)</td>
+                            <td>5,100,000</td>
+                            <td>3,200,000</td>
+                            <td>1,900,000</td>
+                            <td><span class="winner-badge" onclick="toggleBreakdown(this)">
+                                    🏆 Main Pot + Side Pot 1 <span class="expand-icon">▼</span>
+                                </span>
+                                <div class="breakdown-details" style="display:none;">
+                                                                        <div class="breakdown-line">Final Stack: 3,200,000</div>
+                                    <div class="breakdown-line">+ Main Pot: 400,000</div>
+                                    <div class="breakdown-line">+ Side Pot 1: 3,600,000</div>
+                                    <div class="breakdown-line total">= New Stack: 7,200,000</div>
+                                </div></td>
+                            <td>7,200,000</td>
+                        </tr>
+                        <tr>
+                            <td>Charlie (BB)</td>
+                            <td>2,500,000</td>
+                            <td>0</td>
+                            <td>2,500,000</td>
+                            <td><span class="winner-badge loser">-</span></td>
+                            <td>0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="next-hand-preview">
+                <div class="next-hand-header">
+                    <div class="next-hand-title">📋 Next Hand Preview</div>
+                    <button class="copy-btn" onclick="copyPlayerData(this, `Hand (51)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 7700000\nCharlie SB 0\nAlice BB 4800000`)">
+                        <span>📋</span> Copy Next Hand
+                    </button>
+                </div>
+                <div class="next-hand-content">
+Hand (51)
+started_at: 00:05:40 ended_at: HH:MM:SS
+SB 50000 BB 100000 Ante 100000
+Stack Setup:
+Bob Dealer 7700000
+Charlie SB 0
+Alice BB 4800000
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-header">🔍 Compare with Actual Output</div>
+                    <textarea id="actual-output-tc-50" class="comparison-textarea" placeholder="Paste the actual next hand output from your app here..." rows="8"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <button class="paste-btn" onclick="pasteFromClipboard(this, 'tc-50')">
+                            📋 Paste from Clipboard
+                        </button>
+                        <button class="compare-btn" onclick="compareNextHand('tc-50', `Hand (51)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 50000 BB 100000 Ante 100000\nStack Setup:\nBob Dealer 7700000\nCharlie SB 0\nAlice BB 4800000`)">
+                            🔍 Compare
+                        </button>
+                        <button class="copy-result-btn" onclick="copyComparisonResult('tc-50')" style="background: #4caf50;">
+                            📋 Copy Result
+                        </button>
+                    </div>
+                    <div id="comparison-result-tc-50" class="comparison-result"></div>
+                </div>
+            </div>
+
+            <div class="notes">
+                <div class="notes-title">📝 Validation Notes</div>
+                <div class="notes-text">
+                    • Players: 3<br>
+                    • Complexity: Complex<br>
+                    • Blinds: SB 50,000 / BB 100,000 / Ante 100,000<br>
+                    • Button rotation: Previous SB → New Dealer<br>
+                    • All players present in next hand: ✅
+                </div>
+            </div>
+            </div>
+        </div>
+
     </div>
-    <script>
-        function copyPlayerData(button, text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = button.innerHTML;
-                button.innerHTML = '<span>✓</span> Copied!';
-                button.classList.add('copied');
-
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.classList.remove('copied');
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-                alert('Failed to copy to clipboard');
-            });
-        }
-
-        function pasteFromClipboard(button, testCaseId) {
-            navigator.clipboard.readText().then(text => {
-                const textarea = document.getElementById(`actual-output-${testCaseId}`);
-                textarea.value = text;
-
-                const originalText = button.innerHTML;
-                button.innerHTML = '<span>✓</span> Pasted!';
-                button.classList.add('pasted');
-
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.classList.remove('pasted');
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to paste:', err);
-                alert('Failed to paste from clipboard. Please make sure you have clipboard permissions enabled.');
-            });
-        }
-
-        function copyComparisonResult(testCaseId) {
-            const resultDiv = document.getElementById(`comparison-result-${testCaseId}`);
-
-            // Get text and replace newlines with " | " to paste in single Excel cell
-            let text = resultDiv.innerText;
-
-            // Replace newlines with " | " separator for single-cell paste
-            text = text.replace(/\n/g, ' | ');
-
-            // Remove multiple spaces
-            text = text.replace(/\s+/g, ' ');
-
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Comparison result copied to clipboard! Paste into a single Excel/Sheets cell.');
-            }).catch(err => {
-                console.error('Failed to copy result:', err);
-                alert('Failed to copy comparison result');
-            });
-        }
-
-        function toggleTestCase(header) {
-            const content = header.nextElementSibling;
-            const icon = header.querySelector('.collapse-icon');
-
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                content.classList.add('collapsed');
-                icon.classList.remove('expanded');
-                icon.classList.add('collapsed');
-            } else {
-                content.classList.remove('collapsed');
-                content.classList.add('expanded');
-                icon.classList.remove('collapsed');
-                icon.classList.add('expanded');
-            }
-        }
-
-        function toggleBreakdown(badge) {
-            const breakdown = badge.nextElementSibling;
-            const icon = badge.querySelector('.expand-icon');
-
-            if (breakdown.style.display === 'none' || !breakdown.style.display) {
-                breakdown.style.display = 'block';
-                icon.classList.add('expanded');
-            } else {
-                breakdown.style.display = 'none';
-                icon.classList.remove('expanded');
-            }
-        }
-
-        function compareNextHand(testCaseId, expectedText) {
-            const textarea = document.getElementById(`actual-output-${testCaseId}`);
-            const resultDiv = document.getElementById(`comparison-result-${testCaseId}`);
-
-            let actualText = textarea.value.trim();
-
-            if (!actualText) {
-                resultDiv.innerHTML = '<div class="result-title">⚠️ Please paste the actual output first</div>';
-                resultDiv.className = 'comparison-result';
-                return;
-            }
-
-            actualText = actualText.replace(/^["']|["']$/g, '');
-
-            const expected = parseNextHandData(expectedText);
-            const actual = parseNextHandData(actualText);
-
-            const results = [];
-            let allPassed = true;
-
-            if (expected.handNumber === actual.handNumber) {
-                results.push({ field: 'Hand Number', pass: true, expected: expected.handNumber, actual: actual.handNumber });
-            } else {
-                results.push({ field: 'Hand Number', pass: false, expected: expected.handNumber, actual: actual.handNumber });
-                allPassed = false;
-            }
-
-            if (expected.startedAt === actual.startedAt) {
-                results.push({ field: 'Started At', pass: true, expected: expected.startedAt, actual: actual.startedAt });
-            } else {
-                results.push({ field: 'Started At', pass: false, expected: expected.startedAt, actual: actual.startedAt });
-                allPassed = false;
-            }
-
-            for (const player of expected.players) {
-                const actualPlayer = actual.players.find(p => p.name === player.name && p.position === player.position);
-                if (actualPlayer) {
-                    if (player.stack === actualPlayer.stack) {
-                        results.push({ field: `${player.name} ${player.position}`, pass: true, expected: player.stack, actual: actualPlayer.stack });
-                    } else {
-                        results.push({ field: `${player.name} ${player.position}`, pass: false, expected: player.stack, actual: actualPlayer.stack });
-                        allPassed = false;
-                    }
-                } else {
-                    results.push({ field: `${player.name} ${player.position}`, pass: false, expected: player.stack, actual: 'NOT FOUND' });
-                    allPassed = false;
-                }
-            }
-
-            let html = `<div class="result-title">${allPassed ? '✅ PASSED' : '❌ FAILED'}</div>`;
-            for (const result of results) {
-                const className = result.pass ? 'check-item pass' : 'check-item fail';
-                html += `<div class="${className}">${result.field}: ${result.expected}`;
-                if (!result.pass) {
-                    html += `<div class="diff">Expected: ${result.expected}, Got: ${result.actual}</div>`;
-                }
-                html += '</div>';
-            }
-
-            resultDiv.innerHTML = html;
-            resultDiv.className = `comparison-result ${allPassed ? 'passed' : 'failed'}`;
-        }
-
-        function parseNextHandData(text) {
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-
-            const data = {
-                handNumber: '',
-                startedAt: '',
-                players: []
-            };
-
-            const handMatch = lines[0].match(/Hand \((\d+)\)/);
-            if (handMatch) {
-                data.handNumber = handMatch[1];
-            }
-
-            const timeMatch = lines[1].match(/started_at:\s*(\S+)/);
-            if (timeMatch) {
-                data.startedAt = timeMatch[1];
-            }
-
-            let inStackSetup = false;
-            for (const line of lines) {
-                if (line === 'Stack Setup:') {
-                    inStackSetup = true;
-                    continue;
-                }
-                if (inStackSetup && line) {
-                    const parts = line.split(/\s+/);
-                    if (parts.length >= 3) {
-                        data.players.push({
-                            name: parts[0],
-                            position: parts[1],
-                            stack: parts[2].replace(/,/g, '')
-                        });
-                    }
-                }
-            }
-
-            return data;
-        }
-    </script>
     <script>
         function copyPlayerData(button, text) {
             navigator.clipboard.writeText(text).then(() => {

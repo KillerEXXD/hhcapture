@@ -78,6 +78,34 @@ class ExtendedActionGenerator(TestCaseGenerator):
 
             return Action(player.name, player.position, action_type, amount), amount
 
+    def generate_preflop_simple(self):
+        """Override parent's generate_preflop_simple to use street_actions structure"""
+        actions = []
+
+        # Get correct preflop action order
+        action_order = self.get_preflop_action_order(self.players)
+
+        # Everyone calls except last player (BB)
+        for i, player in enumerate(action_order):
+            if i < len(action_order) - 1:
+                # Not BB - call
+                call_amount = self.bb - player.blind_posted
+                if call_amount > 0:
+                    action, _ = self.process_action(player, ActionType.CALL, self.bb)
+                    actions.append(action)
+            else:
+                # BB checks
+                action, _ = self.process_action(player, ActionType.CHECK)
+                actions.append(action)
+
+        self.street_actions['preflop']['base'] = actions
+        self.street_actions['preflop']['more1'] = []
+        self.street_actions['preflop']['more2'] = []
+
+        # Reset street contributions for next street
+        for p in self.players:
+            p.street_contribution = 0
+
     def generate_preflop_with_extended(self):
         """Generate preflop with extended actions"""
         actions_base = []
@@ -245,6 +273,40 @@ class ExtendedActionGenerator(TestCaseGenerator):
         for p in self.players:
             p.street_contribution = 0
 
+    def generate_postflop_simple(self, street_name):
+        """Generate simple postflop street (bet/call, no extended actions)"""
+        actions_base = []
+
+        active_players = [p for p in self.players if not p.folded and p.current_stack > 0]
+        if len(active_players) < 2:
+            return  # Hand over
+
+        # Simple bet/call sequence
+        action_order = self.get_postflop_action_order(active_players)
+
+        # First player bets
+        bettor = action_order[0]
+        bet_amount = int(self.bb * random.randint(4, 8))
+        action, actual_bet = self.process_action(bettor, ActionType.BET, bet_amount)
+        actions_base.append(action)
+        current_bet = actual_bet
+
+        # Everyone else calls or folds
+        for player in action_order[1:]:
+            if random.random() < 0.8:  # 80% call
+                action, _ = self.process_action(player, ActionType.CALL, current_bet)
+            else:
+                action, _ = self.process_action(player, ActionType.FOLD)
+            actions_base.append(action)
+
+        self.street_actions[street_name]['base'] = actions_base
+        self.street_actions[street_name]['more1'] = []
+        self.street_actions[street_name]['more2'] = []
+
+        # Reset street contributions
+        for p in self.players:
+            p.street_contribution = 0
+
     def generate_actions_html_with_extended(self) -> str:
         """Generate actions HTML with Base/More1/More2 sections"""
         html = '            <div class="section-title">Actions</div>\n'
@@ -318,18 +380,40 @@ class ExtendedActionGenerator(TestCaseGenerator):
         # Post blinds and antes
         self.post_blinds_antes()
 
-        # Generate actions based on extended streets
+        # ALWAYS generate Preflop (required)
         if 'preflop' in self.extended_streets:
             self.generate_preflop_with_extended()
         else:
             self.generate_preflop_simple()
 
-        # Postflop streets
-        for street in ['flop', 'turn', 'river']:
-            if not self.go_to_river and street in ['turn', 'river']:
-                break
+        # Postflop streets - generate ALL streets in order, not just extended ones
+        # Streets must follow proper order: Preflop → Flop → Turn → River
+        streets_to_generate = []
+
+        # Determine which streets to generate based on extended_streets and go_to_river
+        if any(s in self.extended_streets for s in ['flop', 'turn', 'river']):
+            # Find the highest street we need
+            max_street_idx = -1
+            street_order = ['flop', 'turn', 'river']
+            for i, street in enumerate(street_order):
+                if street in self.extended_streets:
+                    max_street_idx = i
+
+            # Generate all streets up to and including the highest extended street
+            if max_street_idx >= 0:
+                streets_to_generate = street_order[:max_street_idx + 1]
+
+        # If go_to_river is True, generate all streets
+        if self.go_to_river:
+            streets_to_generate = ['flop', 'turn', 'river']
+
+        # Generate each street (with extended or simple actions)
+        for street in streets_to_generate:
             if street in self.extended_streets:
                 self.generate_postflop_with_extended(street)
+            else:
+                # Generate simple version of this street
+                self.generate_postflop_simple(street)
 
         # Determine winner (player with most chips remaining)
         active_players = [p for p in self.players if not p.folded]
