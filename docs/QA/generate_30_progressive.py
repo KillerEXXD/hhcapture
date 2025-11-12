@@ -393,19 +393,26 @@ class TestCaseGenerator:
 
         action_order = self.get_postflop_action_order(active)
         bet_amount = self.bb * 5
+        actual_bet = 0  # Track what first player actually bets
 
         for i, player in enumerate(action_order):
-            # Check for all-in: cap at available stack
-            amount_to_add = min(bet_amount, player.current_stack)
-            if amount_to_add < bet_amount:
-                player.all_in_street = "Flop"
-
             if i == 0:  # First player bets
+                # Check for all-in: cap at available stack
+                amount_to_add = min(bet_amount, player.current_stack)
+                if amount_to_add < bet_amount:
+                    player.all_in_street = "Flop"
+
+                actual_bet = amount_to_add  # Remember the actual bet amount
                 actions.append(Action(player.name, player.position, ActionType.BET, amount_to_add))
                 player.street_contribution = amount_to_add
                 player.current_stack -= amount_to_add
                 player.total_contribution += amount_to_add
-            else:  # Others call
+            else:  # Others call to match the actual bet
+                # Call to match actual_bet, capped at their stack
+                amount_to_add = min(actual_bet, player.current_stack)
+                if amount_to_add < actual_bet:
+                    player.all_in_street = "Flop"
+
                 actions.append(Action(player.name, player.position, ActionType.CALL, amount_to_add))
                 player.street_contribution = amount_to_add
                 player.current_stack -= amount_to_add
@@ -424,19 +431,26 @@ class TestCaseGenerator:
 
         action_order = self.get_postflop_action_order(active)
         bet_amount = self.bb * 10
+        actual_bet = 0  # Track what first player actually bets
 
         for i, player in enumerate(action_order):
-            # Check for all-in: cap at available stack
-            amount_to_add = min(bet_amount, player.current_stack)
-            if amount_to_add < bet_amount:
-                player.all_in_street = "Turn"
-
             if i == 0:  # First player bets
+                # Check for all-in: cap at available stack
+                amount_to_add = min(bet_amount, player.current_stack)
+                if amount_to_add < bet_amount:
+                    player.all_in_street = "Turn"
+
+                actual_bet = amount_to_add  # Remember the actual bet amount
                 actions.append(Action(player.name, player.position, ActionType.BET, amount_to_add))
                 player.street_contribution = amount_to_add
                 player.current_stack -= amount_to_add
                 player.total_contribution += amount_to_add
-            else:  # Others call
+            else:  # Others call to match the actual bet
+                # Call to match actual_bet, capped at their stack
+                amount_to_add = min(actual_bet, player.current_stack)
+                if amount_to_add < actual_bet:
+                    player.all_in_street = "Turn"
+
                 actions.append(Action(player.name, player.position, ActionType.CALL, amount_to_add))
                 player.street_contribution = amount_to_add
                 player.current_stack -= amount_to_add
