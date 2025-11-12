@@ -4,11 +4,11 @@ Merge 30_base_validated_cases.html with 10_sidepot_cases.html to create 40_TestC
 """
 import re
 
-# Read the 30 test case file
-with open('30_base_validated_cases.html', 'r', encoding='utf-8') as f:
+# Read the 30 test case file from parent directory (where generator writes it)
+with open('../30_base_validated_cases.html', 'r', encoding='utf-8') as f:
     base_content = f.read()
 
-# Read the 10 test case file
+# Read the 10 test case file from current directory
 with open('10_sidepot_cases.html', 'r', encoding='utf-8') as f:
     new_content = f.read()
 

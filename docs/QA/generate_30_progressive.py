@@ -357,8 +357,10 @@ class TestCaseGenerator:
                 amount_to_add = raiser.current_stack
                 raiser.all_in_street = "Preflop"
 
-            actions.append(Action(raiser.name, raiser.position, ActionType.RAISE, raise_amount))
-            raiser.street_contribution = raiser.blind_posted + amount_to_add
+            # Use actual total contribution (blind_posted + amount_to_add) for Action display
+            actual_raise_amount = raiser.blind_posted + amount_to_add
+            actions.append(Action(raiser.name, raiser.position, ActionType.RAISE, actual_raise_amount))
+            raiser.street_contribution = actual_raise_amount
             raiser.current_stack -= amount_to_add
             raiser.total_contribution += amount_to_add
 
@@ -371,8 +373,10 @@ class TestCaseGenerator:
                     amount_to_add = player.current_stack
                     player.all_in_street = "Preflop"
 
-                actions.append(Action(player.name, player.position, ActionType.CALL, raise_amount))
-                player.street_contribution = player.blind_posted + amount_to_add
+                # Use actual total contribution (blind_posted + amount_to_add) for Action display
+                actual_call_amount = player.blind_posted + amount_to_add
+                actions.append(Action(player.name, player.position, ActionType.CALL, actual_call_amount))
+                player.street_contribution = actual_call_amount
                 player.current_stack -= amount_to_add
                 player.total_contribution += amount_to_add
 
