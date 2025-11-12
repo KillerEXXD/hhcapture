@@ -89,19 +89,58 @@ export function processStackSynchronous(
   console.log('═'.repeat(60));
 
   // STEP 1: Get active players and sort by position order
-  const positionOrder = stage === 'preflop'
-    ? ['utg', 'utg+1', 'utg+2', 'lj', 'hj', 'mp', 'mp+1', 'mp+2', 'co', 'dealer', 'sb', 'bb']
-    : ['sb', 'bb', 'utg', 'utg+1', 'utg+2', 'lj', 'hj', 'mp', 'mp+1', 'mp+2', 'co', 'dealer'];
+  // Action order depends on stage and number of players:
+  //
+  // 2-Player:
+  //   Preflop: SB/Dealer → BB
+  //   Postflop: BB → SB/Dealer (BB is first to act, like UTG)
+  //
+  // 3-Player:
+  //   Preflop: Dealer/UTG → SB → BB
+  //   Postflop: SB → BB → Dealer
+  //
+  // 4+ Players:
+  //   Preflop: UTG → ... → Dealer → SB → BB
+  //   Postflop: SB → BB → UTG → ... → Dealer
 
-  let activePlayers = players
-    .filter(p => p.name && p.stack > 0)
-    .sort((a, b) => {
-      const posA = normalizePosition(a.position).toLowerCase();
-      const posB = normalizePosition(b.position).toLowerCase();
-      const indexA = positionOrder.indexOf(posA);
-      const indexB = positionOrder.indexOf(posB);
-      return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-    });
+  let activePlayers = players.filter(p => p.name && p.stack > 0);
+  const playerCount = activePlayers.length;
+
+  let positionOrder: string[];
+
+  if (stage === 'preflop') {
+    // Preflop action order
+    if (playerCount === 2) {
+      // 2P: SB/Dealer → BB
+      positionOrder = ['sb', 'dealer', 'bb'];
+    } else if (playerCount === 3) {
+      // 3P: Dealer/UTG → SB → BB
+      positionOrder = ['dealer', 'sb', 'bb'];
+    } else {
+      // 4+: UTG → ... → Dealer → SB → BB
+      positionOrder = ['utg', 'utg+1', 'utg+2', 'lj', 'hj', 'mp', 'mp+1', 'mp+2', 'co', 'dealer', 'sb', 'bb'];
+    }
+  } else {
+    // Postflop action order
+    if (playerCount === 2) {
+      // 2P: BB → SB/Dealer (BB acts first like UTG in heads-up)
+      positionOrder = ['bb', 'sb', 'dealer'];
+    } else if (playerCount === 3) {
+      // 3P: SB → BB → Dealer
+      positionOrder = ['sb', 'bb', 'dealer'];
+    } else {
+      // 4+: SB → BB → UTG → ... → Dealer
+      positionOrder = ['sb', 'bb', 'utg', 'utg+1', 'utg+2', 'lj', 'hj', 'mp', 'mp+1', 'mp+2', 'co', 'dealer'];
+    }
+  }
+
+  activePlayers.sort((a, b) => {
+    const posA = normalizePosition(a.position).toLowerCase();
+    const posB = normalizePosition(b.position).toLowerCase();
+    const indexA = positionOrder.indexOf(posA);
+    const indexB = positionOrder.indexOf(posB);
+    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+  });
 
   console.log(`   👥 Initial player order: ${activePlayers.map(p => `${p.name}(${p.position})`).join(' → ')}`);
 
