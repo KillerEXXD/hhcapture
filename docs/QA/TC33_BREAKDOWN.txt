@@ -1,0 +1,116 @@
+======================================================================
+TC-33: DETAILED BREAKDOWN WITH STACK TRACKING
+======================================================================
+
+STARTING STACKS:
+  Alice (Dealer): 4,200,000
+  Bob (SB):       1,700,000
+  Charlie (BB):   1,600,000
+
+----------------------------------------------------------------------
+BLINDS & ANTES:
+----------------------------------------------------------------------
+  Bob posts SB:           -50,000
+  Charlie posts Ante:    -100,000
+  Charlie posts BB:      -100,000
+
+  After Blinds:
+    Alice:   4,200,000
+    Bob:     1,650,000
+    Charlie: 1,400,000
+
+----------------------------------------------------------------------
+PREFLOP: Alice raises to 300,000, all call
+----------------------------------------------------------------------
+  Alice raises to 300k:              -300,000
+  Bob calls (adds 250k):             -250,000 (already has 50k SB)
+  Charlie calls (adds 200k):         -200,000 (already has 100k BB)
+
+  After Preflop:
+    Alice:   3,900,000
+    Bob:     1,400,000
+    Charlie: 1,200,000
+  POT: 900,000
+
+----------------------------------------------------------------------
+FLOP (As Kd Qc): Bob bets 500k, all call
+----------------------------------------------------------------------
+  Bob bets:      -500,000
+  Charlie calls: -500,000
+  Alice calls:   -500,000
+
+  After Flop:
+    Alice:   3,400,000
+    Bob:       900,000
+    Charlie:   700,000
+  POT: 2,400,000
+
+----------------------------------------------------------------------
+TURN (7h): Bob bets, others call/go all-in
+----------------------------------------------------------------------
+  Expected bet size: BB x 10 = 1,000,000
+
+  1. BOB'S BET:
+     Bob has 900,000 remaining
+     Bob can bet: min(1,000,000, 900,000) = 900,000
+     >> Bob bets: 900,000 (goes ALL-IN)
+
+  2. CHARLIE'S CALL:
+     Charlie has 700,000 remaining
+     Charlie needs to call to 900,000
+     Charlie can add: min(900,000, 700,000) = 700,000
+     >> Charlie calls: 700,000 (goes ALL-IN for less)
+
+  3. ALICE'S CALL:
+     Alice has 3,400,000 remaining
+     Alice needs to call to 900,000 (Bob's actual bet)
+     Alice can add: min(900,000, 3,400,000) = 900,000
+     >> Alice calls: 900,000 (matches Bob's bet)
+
+  After Turn:
+    Alice:   2,500,000
+    Bob:           0 (ALL-IN)
+    Charlie:       0 (ALL-IN)
+  POT: 4,900,000
+
+----------------------------------------------------------------------
+RIVER (3d): Alice checks (only player left)
+----------------------------------------------------------------------
+
+======================================================================
+THE FIX - WHAT CHANGED:
+======================================================================
+
+BEFORE FIX (Bug):
+  Turn: Bob bets 900,000
+  Turn: Charlie calls 700,000
+  Turn: Alice calls 1,000,000  << WRONG!
+
+  Why wrong? Alice was calling to "bet_amount" (BB*10 = 1,000,000)
+  instead of Bob's actual bet (900,000)
+
+AFTER FIX (Correct):
+  Turn: Bob bets 900,000
+  Turn: Charlie calls 700,000
+  Turn: Alice calls 900,000  << CORRECT!
+
+  Why correct? Alice now calls to match Bob's actual bet amount,
+  not the theoretical bet_amount that Bob couldn't afford
+
+======================================================================
+KEY INSIGHT:
+======================================================================
+
+When the first player goes all-in for LESS than the standard bet size,
+all subsequent callers should call to match THAT amount (the actual bet),
+not the theoretical bet size.
+
+In this case:
+- Theoretical bet: 1,000,000 (BB * 10)
+- Bob's actual bet: 900,000 (all-in with remaining stack)
+- Alice should call: 900,000 (to match Bob)
+- Charlie can only call: 700,000 (all-in for less)
+
+This is proper poker rules!
+
+======================================================================
