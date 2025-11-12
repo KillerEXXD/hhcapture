@@ -397,12 +397,12 @@ class TestCaseGenerator:
                 player.all_in_street = "Flop"
 
             if i == 0:  # First player bets
-                actions.append(Action(player.name, player.position, ActionType.BET, bet_amount))
+                actions.append(Action(player.name, player.position, ActionType.BET, amount_to_add))
                 player.street_contribution = amount_to_add
                 player.current_stack -= amount_to_add
                 player.total_contribution += amount_to_add
             else:  # Others call
-                actions.append(Action(player.name, player.position, ActionType.CALL, bet_amount))
+                actions.append(Action(player.name, player.position, ActionType.CALL, amount_to_add))
                 player.street_contribution = amount_to_add
                 player.current_stack -= amount_to_add
                 player.total_contribution += amount_to_add
@@ -428,12 +428,12 @@ class TestCaseGenerator:
                 player.all_in_street = "Turn"
 
             if i == 0:  # First player bets
-                actions.append(Action(player.name, player.position, ActionType.BET, bet_amount))
+                actions.append(Action(player.name, player.position, ActionType.BET, amount_to_add))
                 player.street_contribution = amount_to_add
                 player.current_stack -= amount_to_add
                 player.total_contribution += amount_to_add
             else:  # Others call
-                actions.append(Action(player.name, player.position, ActionType.CALL, bet_amount))
+                actions.append(Action(player.name, player.position, ActionType.CALL, amount_to_add))
                 player.street_contribution = amount_to_add
                 player.current_stack -= amount_to_add
                 player.total_contribution += amount_to_add
