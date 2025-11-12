@@ -1,0 +1,499 @@
+#!/usr/bin/env python3
+"""
+Generate 10 Test Cases with Extended Actions (Raise/Re-raise sequences)
+
+Extends generate_30_progressive.py with minimal changes
+Adds support for Extended Action 1 and Extended Action 2 per street
+
+Extended Action Rules:
+- Base Action: Initial betting round
+- Extended Action 1: Second betting round (can raise/call/fold)
+- Extended Action 2: Third betting round (ONLY call/fold, no raises)
+- Maximum 2 extended actions per street
+"""
+
+import sys
+import os
+
+# Import all classes from existing generator
+from generate_30_progressive import (
+    Player, Action, ActionType, TestCaseGenerator,
+    BlindStructure, random
+)
+
+
+class ExtendedActionGenerator(TestCaseGenerator):
+    """
+    Extends TestCaseGenerator to support Extended Actions
+    Inherits all existing logic, adds extended action support
+    """
+
+    def __init__(self, tc_num: int, num_players: int, complexity: str,
+                 extended_streets: list = None, **kwargs):
+        """
+        extended_streets: List of streets that should have extended actions
+                         e.g., ['preflop'], ['flop'], ['preflop', 'flop']
+        """
+        super().__init__(tc_num, num_players, complexity, **kwargs)
+
+        # Track which streets have extended actions
+        self.extended_streets = extended_streets or []
+
+        # Track extended action rounds for each street
+        self.street_actions = {
+            'preflop': {'base': [], 'more1': [], 'more2': []},
+            'flop': {'base': [], 'more1': [], 'more2': []},
+            'turn': {'base': [], 'more1': [], 'more2': []},
+            'river': {'base': [], 'more1': [], 'more2': []}
+        }
+
+    def process_action(self, player, action_type, amount=None):
+        """Process an action and update player stacks
+
+        Returns: tuple (Action, actual_amount)
+            - Action: the action object
+            - actual_amount: the actual amount after capping at player's stack
+        """
+        if action_type == ActionType.FOLD:
+            player.folded = True
+            return Action(player.name, player.position, ActionType.FOLD), 0
+
+        elif action_type == ActionType.CHECK:
+            return Action(player.name, player.position, ActionType.CHECK), 0
+
+        elif action_type in [ActionType.CALL, ActionType.RAISE, ActionType.BET]:
+            # Calculate additional amount needed
+            additional = amount - player.street_contribution
+
+            # Check if all-in
+            if additional >= player.current_stack:
+                additional = player.current_stack
+                amount = player.street_contribution + additional
+                player.all_in_street = "current"
+
+            # Update stacks
+            player.current_stack -= additional
+            player.street_contribution = amount
+            player.total_contribution += additional
+
+            return Action(player.name, player.position, action_type, amount), amount
+
+    def generate_preflop_with_extended(self):
+        """Generate preflop with extended actions"""
+        actions_base = []
+        actions_more1 = []
+        actions_more2 = []
+
+        # Get action order
+        action_order = self.get_preflop_action_order(self.players)
+
+        # BASE ROUND: Initial raise and responses
+        current_bet = self.bb
+
+        # First player raises
+        raiser = action_order[0]
+        raise_amount = self.bb * random.randint(3, 5)  # 3-5 BB
+        action, actual_raise = self.process_action(raiser, ActionType.RAISE, raise_amount)
+        actions_base.append(action)
+        current_bet = actual_raise  # Use actual amount
+
+        # Second player re-raises
+        reraiser = action_order[1]
+        reraise_amount = current_bet + (self.bb * random.randint(3, 6))
+        action, actual_reraise = self.process_action(reraiser, ActionType.RAISE, reraise_amount)
+        actions_base.append(action)
+        current_bet = actual_reraise  # Use actual amount
+
+        # Remaining players call or fold
+        for player in action_order[2:]:
+            if random.random() < 0.7:  # 70% call
+                action, _ = self.process_action(player, ActionType.CALL, current_bet)
+            else:
+                action, _ = self.process_action(player, ActionType.FOLD)
+            actions_base.append(action)
+
+        # EXTENDED ACTION 1: Original raiser responds
+        # Find first player who needs to act (original raiser)
+        active_players = [p for p in self.players if not p.folded]
+
+        if len(active_players) >= 2:
+            # Original raiser (first to act) responds
+            if random.random() < 0.5:  # 50% re-raise again
+                new_raise = current_bet + (self.bb * random.randint(3, 6))
+                action, actual_new_raise = self.process_action(raiser, ActionType.RAISE, new_raise)
+                actions_more1.append(action)
+                current_bet = actual_new_raise  # Use actual amount
+
+                # Other players respond
+                for player in active_players[1:]:
+                    if player.name == raiser.name:
+                        continue
+                    if random.random() < 0.6:  # 60% call
+                        action, _ = self.process_action(player, ActionType.CALL, current_bet)
+                    else:
+                        action, _ = self.process_action(player, ActionType.FOLD)
+                    actions_more1.append(action)
+
+                # EXTENDED ACTION 2: Only call/fold allowed
+                active_players = [p for p in self.players if not p.folded]
+                if len(active_players) >= 2:
+                    # First player to act can only call or fold
+                    responder = active_players[0]
+                    if random.random() < 0.8:  # 80% call
+                        action, _ = self.process_action(responder, ActionType.CALL, current_bet)
+                    else:
+                        action, _ = self.process_action(responder, ActionType.FOLD)
+                    actions_more2.append(action)
+
+                    # Other players respond (call/fold only)
+                    for player in active_players[1:]:
+                        if player.name == responder.name:
+                            continue
+                        # Skip last aggressor
+                        if player.street_contribution == current_bet:
+                            continue
+                        if random.random() < 0.7:  # 70% call
+                            action, _ = self.process_action(player, ActionType.CALL, current_bet)
+                        else:
+                            action, _ = self.process_action(player, ActionType.FOLD)
+                        actions_more2.append(action)
+            else:
+                # Original raiser just calls
+                action, _ = self.process_action(raiser, ActionType.CALL, current_bet)
+                actions_more1.append(action)
+
+        self.street_actions['preflop']['base'] = actions_base
+        self.street_actions['preflop']['more1'] = actions_more1
+        self.street_actions['preflop']['more2'] = actions_more2
+
+        # Reset street contributions for next street
+        for p in self.players:
+            p.street_contribution = 0
+
+    def generate_postflop_with_extended(self, street_name):
+        """Generate postflop street (flop/turn/river) with extended actions"""
+        actions_base = []
+        actions_more1 = []
+        actions_more2 = []
+
+        active_players = [p for p in self.players if not p.folded and p.current_stack > 0]
+        if len(active_players) < 2:
+            return  # Hand over
+
+        # BASE ROUND: Bet and raise
+        # First player bets
+        bettor = active_players[0]
+        bet_amount = int(self.bb * random.randint(5, 10))
+        action, actual_bet = self.process_action(bettor, ActionType.BET, bet_amount)
+        actions_base.append(action)
+        current_bet = actual_bet  # Use actual amount
+
+        # Second player raises
+        raiser = active_players[1]
+        raise_amount = current_bet + int(self.bb * random.randint(5, 10))
+        action, actual_raise = self.process_action(raiser, ActionType.RAISE, raise_amount)
+        actions_base.append(action)
+        current_bet = actual_raise  # Use actual amount
+
+        # Other players respond
+        for player in active_players[2:]:
+            if random.random() < 0.6:  # 60% call
+                action, _ = self.process_action(player, ActionType.CALL, current_bet)
+            else:
+                action, _ = self.process_action(player, ActionType.FOLD)
+            actions_base.append(action)
+
+        # EXTENDED ACTION 1: Original bettor responds
+        active_players = [p for p in self.players if not p.folded and p.current_stack > 0]
+
+        if len(active_players) >= 2:
+            if random.random() < 0.4:  # 40% re-raise
+                new_raise = current_bet + int(self.bb * random.randint(5, 10))
+                action, actual_new_raise = self.process_action(bettor, ActionType.RAISE, new_raise)
+                actions_more1.append(action)
+                current_bet = actual_new_raise  # Use actual amount
+
+                # Other players respond
+                for player in active_players[1:]:
+                    if player.name == bettor.name:
+                        continue
+                    if random.random() < 0.6:  # 60% call
+                        action, _ = self.process_action(player, ActionType.CALL, current_bet)
+                    else:
+                        action, _ = self.process_action(player, ActionType.FOLD)
+                    actions_more1.append(action)
+
+                # EXTENDED ACTION 2: Only call/fold
+                active_players = [p for p in self.players if not p.folded and p.current_stack > 0]
+                if len(active_players) >= 2:
+                    responder = active_players[0]
+                    if random.random() < 0.7:  # 70% call
+                        action, _ = self.process_action(responder, ActionType.CALL, current_bet)
+                    else:
+                        action, _ = self.process_action(responder, ActionType.FOLD)
+                    actions_more2.append(action)
+            else:
+                # Original bettor calls
+                action, _ = self.process_action(bettor, ActionType.CALL, current_bet)
+                actions_more1.append(action)
+
+        self.street_actions[street_name]['base'] = actions_base
+        self.street_actions[street_name]['more1'] = actions_more1
+        self.street_actions[street_name]['more2'] = actions_more2
+
+        # Reset street contributions
+        for p in self.players:
+            p.street_contribution = 0
+
+    def generate_actions_html_with_extended(self) -> str:
+        """Generate actions HTML with Base/More1/More2 sections"""
+        html = '            <div class="section-title">Actions</div>\n'
+        html += '            <div class="actions-section">\n'
+
+        # Preflop
+        html += self.generate_street_html_extended('preflop')
+
+        # Flop
+        if len([p for p in self.players if not p.folded]) >= 2:
+            cards = ' '.join(self.board_cards['Flop'])
+            html += self.generate_street_html_extended('flop', cards)
+
+        # Turn
+        if self.go_to_river and len([p for p in self.players if not p.folded]) >= 2:
+            cards = self.board_cards['Turn'][0]
+            html += self.generate_street_html_extended('turn', cards)
+
+        # River
+        if self.go_to_river and len([p for p in self.players if not p.folded]) >= 2:
+            cards = self.board_cards['River'][0]
+            html += self.generate_street_html_extended('river', cards)
+
+        html += '            </div>\n\n'
+        return html
+
+    def generate_street_html_extended(self, street_name, cards=None):
+        """Generate HTML for one street with Base/More1/More2 sections"""
+        html = ""
+
+        # Base section
+        if self.street_actions[street_name]['base']:
+            html += '                <div class="street-block">\n'
+            html += f'                    <div class="street-name">{street_name.title()} Base'
+            if cards:
+                html += f' ({cards})'
+            html += '</div>\n'
+
+            for action in self.street_actions[street_name]['base']:
+                html += f'                    {action.to_html()}\n'
+
+            html += '                </div>\n'
+
+        # More 1 section
+        if self.street_actions[street_name]['more1']:
+            html += '                <div class="street-block">\n'
+            html += f'                    <div class="street-name">{street_name.title()} More 1</div>\n'
+
+            for action in self.street_actions[street_name]['more1']:
+                html += f'                    {action.to_html()}\n'
+
+            html += '                </div>\n'
+
+        # More 2 section
+        if self.street_actions[street_name]['more2']:
+            html += '                <div class="street-block">\n'
+            html += f'                    <div class="street-name">{street_name.title()} More 2</div>\n'
+
+            for action in self.street_actions[street_name]['more2']:
+                html += f'                    {action.to_html()}\n'
+
+            html += '                </div>\n'
+
+        return html
+
+    def generate(self) -> str:
+        """Generate complete test case with extended actions"""
+        # Create players
+        self.players = self.create_players()
+
+        # Post blinds and antes
+        self.post_blinds_antes()
+
+        # Generate actions based on extended streets
+        if 'preflop' in self.extended_streets:
+            self.generate_preflop_with_extended()
+        else:
+            self.generate_preflop_simple()
+
+        # Postflop streets
+        for street in ['flop', 'turn', 'river']:
+            if not self.go_to_river and street in ['turn', 'river']:
+                break
+            if street in self.extended_streets:
+                self.generate_postflop_with_extended(street)
+
+        # Determine winner (player with most chips remaining)
+        active_players = [p for p in self.players if not p.folded]
+        if active_players:
+            self.winner_idx = self.players.index(max(active_players, key=lambda p: p.current_stack))
+
+        # For now, convert street_actions to self.actions format for parent's HTML generation
+        self.actions = {}
+        for street_name in ['preflop', 'flop', 'turn', 'river']:
+            # Combine base, more1, more2 into single list with labels
+            all_actions = []
+            if self.street_actions[street_name]['base']:
+                # For now just combine them - we'll override generate_html later
+                all_actions.extend(self.street_actions[street_name]['base'])
+            if self.street_actions[street_name]['more1']:
+                all_actions.extend(self.street_actions[street_name]['more1'])
+            if self.street_actions[street_name]['more2']:
+                all_actions.extend(self.street_actions[street_name]['more2'])
+
+            if all_actions:
+                self.actions[f"{street_name.title()} Base"] = all_actions
+
+        # Use parent's generate_html method
+        html = self.generate_html()
+
+        return html
+
+
+# Test case configurations
+EXTENDED_TEST_CASES = [
+    # TC-41: Preflop extended actions
+    {
+        'tc_num': 41,
+        'num_players': 3,
+        'complexity': 'Simple',
+        'extended_streets': ['preflop'],
+        'go_to_river': False
+    },
+    # TC-42: Flop extended actions
+    {
+        'tc_num': 42,
+        'num_players': 3,
+        'complexity': 'Simple',
+        'extended_streets': ['flop'],
+        'go_to_river': False
+    },
+    # TC-43: Turn extended actions
+    {
+        'tc_num': 43,
+        'num_players': 3,
+        'complexity': 'Medium',
+        'extended_streets': ['turn'],
+        'go_to_river': True
+    },
+    # TC-44: River extended actions
+    {
+        'tc_num': 44,
+        'num_players': 3,
+        'complexity': 'Medium',
+        'extended_streets': ['river'],
+        'go_to_river': True
+    },
+    # TC-45: Preflop + Flop extended actions
+    {
+        'tc_num': 45,
+        'num_players': 4,
+        'complexity': 'Medium',
+        'extended_streets': ['preflop', 'flop'],
+        'go_to_river': False
+    },
+    # TC-46: Preflop + Turn extended actions
+    {
+        'tc_num': 46,
+        'num_players': 4,
+        'complexity': 'Medium',
+        'extended_streets': ['preflop', 'turn'],
+        'go_to_river': True
+    },
+    # TC-47: Flop + River extended actions
+    {
+        'tc_num': 47,
+        'num_players': 3,
+        'complexity': 'Complex',
+        'extended_streets': ['flop', 'river'],
+        'go_to_river': True
+    },
+    # TC-48: All streets with extended actions
+    {
+        'tc_num': 48,
+        'num_players': 4,
+        'complexity': 'Complex',
+        'extended_streets': ['preflop', 'flop', 'turn', 'river'],
+        'go_to_river': True
+    },
+    # TC-49: Preflop extended with 4 players
+    {
+        'tc_num': 49,
+        'num_players': 4,
+        'complexity': 'Simple',
+        'extended_streets': ['preflop'],
+        'go_to_river': False
+    },
+    # TC-50: Turn extended with side pots
+    {
+        'tc_num': 50,
+        'num_players': 3,
+        'complexity': 'Complex',
+        'extended_streets': ['turn'],
+        'go_to_river': True,
+        'require_side_pot': True
+    }
+]
+
+
+def main():
+    print("=" * 80)
+    print("GENERATING 10 TEST CASES WITH EXTENDED ACTIONS")
+    print("=" * 80)
+    print()
+
+    all_html = []
+
+    for tc_config in EXTENDED_TEST_CASES:
+        print(f"Generating TC-{tc_config['tc_num']}: {tc_config['num_players']}P {tc_config['complexity']} - Extended on {', '.join(tc_config['extended_streets'])}")
+
+        gen = ExtendedActionGenerator(**tc_config)
+        html = gen.generate()
+        all_html.append(html)
+
+        print(f"  [OK] Generated TC-{tc_config['tc_num']}")
+        print()
+
+    # Write to file
+    output_file = 'C:\\Apps\\HUDR\\HHTool_Modular\\docs\\QA\\10_Extended_Action_TestCases.html'
+
+    # Combine all test cases
+    full_html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>10 Extended Action Test Cases</title>
+    <!-- Include same CSS as 40_TestCases_v2.html -->
+</head>
+<body>
+    <div class="container">
+        <h1>10 Extended Action Test Cases</h1>
+        <div class="subtitle">Test cases with raise/re-raise sequences (Extended Actions)</div>
+"""
+
+    full_html += '\n'.join(all_html)
+
+    full_html += """
+    </div>
+</body>
+</html>"""
+
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write(full_html)
+
+    print("=" * 80)
+    print(f"Generated {len(EXTENDED_TEST_CASES)} test cases")
+    print(f"Output: {output_file}")
+    print("=" * 80)
+
+
+if __name__ == '__main__':
+    main()
