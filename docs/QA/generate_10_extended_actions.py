@@ -219,12 +219,28 @@ class ExtendedActionGenerator(TestCaseGenerator):
         actions_base.append(action)
         current_bet = actual_bet  # Use actual amount
 
-        # Second player raises
+        # Second player raises (or calls if can't raise properly)
         raiser = action_order[1]
         raise_amount = current_bet + int(self.bb * random.randint(5, 10))
-        action, actual_raise = self.process_action(raiser, ActionType.RAISE, raise_amount)
-        actions_base.append(action)
-        current_bet = actual_raise  # Use actual amount
+
+        # Check if player has enough to raise properly
+        additional_needed = raise_amount - raiser.street_contribution
+        if additional_needed > raiser.current_stack:
+            # Player doesn't have enough to raise - check if they can at least call
+            call_additional = current_bet - raiser.street_contribution
+            if call_additional < raiser.current_stack:
+                # Can call
+                action, actual_amount = self.process_action(raiser, ActionType.CALL, current_bet)
+            else:
+                # All-in for less than call (will be handled by process_action)
+                action, actual_amount = self.process_action(raiser, ActionType.CALL, current_bet)
+            actions_base.append(action)
+            # current_bet stays the same
+        else:
+            # Can raise properly
+            action, actual_raise = self.process_action(raiser, ActionType.RAISE, raise_amount)
+            actions_base.append(action)
+            current_bet = actual_raise  # Update current_bet
 
         # Other players respond (in correct action order)
         for player in action_order[2:]:
@@ -377,6 +393,114 @@ class ExtendedActionGenerator(TestCaseGenerator):
 
         return html
 
+    def generate_html(self) -> str:
+        """Override parent's generate_html to use extended action sections"""
+        # Build stack setup
+        stack_lines = []
+        for p in self.players:
+            if p.position in ["Dealer", "SB", "BB"]:
+                stack_lines.append(f"{p.name} {p.position} {p.starting_stack}")
+            else:
+                stack_lines.append(f"{p.name} {p.starting_stack}")
+
+        stack_str = "\\n".join(stack_lines)
+        stack_pre = "\n".join(stack_lines)
+
+        # Build actions using extended format (Base/More1/More2 sections)
+        actions_html = self.generate_actions_html_with_extended()
+
+        # Calculate pot and results
+        pot_results = self.calculate_pot_and_results()
+        results_html = self.generate_results_html(pot_results)
+
+        # Build next hand
+        next_hand = self.rotate_button_for_next_hand()
+        next_lines = []
+        for p in next_hand:
+            if p['position'] in ["Dealer", "SB", "BB"]:
+                next_lines.append(f"{p['name']} {p['position']} {p['stack']}")
+            else:
+                next_lines.append(f"{p['name']} {p['stack']}")
+
+        next_str = "\\n".join(next_lines)
+        next_pre = "\n".join(next_lines)
+
+        # Validation status
+        validation_errors = self.validate_test_case()
+        validation_html = ""
+        if validation_errors:
+            validation_html = '<div style="background: #ffebee; border: 2px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">\n'
+            validation_html += '<strong style="color: #c62828;">❌ VALIDATION ERRORS:</strong><ul>\n'
+            for error in validation_errors:
+                validation_html += f'<li style="color: #c62828;">{error}</li>\n'
+            validation_html += '</ul></div>\n'
+        else:
+            validation_html = '<div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 10px; margin: 10px 0; border-radius: 4px;">\n'
+            validation_html += '<strong style="color: #2e7d32;">✅ ALL VALIDATIONS PASSED</strong>\n'
+            validation_html += '</div>\n'
+
+        # Determine test case description
+        test_desc = f"{self.num_players}P {self.complexity} - Extended Actions (SB:{self.sb:,} BB:{self.bb:,})"
+
+        html = f'''
+        <!-- TEST CASE {self.tc_num} -->
+        <div class="test-case">
+            <div class="test-header" onclick="toggleTestCase(this)">
+                <div>
+                    <div class="test-id">TC-{self.tc_num}</div>
+                    <div class="test-name">{test_desc}</div>
+                </div>
+                <div class="badges">
+                    <span class="badge {self.complexity.lower()}">{self.complexity}</span>
+                    <span class="collapse-icon collapsed">▶</span>
+                </div>
+            </div>
+
+            <div class="test-content collapsed">
+            {validation_html}
+
+            <div class="section-title">Stack Setup</div>
+            <div class="blind-setup">
+                <div class="blind-item"><label>Small Blind</label><div class="value">{self.sb:,}</div></div>
+                <div class="blind-item"><label>Big Blind</label><div class="value">{self.bb:,}</div></div>
+                <div class="blind-item"><label>Ante</label><div class="value">{self.ante:,}</div></div>
+                <div class="blind-item"><label>Ante Order</label><div class="value">BB First</div></div>
+            </div>
+
+            <div class="copy-instruction">📋 Copy and paste this into the app:</div>
+            <button class="copy-btn" onclick="copyPlayerData(this, `Hand ({self.tc_num})\\nstarted_at: 00:02:30 ended_at: 00:05:40\\nSB {self.sb} BB {self.bb} Ante {self.ante}\\nStack Setup:\\n{stack_str}`)">
+                <span>📋</span> Copy Player Data
+            </button>
+            <div class="player-data-box">
+<pre>Hand ({self.tc_num})
+started_at: 00:02:30 ended_at: 00:05:40
+SB {self.sb} BB {self.bb} Ante {self.ante}
+Stack Setup:
+{stack_pre}</pre>
+            </div>
+
+{actions_html}
+
+{results_html}
+
+            <div class="next-hand-preview">
+                <div class="next-hand-title">🔄 Next Hand Setup:</div>
+                <button class="copy-btn" onclick="copyPlayerData(this, `Hand ({self.tc_num + 1})\\nstarted_at: 00:05:40 ended_at: 00:08:50\\nSB {self.sb} BB {self.bb} Ante {self.ante}\\nStack Setup:\\n{next_str}`)">
+                    <span>📋</span> Copy Next Hand
+                </button>
+                <div class="player-data-box">
+<pre>Hand ({self.tc_num + 1})
+started_at: 00:05:40 ended_at: 00:08:50
+SB {self.sb} BB {self.bb} Ante {self.ante}
+Stack Setup:
+{next_pre}</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+        '''
+        return html
+
     def generate(self) -> str:
         """Generate complete test case with extended actions"""
         # Create players
@@ -425,23 +549,7 @@ class ExtendedActionGenerator(TestCaseGenerator):
         if active_players:
             self.winner_idx = self.players.index(max(active_players, key=lambda p: p.current_stack))
 
-        # For now, convert street_actions to self.actions format for parent's HTML generation
-        self.actions = {}
-        for street_name in ['preflop', 'flop', 'turn', 'river']:
-            # Combine base, more1, more2 into single list with labels
-            all_actions = []
-            if self.street_actions[street_name]['base']:
-                # For now just combine them - we'll override generate_html later
-                all_actions.extend(self.street_actions[street_name]['base'])
-            if self.street_actions[street_name]['more1']:
-                all_actions.extend(self.street_actions[street_name]['more1'])
-            if self.street_actions[street_name]['more2']:
-                all_actions.extend(self.street_actions[street_name]['more2'])
-
-            if all_actions:
-                self.actions[f"{street_name.title()} Base"] = all_actions
-
-        # Use parent's generate_html method
+        # Call generate_html which now uses extended format
         html = self.generate_html()
 
         return html
