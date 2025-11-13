@@ -311,7 +311,7 @@ function checkPostflopRoundComplete(
     const baseAmountKey = `${stage}Amount`;
     const baseAction = data[baseActionKey] as string | undefined;
 
-    if (baseAction === 'bet' || baseAction === 'raise' || baseAction === 'call') {
+    if (baseAction === 'bet' || baseAction === 'raise' || baseAction === 'call' || baseAction === 'all-in') {
       contribution = parseFloat((data[baseAmountKey] as string) || '0');
     }
 
@@ -321,7 +321,7 @@ function checkPostflopRoundComplete(
       const moreAmountKey = `${stage}_moreActionAmount`;
       const moreAction = data[moreActionKey] as string | undefined;
 
-      if (moreAction === 'bet' || moreAction === 'raise' || moreAction === 'call') {
+      if (moreAction === 'bet' || moreAction === 'raise' || moreAction === 'call' || moreAction === 'all-in') {
         // Player acted in MORE - use their MORE amount (which is TOTAL including BASE)
         contribution = parseFloat((data[moreAmountKey] as string) || '0');
         currentLevelAction = moreAction;
@@ -335,7 +335,7 @@ function checkPostflopRoundComplete(
       const more2AmountKey = `${stage}_moreAction2Amount`;
       const more2Action = data[more2ActionKey] as string | undefined;
 
-      if (more2Action === 'bet' || more2Action === 'raise' || more2Action === 'call') {
+      if (more2Action === 'bet' || more2Action === 'raise' || more2Action === 'call' || more2Action === 'all-in') {
         contribution = parseFloat((data[more2AmountKey] as string) || '0');
         currentLevelAction = more2Action;
       } else {
@@ -344,7 +344,7 @@ function checkPostflopRoundComplete(
         const moreAmountKey = `${stage}_moreActionAmount`;
         const moreAction = data[moreActionKey] as string | undefined;
 
-        if (moreAction === 'bet' || moreAction === 'raise' || moreAction === 'call') {
+        if (moreAction === 'bet' || moreAction === 'raise' || moreAction === 'call' || moreAction === 'all-in') {
           contribution = parseFloat((data[moreAmountKey] as string) || '0');
         }
         currentLevelAction = 'none';

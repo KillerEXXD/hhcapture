@@ -126,8 +126,9 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
     console.log(`🔄 [PreFlopView useEffect] Current level: ${currentLevel}, Round complete: ${isRoundComplete.isComplete}, Reason: ${isRoundComplete.reason}, Processed: ${hasProcessedCurrentState}`);
 
-    // "Add More Action" is disabled when round is complete OR when state hasn't been processed
-    setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
+    // "Add More Action" is disabled only when round is complete
+    // Note: We check hasProcessedCurrentState for "Create Next Street" button, but not for "Add More Action"
+    setIsAddMoreActionDisabled(isRoundComplete.isComplete);
 
     // "Create Next Street" is disabled when round is incomplete OR when state hasn't been processed
     setIsCreateNextStreetDisabled(!isRoundComplete.isComplete || !hasProcessedCurrentState);
@@ -676,6 +677,16 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
       return []; // Player not found
     }
 
+    // IMPORTANT: Check if player is all-in FIRST (before checking action order)
+    // A player who is all-in cannot take any further actions
+    const playerStatus = checkPlayerNeedsToAct(playerId, 'preflop', actionLevel, players, playerData);
+
+    if (playerStatus.alreadyAllIn) {
+      // Player is all-in from previous round - show locked all-in button
+      console.log(`🔒 [getAvailableActionsForPlayer] Player ${playerId} is all-in, showing locked state`);
+      return ['all-in']; // Special locked state - will be handled by UI
+    }
+
     // Check if player has already acted
     const actionKey = `preflop${suffix}Action` as keyof PlayerData[number];
     const playerAction = playerData[playerId]?.[actionKey];
@@ -706,16 +717,6 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
     // If previous player hasn't acted yet, disable all buttons
     if (!previousPlayerAction || previousPlayerAction === 'no action') {
       return []; // Disabled
-    }
-
-    // NEW LOGIC: Check if THIS SPECIFIC PLAYER needs to act
-    // This replaces the checkBettingRoundComplete check with per-player evaluation
-    const playerStatus = checkPlayerNeedsToAct(playerId, 'preflop', actionLevel, players, playerData);
-
-    if (playerStatus.alreadyAllIn) {
-      // Player is all-in from previous round - show locked all-in button
-      console.log(`🔒 [getAvailableActionsForPlayer] Player ${playerId} is all-in, showing locked state`);
-      return ['all-in']; // Special locked state - will be handled by UI
     }
 
     if (playerStatus.alreadyMatchedMaxBet) {
@@ -1115,18 +1116,6 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
       setLastProcessedPlayerDataHash(preflopDataHash);
       console.log('✅ [PreFlopView] Set hasProcessedCurrentState to true');
 
-      // Show alert to user
-      alert(
-        `Process Stack Complete!\n\n` +
-        `Total Pot: ${finalPotInfo.totalPot}\n` +
-        `Main Pot: ${finalPotInfo.mainPot.amount}\n` +
-        (finalPotInfo.sidePots.length > 0
-          ? `Side Pots: ${finalPotInfo.sidePots.length}\n`
-          : '') +
-        `Dead Money: ${finalPotInfo.deadMoney}\n\n` +
-        `Check console for detailed breakdown.`
-      );
-
       // Check if betting round is complete after processing
       const currentLevel = currentLevels[currentLevels.length - 1]; // Last processed level
       const isRoundComplete = checkBettingRoundComplete(
@@ -1138,6 +1127,9 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
       // Format and display pot breakdown if round is complete
       if (isRoundComplete.isComplete && finalPotInfo) {
+        console.log('💰 [PreFlopView] latestContributedAmounts:', latestContributedAmounts);
+        console.log('💰 [PreFlopView] finalPotInfo:', finalPotInfo);
+
         const displayData = formatPotsForDisplay(
           finalPotInfo,
           players,
@@ -1152,8 +1144,9 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
       }
 
       // Disable "Add More Action" button if round is complete
-      setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
-      console.log(`🎯 [PreFlop] Betting round complete: ${isRoundComplete.isComplete}, Add More Action disabled: ${isRoundComplete.isComplete || !hasProcessedCurrentState}`);
+      // Note: We just set hasProcessedCurrentState to true above, so use true here instead of old state value
+      setIsAddMoreActionDisabled(isRoundComplete.isComplete);
+      console.log(`🎯 [PreFlop] Betting round complete: ${isRoundComplete.isComplete}, Add More Action disabled: ${isRoundComplete.isComplete}`);
 
       // FR-13.4: Return focus after Process Stack completes
       const hasMoreActionButton = (currentLevel === 'base' || currentLevel === 'more') && !isRoundComplete.isComplete;

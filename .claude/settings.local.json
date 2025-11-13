@@ -25,7 +25,9 @@
       "Bash(/dev/null)",
       "Bash(start \"C:\\Apps\\HUDR\\HHTool_Modular\\docs\\QA\\10_Extended_Action_TestCases.html\")",
       "Bash(git ls-tree:*)",
-      "Bash(timeout 30 tail:*)"
+      "Bash(timeout 30 tail:*)",
+      "Bash(tc48_output.txt)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

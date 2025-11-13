@@ -57,7 +57,7 @@ export function formatPotsForDisplay(
   contributedAmounts: ContributedAmounts,
   currentStreet: Stage
 ): DisplayPotData {
-  const { mainPot, sidePots, totalPot } = enginePotInfo;
+  const { mainPot, sidePots, totalPot, deadMoneyBreakdown } = enginePotInfo;
 
   // Format main pot
   const formattedMainPot = formatPotInfo(
@@ -67,7 +67,7 @@ export function formatPotsForDisplay(
     players,
     contributedAmounts,
     currentStreet,
-    enginePotInfo.deadMoneyBreakdown.ante
+    deadMoneyBreakdown
   );
 
   // Format side pots
@@ -79,7 +79,7 @@ export function formatPotsForDisplay(
       players,
       contributedAmounts,
       currentStreet,
-      0
+      deadMoneyBreakdown
     )
   );
 
@@ -101,7 +101,7 @@ function formatPotInfo(
   players: Player[],
   contributedAmounts: ContributedAmounts,
   currentStreet: Stage,
-  anteAmount: number
+  deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number }
 ): DisplayPotInfo {
   // Get eligible and excluded players
   const eligiblePlayers = players.filter(p =>
@@ -123,10 +123,14 @@ function formatPotInfo(
   }));
 
   // Build street breakdown
+  // Note: For side pots, this shows total contributions from eligible players
+  // The pot engine has already capped these at the appropriate level
   const streetBreakdown = buildStreetBreakdown(
     eligiblePlayers.map(p => p.id),
     contributedAmounts,
-    currentStreet
+    currentStreet,
+    potType,
+    pot.amount
   );
 
   // Generate calculation formula
@@ -134,8 +138,11 @@ function formatPotInfo(
     pot,
     potType,
     potNumber,
-    eligiblePlayers.length,
-    anteAmount
+    eligiblePlayers,
+    players,
+    contributedAmounts,
+    currentStreet,
+    deadMoneyBreakdown
   );
 
   // Generate description
@@ -166,24 +173,35 @@ function getExclusionReason(player: Player, cappedAt: number): string {
 
 /**
  * Calculate total contribution for a player up to current street
+ *
+ * ContributedAmounts structure:
+ * {
+ *   "preflop_base": { 1: 500, 2: 1000 },
+ *   "preflop_more": { 1: 1000, 2: 1000 },
+ *   "flop_base": { 1: 2000, 2: 2000 },
+ *   ...
+ * }
  */
 function getPlayerTotalContribution(
   playerId: number,
   contributedAmounts: ContributedAmounts,
   currentStreet: Stage
 ): number {
-  const playerContributions = contributedAmounts[playerId] || {};
   let total = 0;
 
   const streets: Stage[] = ['preflop', 'flop', 'turn', 'river'];
   const currentIndex = streets.indexOf(currentStreet);
 
-  // Sum contributions up to and including current street
-  for (let i = 0; i <= currentIndex; i++) {
-    const street = streets[i];
-    for (const key in playerContributions) {
-      if (key.startsWith(street)) {
-        total += playerContributions[key] || 0;
+  // Loop through all section keys and find ones that match streets up to current street
+  for (const sectionKey in contributedAmounts) {
+    // Check if this section belongs to any street up to current street
+    for (let i = 0; i <= currentIndex; i++) {
+      const street = streets[i];
+      if (sectionKey.startsWith(street)) {
+        const sectionContributions = contributedAmounts[sectionKey] || {};
+        const playerContribution = sectionContributions[playerId] || 0;
+        total += playerContribution;
+        break; // Move to next section key
       }
     }
   }
@@ -193,34 +211,70 @@ function getPlayerTotalContribution(
 
 /**
  * Build street-by-street contribution breakdown
+ * Shows total amount contributed to the pot on each street (from eligible players only)
+ *
+ * ContributedAmounts structure:
+ * {
+ *   "preflop_base": { 1: 500, 2: 1000 },
+ *   "preflop_more": { 1: 1000, 2: 1000 },
+ *   "flop_base": { 1: 2000, 2: 2000 },
+ *   ...
+ * }
+ *
+ * For side pots, we show a simplified breakdown that just displays the pot amount
+ * because calculating exact street-by-street incremental contributions is complex.
  */
 function buildStreetBreakdown(
   eligiblePlayerIds: number[],
   contributedAmounts: ContributedAmounts,
-  currentStreet: Stage
+  currentStreet: Stage,
+  potType: 'main' | 'side',
+  potAmount: number
 ): StreetContribution[] {
   const streets: Array<'preflop' | 'flop' | 'turn' | 'river'> = ['preflop', 'flop', 'turn', 'river'];
   const currentIndex = streets.indexOf(currentStreet as 'preflop' | 'flop' | 'turn' | 'river');
 
+  // For side pots, show simplified breakdown: just the current street with the pot amount
+  // This avoids complexity of calculating incremental contributions above previous caps
+  if (potType === 'side') {
+    return [{
+      street: currentStreet,
+      amount: potAmount,
+      detail: `${eligiblePlayerIds.length} player${eligiblePlayerIds.length !== 1 ? 's' : ''} eligible for this side pot`,
+    }];
+  }
+
+  // For main pot, show detailed street-by-street breakdown
   return streets.slice(0, currentIndex + 1).map(street => {
     let amount = 0;
-    let contributingPlayers = 0;
+    const playersWhoContributed = new Set<number>();
 
-    for (const playerId of eligiblePlayerIds) {
-      const contributions = contributedAmounts[playerId] || {};
-      let streetContribution = 0;
+    // Loop through all section keys (e.g., "preflop_base", "preflop_more", "flop_base")
+    for (const sectionKey in contributedAmounts) {
+      // Check if this section belongs to the current street
+      if (sectionKey.startsWith(street)) {
+        const sectionContributions = contributedAmounts[sectionKey] || {};
 
-      for (const key in contributions) {
-        if (key.startsWith(street)) {
-          streetContribution += contributions[key] || 0;
+        // Sum up contributions ONLY from eligible players for THIS pot
+        for (const playerIdStr in sectionContributions) {
+          const playerId = parseInt(playerIdStr);
+
+          // IMPORTANT: Only include contributions from eligible players
+          if (!eligiblePlayerIds.includes(playerId)) {
+            continue; // Skip players not eligible for this pot
+          }
+
+          const contribution = sectionContributions[playerId] || 0;
+
+          if (contribution > 0) {
+            amount += contribution;
+            playersWhoContributed.add(playerId);
+          }
         }
       }
-
-      if (streetContribution > 0) {
-        amount += streetContribution;
-        contributingPlayers++;
-      }
     }
+
+    const contributingPlayers = playersWhoContributed.size;
 
     return {
       street,
@@ -240,38 +294,121 @@ function generateStreetDetail(numPlayers: number, amount: number): string {
 
 /**
  * Generate calculation formula for pot
+ * Shows street-by-street breakdown with Posted money logic
+ *
+ * IMPORTANT: This function receives pot.amount which is the FINAL pot amount
+ * already calculated by the pot engine. We just need to show how it breaks down by street.
+ *
+ * For the formula display, we simply show the pot.amount value that was already calculated.
+ * The street breakdown in "Contributions by Street" section uses buildStreetBreakdown() separately.
  */
 function generateCalculation(
   pot: EnginePotInfo['mainPot'],
   potType: 'main' | 'side',
   potNumber: number | undefined,
-  numEligiblePlayers: number,
-  anteAmount: number
+  eligiblePlayers: Player[],
+  allPlayers: Player[],
+  contributedAmounts: ContributedAmounts,
+  currentStreet: Stage,
+  deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number }
 ): DisplayPotInfo['calculation'] {
-  if (potType === 'main') {
-    const perPlayer = pot.cappedAt;
-    const liveAmount = perPlayer * numEligiblePlayers;
+  const streets: Array<'preflop' | 'flop' | 'turn' | 'river'> = ['preflop', 'flop', 'turn', 'river'];
+  const currentIndex = streets.indexOf(currentStreet as 'preflop' | 'flop' | 'turn' | 'river');
 
-    return {
-      formula: `Main Pot = (Smallest Stack × Players) + Ante\nMain Pot = ($${perPlayer.toLocaleString()} × ${numEligiblePlayers}) + $${anteAmount.toLocaleString()}`,
-      variables: {
-        smallestStack: perPlayer,
-        activePlayers: numEligiblePlayers,
-        ante: anteAmount,
-      },
-      result: `= $${pot.amount.toLocaleString()} (capped at smallest contribution)`,
-    };
-  } else {
-    // Side pot calculation
-    return {
-      formula: `Side Pot ${potNumber} = Contributions above previous cap\nSide Pot ${potNumber} = $${pot.cappedAt.toLocaleString()} × ${numEligiblePlayers} players`,
-      variables: {
-        cappedAt: pot.cappedAt,
-        eligiblePlayers: numEligiblePlayers,
-      },
-      result: `= $${pot.amount.toLocaleString()}`,
-    };
+  // For the formula display, we just show pot.amount
+  // The pot engine has already calculated this correctly
+  // The detailed street-by-street breakdown is shown in "Contributions by Street" section
+  const formulaLines: string[] = [];
+
+  // For main pot on preflop, show Posted money
+  if (potType === 'main' && currentStreet === 'preflop') {
+    const postedLine = generatePostedMoneyLine(allPlayers, eligiblePlayers, deadMoneyBreakdown);
+    if (postedLine) {
+      formulaLines.push(postedLine);
+    }
   }
+
+  // Simple display: Just show the pot total
+  // The pot engine calculated this based on eligible players and pot caps
+  const potDescription = potType === 'main'
+    ? `Main Pot Amount:`
+    : `Side Pot ${potNumber} Amount:`;
+
+  formulaLines.push(`${potDescription}`.padEnd(25) + `$${pot.amount.toLocaleString()}`.padEnd(20));
+
+  const formula = formulaLines.join('\n');
+
+  return {
+    formula,
+    variables: {}, // No variables needed for simple display
+    result: `Total = $${pot.amount.toLocaleString()}`,
+  };
+}
+
+/**
+ * Generate Posted money line based on who folded
+ * Returns formatted string or empty if no posted money to show
+ */
+function generatePostedMoneyLine(
+  allPlayers: Player[],
+  eligiblePlayers: Player[],
+  deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number }
+): string {
+  // Find SB and BB players
+  const sbPlayer = allPlayers.find(p =>
+    p.position?.toLowerCase() === 'sb' ||
+    p.position?.toLowerCase() === 'small blind'
+  );
+  const bbPlayer = allPlayers.find(p =>
+    p.position?.toLowerCase() === 'bb' ||
+    p.position?.toLowerCase() === 'big blind'
+  );
+
+  // Check if they're in the pot (eligible)
+  const sbInPot = sbPlayer && eligiblePlayers.some(ep => ep.id === sbPlayer.id);
+  const bbInPot = bbPlayer && eligiblePlayers.some(ep => ep.id === bbPlayer.id);
+
+  // Determine what to show based on logic
+  const parts: string[] = [];
+  let total = 0;
+
+  // If SB folded, include SB
+  if (sbPlayer && !sbInPot) {
+    parts.push('SB');
+  }
+
+  // If BB folded, include BB
+  if (bbPlayer && !bbInPot) {
+    parts.push('BB');
+  }
+
+  // Add folded blinds amount
+  if (deadMoneyBreakdown.foldedBlinds > 0) {
+    total += deadMoneyBreakdown.foldedBlinds;
+  }
+
+  // Always include ante if > 0
+  if (deadMoneyBreakdown.ante > 0) {
+    parts.push('Ante');
+    total += deadMoneyBreakdown.ante;
+  }
+
+  // If both blinds in pot, only show ante
+  if (sbInPot && bbInPot) {
+    if (deadMoneyBreakdown.ante > 0) {
+      return `Posted (Ante):`.padEnd(25) + `$${deadMoneyBreakdown.ante.toLocaleString()}`.padEnd(20);
+    }
+    return ''; // No posted money to show
+  }
+
+  if (parts.length === 0) {
+    return ''; // No posted money to show
+  }
+
+  const label = `Posted (${parts.join(' + ')}):`;
+  const formattedAmount = `$${total.toLocaleString()}`;
+
+  return label.padEnd(25) + formattedAmount.padEnd(20);
 }
 
 /**

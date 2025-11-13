@@ -13,12 +13,14 @@ import type { UsePotCalculationReturn } from '../../hooks/usePotCalculation';
 import { ActionButtons } from '../poker/ActionButtons';
 import { AmountInput } from '../poker/AmountInput';
 import { CommunityCardSelector } from '../poker/CommunityCardSelector';
+import { PotCalculationDisplay } from '../poker/PotCalculationDisplay';
 import { processStackSynchronous } from '../../lib/poker/engine/processStack';
 import { calculatePotsForBettingRound } from '../../lib/poker/engine/potCalculationEngine';
 import { checkBettingRoundComplete } from '../../lib/poker/validators/roundCompletionValidator';
 import { checkPlayerNeedsToAct } from '../../lib/poker/validators/playerActionStatus';
 import { returnFocusAfterProcessStack } from '../../lib/poker/utils/focusManagement';
 import { validateRaiseAmount } from '../../lib/poker/validators/raiseValidator';
+import { formatPotsForDisplay, type DisplayPotData } from '../../lib/poker/engine/potDisplayFormatter';
 
 interface RiverViewProps {
   state: GameState;
@@ -81,6 +83,10 @@ export const RiverView: React.FC<RiverViewProps> = ({
   // State for tracking last processed playerData to detect changes
   const [lastProcessedPlayerDataHash, setLastProcessedPlayerDataHash] = useState<string>('');
 
+  // State for pot display
+  const [potDisplayData, setPotDisplayData] = useState<DisplayPotData | null>(null);
+  const [showPotDisplay, setShowPotDisplay] = useState(false);
+
   // Detect playerData changes and invalidate processed state
   React.useEffect(() => {
     const currentLevels = visibleActionLevels.river || ['base'];
@@ -119,8 +125,9 @@ export const RiverView: React.FC<RiverViewProps> = ({
 
     console.log(`🔄 [RiverView useEffect] Current level: ${currentLevel}, Round complete: ${isRoundComplete.isComplete}, Reason: ${isRoundComplete.reason}, Processed: ${hasProcessedCurrentState}`);
 
-    // "Add More Action" is disabled when round is complete OR when state hasn't been processed
-    setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
+    // "Add More Action" is disabled only when round is complete
+    // Note: River doesn't have "Create Next Street" button since it's the last street
+    setIsAddMoreActionDisabled(isRoundComplete.isComplete);
   }, [playerData, visibleActionLevels.river, players, hasProcessedCurrentState]);
 
   // Refs for card selectors
@@ -485,21 +492,68 @@ export const RiverView: React.FC<RiverViewProps> = ({
 
         // Calculate pot for this section
         const sectionKey = `river_${levelName}`;
-        const potInfo = calculatePotsForBettingRound(
-          'river',
-          level,
-          players,
-          result.updatedPlayerData,
-          result.updatedContributedAmounts,
-          result.updatedProcessedSections,
-          result.updatedSectionStacks,
-          {
-            bigBlind: stackData.bigBlind,
-            smallBlind: stackData.smallBlind,
-            ante: stackData.ante
-          },
-          previousStreetPot // Carry forward from turn
+
+        // Check if there are any new contributions on River
+        const riverContributions = result.updatedContributedAmounts['river_base'] || {};
+        const hasRiverContributions = Object.keys(riverContributions).some(
+          playerId => (riverContributions[parseInt(playerId)] || 0) > 0
         );
+
+        let potInfo;
+
+        if (!hasRiverContributions && previousStreetPot > 0) {
+          // No new contributions on River - preserve Turn pot structure
+          // Get the Turn pot structure (check more2 -> more -> base)
+          let turnPotStructure = potsByStage?.turn_more2 || potsByStage?.turn_more || potsByStage?.turn_base;
+
+          if (turnPotStructure) {
+            console.log(`🔄 [River] No new contributions, preserving Turn pot structure`);
+            console.log(`   Main Pot: ${turnPotStructure.mainPot.amount}`);
+            if (turnPotStructure.sidePots.length > 0) {
+              turnPotStructure.sidePots.forEach((sp, i) => {
+                console.log(`   Side Pot ${i + 1}: ${sp.amount}`);
+              });
+            }
+
+            // Use the Turn pot structure directly
+            potInfo = turnPotStructure;
+          } else {
+            // Fallback: Calculate normally if no turn structure found
+            console.log(`⚠️ [River] No Turn pot structure found, calculating normally`);
+            potInfo = calculatePotsForBettingRound(
+              'river',
+              level,
+              players,
+              result.updatedPlayerData,
+              result.updatedContributedAmounts,
+              result.updatedProcessedSections,
+              result.updatedSectionStacks,
+              {
+                bigBlind: stackData.bigBlind,
+                smallBlind: stackData.smallBlind,
+                ante: stackData.ante
+              },
+              previousStreetPot
+            );
+          }
+        } else {
+          // Has new contributions - calculate normally
+          potInfo = calculatePotsForBettingRound(
+            'river',
+            level,
+            players,
+            result.updatedPlayerData,
+            result.updatedContributedAmounts,
+            result.updatedProcessedSections,
+            result.updatedSectionStacks,
+            {
+              bigBlind: stackData.bigBlind,
+              smallBlind: stackData.smallBlind,
+              ante: stackData.ante
+            },
+            previousStreetPot // Carry forward from turn
+          );
+        }
 
         // Store pot info in state
         setPotsByStage((prev) => ({
@@ -544,16 +598,6 @@ export const RiverView: React.FC<RiverViewProps> = ({
       setLastProcessedPlayerDataHash(riverDataHash);
       console.log('✅ [RiverView] Set hasProcessedCurrentState to true');
 
-      // Show alert to user
-      alert(
-        `Process Stack Complete!\n\n` +
-        `Total Pot: ${finalPotInfo.totalPot}\n` +
-        `Main Pot: ${finalPotInfo.mainPot.amount}\n` +
-        `Side Pots: ${finalPotInfo.sidePots.length}\n` +
-        `Dead Money: ${finalPotInfo.deadMoney}\n` +
-        `Previous Street Pot: ${previousStreetPot}`
-      );
-
       // Check if betting round is complete after processing
       const currentLevel = currentLevels[currentLevels.length - 1]; // Last processed level
       const isRoundComplete = checkBettingRoundComplete(
@@ -563,9 +607,25 @@ export const RiverView: React.FC<RiverViewProps> = ({
         latestPlayerData
       );
 
+      // Format and display pot breakdown if round is complete
+      if (isRoundComplete.isComplete && finalPotInfo) {
+        const displayData = formatPotsForDisplay(
+          finalPotInfo,
+          players,
+          latestContributedAmounts,
+          'river'
+        );
+        setPotDisplayData(displayData);
+        setShowPotDisplay(true);
+        console.log('💰 [RiverView] Pot display data prepared:', displayData);
+      } else {
+        setShowPotDisplay(false);
+      }
+
       // Disable "Add More Action" button if round is complete
-      setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
-      console.log(`🎯 [River] Betting round complete: ${isRoundComplete.isComplete}, Add More Action disabled: ${isRoundComplete.isComplete || !hasProcessedCurrentState}`);
+      // Note: We just set hasProcessedCurrentState to true above, so use true here instead of old state value
+      setIsAddMoreActionDisabled(isRoundComplete.isComplete);
+      console.log(`🎯 [River] Betting round complete: ${isRoundComplete.isComplete}, Add More Action disabled: ${isRoundComplete.isComplete}`);
 
       // FR-13.4: Return focus after Process Stack completes
       const hasMoreActionButton = (currentLevel === 'base' || currentLevel === 'more') && !isRoundComplete.isComplete;
@@ -810,6 +870,16 @@ export const RiverView: React.FC<RiverViewProps> = ({
       return []; // Player not found
     }
 
+    // IMPORTANT: Check if player is all-in FIRST (before checking action order)
+    // A player who is all-in cannot take any further actions
+    const playerStatus = checkPlayerNeedsToAct(playerId, 'river', actionLevel, players, playerData);
+
+    if (playerStatus.alreadyAllIn) {
+      // Player is all-in from previous round - show locked all-in button (FR-11)
+      console.log(`🔒 [getAvailableActionsForPlayer] Player ${playerId} is all-in, showing locked state`);
+      return ['all-in']; // Special locked state
+    }
+
     // Check if player has already acted
     const actionKey = `river${suffix}Action` as keyof PlayerData[number];
     const playerAction = playerData[playerId]?.[actionKey];
@@ -832,15 +902,6 @@ export const RiverView: React.FC<RiverViewProps> = ({
     // If previous player hasn't acted yet, disable all buttons
     if (!previousPlayerAction || previousPlayerAction === 'no action') {
       return []; // Disabled - sequential enabling
-    }
-
-    // Check if THIS SPECIFIC PLAYER needs to act (using FR-9 logic)
-    const playerStatus = checkPlayerNeedsToAct(playerId, 'river', actionLevel, players, playerData);
-
-    if (playerStatus.alreadyAllIn) {
-      // Player is all-in from previous round - show locked all-in button (FR-11)
-      console.log(`🔒 [getAvailableActionsForPlayer] Player ${playerId} is all-in, showing locked state`);
-      return ['all-in']; // Special locked state
     }
 
     if (playerStatus.alreadyMatchedMaxBet) {
@@ -2109,6 +2170,41 @@ export const RiverView: React.FC<RiverViewProps> = ({
             Process Stack - River
           </button>
         </div>
+
+        {/* POT DISPLAY SECTION - SHOWN AT BOTTOM WHEN BETTING ROUND IS COMPLETE */}
+        {showPotDisplay && potDisplayData && (
+          <div className="mt-8 mb-8">
+            {/* Pot Display Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-t-xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">💰</span>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Pot Distribution</h2>
+                    <p className="text-sm text-white/90 mt-1">RIVER betting round complete</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowPotDisplay(false)}
+                  className="text-white/80 hover:text-white text-3xl font-bold leading-none px-2 transition-colors"
+                  aria-label="Close pot display"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Pot Display Content */}
+            <div className="bg-gray-100 rounded-b-xl p-6 shadow-xl">
+              <PotCalculationDisplay
+                totalPot={potDisplayData.totalPot}
+                mainPot={potDisplayData.mainPot}
+                sidePots={potDisplayData.sidePots}
+                players={potDisplayData.players}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

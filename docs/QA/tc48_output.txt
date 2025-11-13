@@ -1,0 +1,11 @@
+================================================================================
+REGENERATING TC-48: 4P Complex - Extended on preflop, flop, turn, river
+================================================================================
+Traceback (most recent call last):
+  File "C:\Apps\HUDR\HHTool_Modular\docs\QA\regenerate_tc48.py", line 29, in <module>
+    print(html)
+    ~~~~~^^^^^^
+  File "C:\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u25b6' in position 505: character maps to <undefined>
