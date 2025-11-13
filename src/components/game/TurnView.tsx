@@ -511,7 +511,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
             console.log(`🔄 [Turn] No new contributions, preserving Flop pot structure`);
             console.log(`   Main Pot: ${flopPotStructure.mainPot.amount}`);
             if (flopPotStructure.sidePots.length > 0) {
-              flopPotStructure.sidePots.forEach((sp, i) => {
+              flopPotStructure.sidePots.forEach((sp: any, i: number) => {
                 console.log(`   Side Pot ${i + 1}: ${sp.amount}`);
               });
             }
@@ -568,7 +568,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
         console.log(`💰 Calculated pot for ${levelName}:`, potInfo.totalPot);
         console.log(`   Main Pot: ${potInfo.mainPot.amount}`);
         if (potInfo.sidePots.length > 0) {
-          potInfo.sidePots.forEach((sp, i) => {
+          potInfo.sidePots.forEach((sp: any, i: number) => {
             console.log(`   Side Pot ${i + 1}: ${sp.amount}`);
           });
         }
@@ -864,16 +864,19 @@ export const TurnView: React.FC<TurnViewProps> = ({
         let contribution = 0;
 
         // Get action contribution
-        const action = playerData[player.id]?.turnAction as ActionType | undefined;
-        const amount = playerData[player.id]?.turnAmount as number | undefined;
-        if (action && action !== 'no action' && action !== 'fold') {
-          contribution = amount || 0;
+        // IMPORTANT: Exclude current player's own contribution to allow changing action/amount
+        if (player.id !== playerId) {
+          const action = playerData[player.id]?.turnAction as ActionType | undefined;
+          const amount = playerData[player.id]?.turnAmount as number | undefined;
+          if (action && action !== 'no action' && action !== 'fold') {
+            contribution = amount || 0;
+          }
         }
 
         contributions.set(player.id, contribution);
       }
 
-      const playerContribution = contributions.get(playerId) || 0;
+      const playerContribution = 0; // Current player's contribution is 0 for determining available actions
       const maxContribution = Math.max(...contributions.values());
 
       // Available actions based on contribution
@@ -2115,6 +2118,9 @@ export const TurnView: React.FC<TurnViewProps> = ({
                 mainPot={potDisplayData.mainPot}
                 sidePots={potDisplayData.sidePots}
                 players={potDisplayData.players}
+                currentPlayers={state.players}
+                stackData={state.stackData}
+                actions={actions}
               />
             </div>
           </div>

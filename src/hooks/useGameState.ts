@@ -99,6 +99,9 @@ export interface GameState {
     playerId: number;
     cardNumber?: number;
   } | null;
+
+  // Next hand generation
+  generatedNextHand: string | null;
 }
 
 /**
@@ -154,6 +157,9 @@ export interface GameStateActions {
 
   // Focus management
   setElementToRefocus: (element: GameState['elementToRefocus']) => void;
+
+  // Next hand generation
+  setGeneratedNextHand: (hand: string | null) => void;
 
   // Reset actions
   resetGameState: () => void;
@@ -226,7 +232,10 @@ const createInitialState = (): GameState => ({
   confirmMessage: '',
 
   // Focus management
-  elementToRefocus: null
+  elementToRefocus: null,
+
+  // Next hand generation
+  generatedNextHand: null
 });
 
 /**
@@ -254,7 +263,7 @@ export function useGameState(): [GameState, GameStateActions] {
     smallBlind: 500,
     ante: 1000,
     anteOrder: 'BB First',
-    rawInput: 'John Dealer 10000\nJane SB 8500\nBob BB 12000\nAlice 9500\nCharlie 11000\nDavid 7500\nEmma 15000\nFrank 9000\nGrace 13000',
+    rawInput: 'Hand (1)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nJohn Dealer 10000\nJane SB 8500\nBob BB 12000\nAlice 9500\nCharlie 11000\nDavid 7500\nEmma 15000\nFrank 9000\nGrace 13000',
     unit: 'K'
   });
   const [autoSelectCards, setAutoSelectCards] = useState<boolean>(true);
@@ -304,6 +313,9 @@ export function useGameState(): [GameState, GameStateActions] {
 
   // Focus management
   const [elementToRefocus, setElementToRefocus] = useState<GameState['elementToRefocus']>(null);
+
+  // Next hand generation
+  const [generatedNextHand, setGeneratedNextHand] = useState<string | null>(null);
 
   // Helper: Update player data
   const updatePlayerData = useCallback((
@@ -401,6 +413,7 @@ export function useGameState(): [GameState, GameStateActions] {
     setPendingAction(initial.pendingAction);
     setConfirmMessage(initial.confirmMessage);
     setElementToRefocus(initial.elementToRefocus);
+    setGeneratedNextHand(initial.generatedNextHand);
   }, []);
 
   // Build state object
@@ -428,7 +441,8 @@ export function useGameState(): [GameState, GameStateActions] {
     showConfirmDialog,
     pendingAction,
     confirmMessage,
-    elementToRefocus
+    elementToRefocus,
+    generatedNextHand
   };
 
   // Build actions object
@@ -461,6 +475,7 @@ export function useGameState(): [GameState, GameStateActions] {
     setPendingAction,
     setConfirmMessage,
     setElementToRefocus,
+    setGeneratedNextHand,
     resetGameState
   };
 

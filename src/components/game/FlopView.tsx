@@ -844,16 +844,19 @@ export const FlopView: React.FC<FlopViewProps> = ({
         let contribution = 0;
 
         // Get action contribution
-        const action = playerData[player.id]?.flopAction as ActionType | undefined;
-        const amount = playerData[player.id]?.flopAmount as number | undefined;
-        if (action && action !== 'no action' && action !== 'fold') {
-          contribution = amount || 0;
+        // IMPORTANT: Exclude current player's own contribution to allow changing action/amount
+        if (player.id !== playerId) {
+          const action = playerData[player.id]?.flopAction as ActionType | undefined;
+          const amount = playerData[player.id]?.flopAmount as number | undefined;
+          if (action && action !== 'no action' && action !== 'fold') {
+            contribution = amount || 0;
+          }
         }
 
         contributions.set(player.id, contribution);
       }
 
-      const playerContribution = contributions.get(playerId) || 0;
+      const playerContribution = 0; // Current player's contribution is 0 for determining available actions
       const maxContribution = Math.max(...contributions.values());
 
       // Available actions based on contribution
@@ -2053,6 +2056,9 @@ export const FlopView: React.FC<FlopViewProps> = ({
                 mainPot={potDisplayData.mainPot}
                 sidePots={potDisplayData.sidePots}
                 players={potDisplayData.players}
+                currentPlayers={state.players}
+                stackData={state.stackData}
+                actions={actions}
               />
             </div>
           </div>

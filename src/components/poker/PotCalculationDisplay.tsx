@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import type { Player } from '../../types/poker';
+import type { Player, GameConfig } from '../../types/poker';
+import type { GameStateActions } from '../../hooks/useGameState';
+import { HandComparisonModal } from './HandComparisonModal';
+import { WinnerSelectionModal } from './WinnerSelectionModal';
+import {
+  processWinnersAndGenerateNextHand,
+  type Pot,
+  type WinnerSelection,
+  type NextHandPlayer,
+  type ValidationResult
+} from '../../lib/poker/engine/nextHandGenerator';
+import { formatNextHandForDisplay } from '../../lib/poker/utils/handFormatParser';
 
 // ===== TYPE DEFINITIONS =====
 
@@ -38,6 +49,9 @@ interface PotCalculationDisplayProps {
   mainPot: PotInfo;
   sidePots: PotInfo[];
   players: Player[];
+  currentPlayers: Player[];
+  stackData: GameConfig;
+  actions: GameStateActions;
 }
 
 // ===== COMPONENTS =====
@@ -293,7 +307,88 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
   mainPot,
   sidePots,
   players,
+  currentPlayers,
+  stackData,
+  actions,
 }) => {
+  const [showWinnerModal, setShowWinnerModal] = useState(false);
+  const [nextHandData, setNextHandData] = useState<NextHandPlayer[] | null>(null);
+  const [nextHandFormatted, setNextHandFormatted] = useState<string>('');
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [comparisonHand, setComparisonHand] = useState('');
+  const [showComparisonModal, setShowComparisonModal] = useState(false);
+
+  const convertToPots = (): Pot[] => {
+    const pots: Pot[] = [];
+    pots.push({
+      name: 'Main Pot',
+      type: 'main',
+      amount: mainPot.amount,
+      eligible: mainPot.eligiblePlayers.map(p => p.name),
+      percentage: (mainPot.amount / totalPot) * 100
+    });
+    sidePots.forEach((sidePot) => {
+      const sideNum = sidePot.potNumber || 1;
+      pots.push({
+        name: `Side Pot ${sideNum}`,
+        type: `side${sideNum}` as 'side1' | 'side2' | 'side3' | 'side4' | 'side5',
+        amount: sidePot.amount,
+        eligible: sidePot.eligiblePlayers.map(p => p.name),
+        percentage: (sidePot.amount / totalPot) * 100
+      });
+    });
+    return pots;
+  };
+
+  const handleWinnerConfirm = (selections: WinnerSelection[]) => {
+    const pots = convertToPots();
+    const result = processWinnersAndGenerateNextHand(currentPlayers, pots, selections);
+    setNextHandData(result.nextHand);
+    setValidationResult(result.validation);
+    const handNumber = parseInt(stackData.handNumber?.replace(/[^0-9]/g, '') || '1') + 1;
+    const formatted = formatNextHandForDisplay(
+      handNumber.toString(),
+      stackData.startedAt || '00:00:00',
+      stackData.smallBlind || 0,
+      stackData.bigBlind || 0,
+      stackData.ante || 0,
+      result.nextHand.map(p => ({ name: p.name, position: p.position, stack: p.stack }))
+    );
+    setNextHandFormatted(formatted);
+    setShowWinnerModal(false);
+  };
+
+  const handleCopyNextHand = async () => {
+    if (!nextHandFormatted) return;
+    try {
+      console.log('📋 [CopyNextHand] Copying next hand to clipboard...');
+      console.log('📋 [CopyNextHand] nextHandFormatted:', nextHandFormatted);
+      console.log('📋 [CopyNextHand] Type:', typeof nextHandFormatted);
+      console.log('📋 [CopyNextHand] Length:', nextHandFormatted.length);
+
+      await navigator.clipboard.writeText(nextHandFormatted);
+
+      console.log('💾 [CopyNextHand] Storing in state.generatedNextHand...');
+      actions.setGeneratedNextHand(nextHandFormatted);
+      console.log('✅ [CopyNextHand] Stored successfully');
+
+      alert('✅ Next hand copied to clipboard and ready to load!\n\nGo to Stack Setup and click "Load Next Hand" button.');
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      alert('❌ Failed to copy to clipboard');
+    }
+  };
+
+  const handlePasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setComparisonHand(text);
+    } catch (error) {
+      console.error('Failed to read clipboard:', error);
+      alert('❌ Failed to read from clipboard');
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-5">
       {/* Page Header */}
@@ -344,109 +439,104 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
           />
         );
       })}
+
+      <div className="mt-8 mb-6">
+        <button
+          onClick={() => setShowWinnerModal(true)}
+          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold py-4 px-6 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all shadow-lg flex items-center justify-center text-lg"
+        >
+          🏆 Select Winners
+        </button>
+      </div>
+
+      {showWinnerModal && (
+        <WinnerSelectionModal
+          pots={convertToPots()}
+          onConfirm={handleWinnerConfirm}
+          onCancel={() => setShowWinnerModal(false)}
+        />
+      )}
+
+      {nextHandData && (
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-300 rounded-xl p-6 mt-8">
+          <h3 className="text-2xl font-bold text-purple-900 mb-4">🔄 Next Hand Generated</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            {nextHandData.map(player => (
+              <div key={player.name} className={`p-4 rounded-lg ${player.stack > 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'} border-2`}>
+                <div className="font-bold text-lg">{player.name}</div>
+                <div className="text-sm">{player.position}</div>
+                <div className="text-2xl font-mono">{player.stack.toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+
+          {validationResult && (
+            <div className={`p-4 rounded-lg mb-4 ${validationResult.isValid ? 'bg-green-100' : 'bg-red-100'}`}>
+              {validationResult.isValid ? (
+                <span className="text-green-800 font-semibold">✅ All validations passed</span>
+              ) : (
+                <div>
+                  <span className="text-red-800 font-semibold">❌ Validation errors:</span>
+                  <ul className="list-disc list-inside mt-2">
+                    {validationResult.errors.map((error, idx) => (
+                      <li key={idx} className="text-red-700 text-sm">{error}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={handleCopyNextHand}
+            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-md mb-6"
+          >
+            📋 Copy Next Hand
+          </button>
+
+          <div className="mt-6 border-t-2 border-purple-300 pt-6">
+            <h4 className="text-lg font-bold mb-4">🔍 Compare with Expected Hand</h4>
+            <div className="mb-4">
+              <label className="font-semibold block mb-2">Generated Hand:</label>
+              <pre className="bg-white p-4 rounded border font-mono text-sm whitespace-pre-wrap">{nextHandFormatted}</pre>
+            </div>
+            <div className="mb-4">
+              <label className="font-semibold block mb-2">Paste from GS (Google Sheets):</label>
+              <textarea
+                value={comparisonHand}
+                onChange={(e) => setComparisonHand(e.target.value)}
+                className="w-full p-4 border rounded font-mono text-sm"
+                rows={10}
+                placeholder="Paste expected hand here..."
+              />
+              <button
+                onClick={handlePasteFromClipboard}
+                className="mt-2 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+              >
+                📋 Paste from Clipboard
+              </button>
+            </div>
+            <button
+              onClick={() => setShowComparisonModal(true)}
+              disabled={!comparisonHand.trim()}
+              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${comparisonHand.trim() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+            >
+              🔍 Compare Hands
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showComparisonModal && (
+        <HandComparisonModal
+          generatedHand={nextHandFormatted}
+          expectedHand={comparisonHand}
+          onClose={() => setShowComparisonModal(false)}
+        />
+      )}
     </div>
   );
 };
 
-// ===== EXAMPLE USAGE =====
-
-export const PotCalculationDisplayExample: React.FC = () => {
-  // Example data
-  const players: Player[] = [
-    { id: 1, name: 'Alice', position: 'UTG', stack: 100000 },
-    { id: 2, name: 'Bob', position: 'BB', stack: 100000 },
-    { id: 3, name: 'Charlie', position: 'CO', stack: 100000 },
-    { id: 4, name: 'David', position: 'Dealer', stack: 100000 },
-    { id: 5, name: 'Emma', position: 'SB', stack: 100000 },
-  ];
-
-  const mainPot: PotInfo = {
-    potType: 'main',
-    amount: 12500,
-    eligiblePlayers: players,
-    contributions: [
-      { playerId: 1, amount: 2500 },
-      { playerId: 2, amount: 2500, isAllIn: true },
-      { playerId: 3, amount: 2500 },
-      { playerId: 4, amount: 2500 },
-      { playerId: 5, amount: 2500 },
-    ],
-    streetBreakdown: [
-      { street: 'preflop', amount: 11000, detail: 'All players contributed' },
-      { street: 'flop', amount: 1500, detail: '2 active players bet' },
-      { street: 'turn', amount: 0, detail: 'All checked' },
-      { street: 'river', amount: 0, detail: 'All checked' },
-    ],
-    calculation: {
-      formula: 'Main Pot = Smallest Stack × Active Players\nMain Pot = $2,500 × 5 players',
-      variables: { smallestStack: 2500, activePlayers: 5 },
-      result: '= $12,500 (capped at smallest contribution)',
-    },
-    description: 'The main pot is capped at the smallest all-in amount ($2,500 from Bob). All five players contributed this amount, making the main pot $12,500. Any contributions above this threshold go into side pots.',
-  };
-
-  const sidePot1: PotInfo = {
-    potType: 'side',
-    potNumber: 1,
-    amount: 4800,
-    eligiblePlayers: players.filter(p => p.id !== 2), // Exclude Bob
-    excludedPlayers: [{ player: players[1], reason: 'All-in for $2,500' }],
-    contributions: [
-      { playerId: 1, amount: 1200 },
-      { playerId: 3, amount: 1200 },
-      { playerId: 4, amount: 1200 },
-      { playerId: 5, amount: 1200 },
-    ],
-    streetBreakdown: [
-      { street: 'preflop', amount: 4800, detail: '4 players extra contribution' },
-      { street: 'flop', amount: 0, detail: 'No additional bets' },
-      { street: 'turn', amount: 0, detail: 'No bets' },
-      { street: 'river', amount: 0, detail: 'No bets' },
-    ],
-    calculation: {
-      formula: 'Side Pot 1 = (Next Smallest - Main Pot Cap) × Eligible Players\nSide Pot 1 = ($3,700 - $2,500) × 4 players',
-      variables: { nextSmallest: 3700, mainPotCap: 2500, eligiblePlayers: 4 },
-      result: '= $1,200 × 4 = $4,800',
-    },
-    description: 'This pot contains contributions from players who put in more than Bob\'s all-in amount ($2,500). Bob is excluded because he was all-in for less.',
-  };
-
-  const sidePot2: PotInfo = {
-    potType: 'side',
-    potNumber: 2,
-    amount: 1700,
-    eligiblePlayers: [players[0], players[2]], // Alice and Charlie
-    excludedPlayers: [
-      { player: players[1], reason: 'All-in preflop' },
-      { player: players[3], reason: 'All-in at $3,700' },
-      { player: players[4], reason: 'All-in at $3,700' },
-    ],
-    contributions: [
-      { playerId: 1, amount: 850 },
-      { playerId: 3, amount: 850 },
-    ],
-    streetBreakdown: [
-      { street: 'preflop', amount: 1700, detail: '2 players extra contribution' },
-      { street: 'flop', amount: 0, detail: 'No additional bets' },
-      { street: 'turn', amount: 0, detail: 'No bets' },
-      { street: 'river', amount: 0, detail: 'No bets' },
-    ],
-    calculation: {
-      formula: 'Side Pot 2 = (Remaining - Side Pot 1 Cap) × Eligible Players\nSide Pot 2 = ($4,550 - $3,700) × 2 players',
-      variables: { remaining: 4550, sidePot1Cap: 3700, eligiblePlayers: 2 },
-      result: '= $850 × 2 = $1,700',
-    },
-    description: 'This pot contains the extra contributions from Alice and Charlie who put in more than the second all-in threshold ($3,700). Only these two players can win this pot.',
-  };
-
-  return (
-    <PotCalculationDisplay
-      totalPot={19000}
-      mainPot={mainPot}
-      sidePots={[sidePot1, sidePot2]}
-      players={players}
-    />
-  );
-};
 
 export default PotCalculationDisplay;

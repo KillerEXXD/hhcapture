@@ -2274,6 +2274,9 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                 mainPot={potDisplayData.mainPot}
                 sidePots={potDisplayData.sidePots}
                 players={potDisplayData.players}
+                currentPlayers={state.players}
+                stackData={state.stackData}
+                actions={actions}
               />
             </div>
           </div>

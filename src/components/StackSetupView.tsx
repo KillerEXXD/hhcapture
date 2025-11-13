@@ -12,6 +12,7 @@ import React, { useCallback } from 'react';
 import type { Player, ChipUnit, Position, Rank, Suit } from '../types/poker';
 import type { GameState, GameStateActions } from '../hooks/useGameState';
 import type { UseCardManagementReturn } from '../hooks/useCardManagement';
+import { parseHandFormat } from '../lib/poker/utils/handFormatParser';
 
 interface StackSetupViewProps {
   state: GameState;
@@ -108,33 +109,131 @@ export function StackSetupView({
    * Setup players from raw input
    */
   const setupPlayers = useCallback(() => {
+    // Show confirmation dialog
+    const hasExistingData = state.players.some(p => p.name) ||
+                           Object.keys(state.playerData).length > 0 ||
+                           state.currentView !== 'stack';
+
+    if (hasExistingData) {
+      const confirmed = window.confirm(
+        '⚠️ WARNING: This will clear all entered data and start fresh!\n\n' +
+        'All player data, cards, actions, and progress will be lost.\n\n' +
+        'Do you want to continue?'
+      );
+
+      if (!confirmed) {
+        return; // User cancelled
+      }
+    }
+
     try {
       console.log('=== setupPlayers CALLED ===');
-      const lines = (state.stackData.rawInput || '').trim().split('\n');
-      const parsedPlayers: ParsedPlayer[] = [];
 
-      lines.forEach((line: string) => {
-        const trimmedLine = line.trim();
-        if (!trimmedLine) return;
+      // COMPLETE RESET: Clear all game state before loading new hand
+      console.log('🔄 Resetting all game state...');
 
-        const parts = trimmedLine.split(/\s+/);
-        if (parts.length >= 2) {
-          const name = parts[0];
-          let position = '';
-          let stack = 0;
+      // Reset player data (actions, amounts, cards, etc.)
+      actions.setPlayerData({});
 
-          if (parts[1] === 'Dealer' || parts[1] === 'SB' || parts[1] === 'BB') {
-            position = parts[1];
-            stack = parseFloat(parts[2]) || 0;
-          } else {
-            stack = parseFloat(parts[1]) || 0;
-          }
+      // Reset all contributions
+      actions.setContributedAmounts({});
 
-          if (name && stack > 0) {
-            parsedPlayers.push({ name, position, stack });
-          }
-        }
+      // Reset processed sections
+      actions.setProcessedSections({});
+
+      // Reset all pots
+      actions.setPotsByStage({});
+
+      // Reset visible action levels (remove MORE action sections)
+      actions.setVisibleActionLevels({ preflop: ['base'], flop: ['base'], turn: ['base'], river: ['base'] });
+
+      // Reset section stacks (will be reinitialized)
+      actions.setSectionStacks({});
+
+      // Reset community cards (all null for fresh start)
+      actions.setCommunityCards({
+        flop: { card1: null, card2: null, card3: null },
+        turn: { card1: null },
+        river: { card1: null }
       });
+
+      // Reset view to stack
+      actions.setCurrentView('stack');
+
+      console.log('✅ Complete reset done, loading new hand...');
+
+      const rawInput = (state.stackData.rawInput || '').trim();
+
+      // Try to parse as 4-line header format first
+      const handFormatData = parseHandFormat(rawInput);
+      let parsedPlayers: ParsedPlayer[] = [];
+
+      // Capture blind values to use immediately (state.stackData will be stale after setStackData)
+      let smallBlindValue = state.stackData.smallBlind;
+      let bigBlindValue = state.stackData.bigBlind;
+      let anteValue = state.stackData.ante;
+      let anteOrderValue = state.stackData.anteOrder;
+
+      if (handFormatData) {
+        console.log('✅ Parsed 4-line header format');
+        console.log('  Hand Number:', handFormatData.header.handNumber);
+        console.log('  Started At:', handFormatData.header.startedAt);
+        console.log('  SB:', handFormatData.header.sb, 'BB:', handFormatData.header.bb, 'Ante:', handFormatData.header.ante);
+
+        // Capture parsed values for immediate use
+        smallBlindValue = handFormatData.header.sb;
+        bigBlindValue = handFormatData.header.bb;
+        anteValue = handFormatData.header.ante;
+
+        console.log('📝 Setting stackData with parsed blind values:', {
+          smallBlind: smallBlindValue,
+          bigBlind: bigBlindValue,
+          ante: anteValue
+        });
+
+        // Auto-fill hand number, started time, blinds, ante
+        actions.setStackData({
+          ...state.stackData,
+          handNumber: handFormatData.header.handNumber,
+          startedAt: handFormatData.header.startedAt,
+          smallBlind: smallBlindValue,
+          bigBlind: bigBlindValue,
+          ante: anteValue
+        });
+
+        console.log('✅ stackData updated, blind input fields should now show the values');
+
+        // Use parsed players
+        parsedPlayers = handFormatData.players;
+        console.log('📋 Parsed', parsedPlayers.length, 'players from 4-line format');
+      } else {
+        // Fall back to simple format parsing (just player lines)
+        console.log('ℹ️ Using simple format (no header)');
+        const lines = rawInput.split('\n');
+
+        lines.forEach((line: string) => {
+          const trimmedLine = line.trim();
+          if (!trimmedLine) return;
+
+          const parts = trimmedLine.split(/\s+/);
+          if (parts.length >= 2) {
+            const name = parts[0];
+            let position = '';
+            let stack = 0;
+
+            if (parts[1] === 'Dealer' || parts[1] === 'SB' || parts[1] === 'BB') {
+              position = parts[1];
+              stack = parseFloat(parts[2]?.replace(/,/g, '') || '0') || 0;
+            } else {
+              stack = parseFloat(parts[1]?.replace(/,/g, '') || '0') || 0;
+            }
+
+            if (name && stack >= 0) { // Allow 0 stacks
+              parsedPlayers.push({ name, position, stack });
+            }
+          }
+        });
+      }
 
       if (parsedPlayers.length === 0) {
         alert('No valid players found. Please check the format.');
@@ -182,8 +281,8 @@ export function StackSetupView({
 
         // SB player
         if (normalizedPosition === 'sb') {
-          postedSB = Math.min(state.stackData.smallBlind, player.stack);
-          if (player.stack <= state.stackData.smallBlind) {
+          postedSB = Math.min(smallBlindValue, player.stack);
+          if (player.stack <= smallBlindValue) {
             isForcedAllIn = true;
             forcedAllInAmount = player.stack;
           }
@@ -191,8 +290,8 @@ export function StackSetupView({
 
         // Heads up: Dealer posts SB
         if (playersWithInferredPositions.filter(p => p.name).length === 2 && normalizedPosition === 'dealer') {
-          postedSB = Math.min(state.stackData.smallBlind, player.stack);
-          if (player.stack <= state.stackData.smallBlind) {
+          postedSB = Math.min(smallBlindValue, player.stack);
+          if (player.stack <= smallBlindValue) {
             isForcedAllIn = true;
             forcedAllInAmount = player.stack;
           }
@@ -200,32 +299,32 @@ export function StackSetupView({
 
         // BB player
         if (normalizedPosition === 'bb') {
-          if (state.stackData.anteOrder === 'BB First') {
+          if (anteOrderValue === 'BB First') {
             // BB First: BB posts BB first, then Ante
-            postedBB = Math.min(state.stackData.bigBlind, player.stack);
+            postedBB = Math.min(bigBlindValue, player.stack);
             const remainingAfterBB = player.stack - postedBB;
 
-            if (player.stack <= state.stackData.bigBlind) {
+            if (player.stack <= bigBlindValue) {
               isForcedAllIn = true;
               forcedAllInAmount = postedBB;
             } else if (remainingAfterBB > 0) {
-              postedAnte = Math.min(state.stackData.ante, remainingAfterBB);
-              if (remainingAfterBB <= state.stackData.ante) {
+              postedAnte = Math.min(anteValue, remainingAfterBB);
+              if (remainingAfterBB <= anteValue) {
                 isForcedAllIn = true;
                 forcedAllInAmount = postedBB;
               }
             }
           } else {
             // Ante First: Ante posts first, then BB
-            postedAnte = Math.min(state.stackData.ante, player.stack);
+            postedAnte = Math.min(anteValue, player.stack);
             const remainingAfterAnte = player.stack - postedAnte;
 
-            if (player.stack <= state.stackData.ante) {
+            if (player.stack <= anteValue) {
               isForcedAllIn = true;
               forcedAllInAmount = 0; // All-in with just ante, no live bet
             } else if (remainingAfterAnte > 0) {
-              postedBB = Math.min(state.stackData.bigBlind, remainingAfterAnte);
-              if (remainingAfterAnte <= state.stackData.bigBlind) {
+              postedBB = Math.min(bigBlindValue, remainingAfterAnte);
+              if (remainingAfterAnte <= bigBlindValue) {
                 isForcedAllIn = true;
                 forcedAllInAmount = postedBB;
               }
@@ -340,6 +439,43 @@ export function StackSetupView({
       alert('Error setting up players. Please check the console for details.');
     }
   }, [state.stackData, state.players, state.autoSelectCards, actions, cardManagement]);
+
+  /**
+   * Load Next Hand - either from generated next hand or clipboard
+   */
+  const loadNextHandFromClipboard = useCallback(async () => {
+    try {
+      // First, check if there's a generated next hand
+      console.log('🔍 [LoadNextHand] Checking for generated next hand...');
+      console.log('🔍 [LoadNextHand] state.generatedNextHand:', state.generatedNextHand);
+      console.log('🔍 [LoadNextHand] Type:', typeof state.generatedNextHand);
+      console.log('🔍 [LoadNextHand] Length:', state.generatedNextHand?.length);
+
+      if (state.generatedNextHand) {
+        console.log('✅ [LoadNextHand] Loading generated next hand:', state.generatedNextHand);
+        actions.setStackData({ ...state.stackData, rawInput: state.generatedNextHand });
+        alert('✅ Next hand loaded from generation!\n\nClick "Setup Players" to start the new hand.');
+        // Clear the generated next hand after loading
+        actions.setGeneratedNextHand(null);
+        return;
+      }
+
+      // If no generated hand, try clipboard
+      const clipboardText = await navigator.clipboard.readText();
+
+      if (!clipboardText.trim()) {
+        alert('❌ No next hand available!\n\nThe next hand has not been generated yet.\nPlease complete the current hand and generate the next hand first.');
+        return;
+      }
+
+      // Clear the textarea and paste from clipboard
+      actions.setStackData({ ...state.stackData, rawInput: clipboardText });
+      alert('✅ Next hand loaded from clipboard!\n\nClick "Setup Players" to start the new hand.');
+    } catch (error) {
+      console.error('Failed to read clipboard:', error);
+      alert('Failed to read from clipboard. Please make sure you have granted clipboard permissions.');
+    }
+  }, [state.stackData, state.generatedNextHand, actions]);
 
   /**
    * Handle auto-select cards toggle
@@ -472,20 +608,20 @@ export function StackSetupView({
             <div className="space-y-2">
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="text-xs text-gray-600">BB:</label>
-                  <input
-                    type="number"
-                    value={state.stackData.bigBlind}
-                    onChange={(e) => actions.setStackData({ ...state.stackData, bigBlind: parseInt(e.target.value) || 0 })}
-                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                  />
-                </div>
-                <div className="flex-1">
                   <label className="text-xs text-gray-600">SB:</label>
                   <input
                     type="number"
                     value={state.stackData.smallBlind}
                     onChange={(e) => actions.setStackData({ ...state.stackData, smallBlind: parseInt(e.target.value) || 0 })}
+                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs text-gray-600">BB:</label>
+                  <input
+                    type="number"
+                    value={state.stackData.bigBlind}
+                    onChange={(e) => actions.setStackData({ ...state.stackData, bigBlind: parseInt(e.target.value) || 0 })}
                     className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                   />
                 </div>
@@ -618,28 +754,41 @@ export function StackSetupView({
           {/* Player Data Input */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">
-              Player Data (Name Position Stack - one per line)
+              Player Data (with 4-line header)
             </label>
             <textarea
               value={state.stackData.rawInput || ''}
               onChange={(e) => actions.setStackData({ ...state.stackData, rawInput: e.target.value })}
               className="w-full px-2 py-1 border border-gray-300 rounded text-sm font-mono"
-              rows={8}
-              placeholder={'Example:\nJohn Dealer 10000\nJane SB 8500\nBob BB 12000'}
+              rows={15}
+              placeholder={'Hand (1)\nstarted_at: 00:05:40 ended_at: HH:MM:SS\nSB 500 BB 1000 Ante 1000\nStack Setup:\nJohn Dealer 10000\nJane SB 8500\nBob BB 12000\nAlice 9500\nCharlie 11000\nDavid 7500\nEmma 15000\nFrank 9000\nGrace 13000'}
             />
             <div className="text-xs text-gray-600 mt-1">
-              Format: Name [Position] Stack
-              <br />Position: Dealer, SB, or BB (optional for other players)
+              <strong>Format:</strong> Line 1: Hand (number) | Line 2: started_at: HH:MM:SS ended_at: HH:MM:SS | Line 3: SB value BB value Ante value | Line 4: Stack Setup: | Lines 5+: Player lines
+              <br />
+              <strong>Player format:</strong> Name [Position] Stack - Position only for Dealer, SB, BB
+              <br />
+              <strong>Note:</strong> SB, BB, Ante values from Line 3 will be auto-filled when you click Setup Players.
             </div>
           </div>
 
-          {/* Setup Button */}
-          <button
-            onClick={setupPlayers}
-            className="w-full px-4 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
-          >
-            Setup Players
-          </button>
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={loadNextHandFromClipboard}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              title="Load next hand data from clipboard"
+            >
+              <span>📋</span>
+              <span>Load Next Hand</span>
+            </button>
+            <button
+              onClick={setupPlayers}
+              className="flex-1 px-4 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
+            >
+              Setup Players
+            </button>
+          </div>
 
           {/* Current Players Display */}
           {state.players.some(p => p.name) && (

@@ -510,7 +510,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
             console.log(`🔄 [River] No new contributions, preserving Turn pot structure`);
             console.log(`   Main Pot: ${turnPotStructure.mainPot.amount}`);
             if (turnPotStructure.sidePots.length > 0) {
-              turnPotStructure.sidePots.forEach((sp, i) => {
+              turnPotStructure.sidePots.forEach((sp: any, i: number) => {
                 console.log(`   Side Pot ${i + 1}: ${sp.amount}`);
               });
             }
@@ -567,7 +567,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
         console.log(`💰 Calculated pot for ${levelName}:`, potInfo.totalPot);
         console.log(`   Main Pot: ${potInfo.mainPot.amount}`);
         if (potInfo.sidePots.length > 0) {
-          potInfo.sidePots.forEach((sp, i) => {
+          potInfo.sidePots.forEach((sp: any, i: number) => {
             console.log(`   Side Pot ${i + 1}: ${sp.amount}`);
           });
         }
@@ -813,16 +813,19 @@ export const RiverView: React.FC<RiverViewProps> = ({
         let contribution = 0;
 
         // Get action contribution
-        const action = playerData[player.id]?.riverAction as ActionType | undefined;
-        const amount = playerData[player.id]?.riverAmount as number | undefined;
-        if (action && action !== 'no action' && action !== 'fold') {
-          contribution = amount || 0;
+        // IMPORTANT: Exclude current player's own contribution to allow changing action/amount
+        if (player.id !== playerId) {
+          const action = playerData[player.id]?.riverAction as ActionType | undefined;
+          const amount = playerData[player.id]?.riverAmount as number | undefined;
+          if (action && action !== 'no action' && action !== 'fold') {
+            contribution = amount || 0;
+          }
         }
 
         contributions.set(player.id, contribution);
       }
 
-      const playerContribution = contributions.get(playerId) || 0;
+      const playerContribution = 0; // Current player's contribution is 0 for determining available actions
       const maxContribution = Math.max(...contributions.values());
 
       // Available actions based on contribution
@@ -2201,6 +2204,9 @@ export const RiverView: React.FC<RiverViewProps> = ({
                 mainPot={potDisplayData.mainPot}
                 sidePots={potDisplayData.sidePots}
                 players={potDisplayData.players}
+                currentPlayers={state.players}
+                stackData={state.stackData}
+                actions={actions}
               />
             </div>
           </div>
