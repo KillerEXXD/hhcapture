@@ -168,32 +168,10 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
     }
   };
 
-  // Initialize all players with 'fold' action for PreFlop BASE if they don't have an action yet
-  React.useEffect(() => {
-    const currentLevels = visibleActionLevels.preflop || ['base'];
-
-    // Only initialize for BASE level
-    if (currentLevels.includes('base')) {
-      let needsUpdate = false;
-      const updatedData = { ...playerData };
-
-      players.forEach(player => {
-        if (player.name && !playerData[player.id]?.preflopAction) {
-          // Player doesn't have an action set - initialize with 'fold'
-          updatedData[player.id] = {
-            ...updatedData[player.id],
-            preflopAction: 'fold'
-          };
-          needsUpdate = true;
-        }
-      });
-
-      if (needsUpdate) {
-        console.log('🎲 [PreFlopView] Initializing players with default fold action for PreFlop BASE');
-        setPlayerData(updatedData);
-      }
-    }
-  }, [players, playerData, setPlayerData, visibleActionLevels.preflop]);
+  // NOTE: We do NOT initialize players with 'fold' in playerData
+  // 'Fold' is shown as the default selection in the UI only (see PlayerActionButton logic)
+  // This allows getActivePlayers() to correctly identify which players are still active
+  // If we stored 'fold' in playerData by default, getActivePlayers() would filter everyone out!
 
   const getViewTitle = () => {
     if (currentView === 'stack') return 'Stack Setup';
@@ -2272,6 +2250,41 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
             Create Flop
           </button>
         </div>
+
+        {/* POT DISPLAY SECTION - SHOWN AT BOTTOM WHEN BETTING ROUND IS COMPLETE */}
+        {showPotDisplay && potDisplayData && (
+          <div className="mt-8 mb-8">
+            {/* Pot Display Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-t-xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">💰</span>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Pot Distribution</h2>
+                    <p className="text-sm text-white/90 mt-1">PREFLOP betting round complete</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowPotDisplay(false)}
+                  className="text-white/80 hover:text-white text-3xl font-bold leading-none px-2 transition-colors"
+                  aria-label="Close pot display"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Pot Display Content */}
+            <div className="bg-gray-100 rounded-b-xl p-6 shadow-xl">
+              <PotCalculationDisplay
+                totalPot={potDisplayData.totalPot}
+                mainPot={potDisplayData.mainPot}
+                sidePots={potDisplayData.sidePots}
+                players={potDisplayData.players}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
