@@ -393,6 +393,32 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     }
   };
 
+  const handleLoadNextHand = async () => {
+    if (!nextHandFormatted) return;
+    try {
+      console.log('🔄 [LoadNextHand] Loading next hand...');
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(nextHandFormatted);
+
+      // Store in state
+      console.log('💾 [LoadNextHand] Storing in state.generatedNextHand...');
+      actions.setGeneratedNextHand(nextHandFormatted);
+
+      // Also update the raw input in stackData so it auto-loads
+      actions.setStackData({ ...stackData, rawInput: nextHandFormatted });
+      console.log('✅ [LoadNextHand] Stored in stackData.rawInput');
+
+      // Navigate to stack setup
+      actions.setCurrentView('stack');
+      console.log('✅ [LoadNextHand] Navigated to Stack Setup');
+
+    } catch (error) {
+      console.error('Failed to load next hand:', error);
+      alert('❌ Failed to load next hand');
+    }
+  };
+
   const handlePasteFromClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
@@ -501,12 +527,20 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
             </div>
           )}
 
-          <button
-            onClick={handleCopyNextHand}
-            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-md mb-6"
-          >
-            📋 Copy Next Hand
-          </button>
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <button
+              onClick={handleCopyNextHand}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-md"
+            >
+              📋 Copy Next Hand
+            </button>
+            <button
+              onClick={handleLoadNextHand}
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md"
+            >
+              🔄 Load Next Hand
+            </button>
+          </div>
 
           <div className="mt-6 border-t-2 border-purple-300 pt-6">
             <h4 className="text-lg font-bold mb-4">🔍 Compare with Expected Hand</h4>
