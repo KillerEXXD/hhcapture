@@ -1,0 +1,187 @@
+================================================================================
+VALIDATION REPORT: 30 Test Cases - Raise TO vs Raise BY Rule
+================================================================================
+
+TC-1: PASS
+TC-2: PASS
+TC-3: PASS
+TC-4: PASS
+TC-5: PASS
+TC-6: PASS
+
+TC-7: ERRORS FOUND (2 issue(s))
+  Blinds: SB 10,000 / BB 20,000 / Ante 20,000
+  Pot: 740,000
+
+  Error: Contribution mismatch
+    Player: Alice
+    Expected: -60,000
+    Actual: 680,000
+
+  Error: Pot calculation mismatch
+    Player: N/A
+    Expected: 1,060,000
+    Actual: 740,000
+    Details: Sum of contributions: 1060000
+TC-8: PASS
+TC-9: PASS
+TC-10: PASS
+TC-11: PASS
+TC-12: PASS
+TC-13: PASS
+
+TC-14: ERRORS FOUND (2 issue(s))
+  Blinds: SB 2,500 / BB 5,000 / Ante 5,000
+  Pot: 730,000
+
+  Error: Contribution mismatch
+    Player: Charlie
+    Expected: -40,000
+    Actual: 280,000
+
+  Error: Pot calculation mismatch
+    Player: N/A
+    Expected: 640,000
+    Actual: 730,000
+    Details: Sum of contributions: 640000
+TC-15: PASS
+TC-16: PASS
+TC-17: PASS
+TC-18: PASS
+
+TC-19: ERRORS FOUND (2 issue(s))
+  Blinds: SB 25,000 / BB 50,000 / Ante 50,000
+  Pot: 7,300,000
+
+  Error: Contribution mismatch
+    Player: Alice
+    Expected: -100,000
+    Actual: 1,500,000
+
+  Error: Pot calculation mismatch
+    Player: N/A
+    Expected: 5,200,000
+    Actual: 7,300,000
+    Details: Sum of contributions: 5200000
+
+TC-20: ERRORS FOUND (2 issue(s))
+  Blinds: SB 50,000 / BB 100,000 / Ante 100,000
+  Pot: 275,000
+
+  Error: Contribution mismatch
+    Player: Bob
+    Expected: -10,000
+    Actual: 145,000
+
+  Error: Pot calculation mismatch
+    Player: N/A
+    Expected: 235,000
+    Actual: 275,000
+    Details: Sum of contributions: 235000
+
+TC-21: ERRORS FOUND (2 issue(s))
+  Blinds: SB 2,500 / BB 5,000 / Ante 5,000
+  Pot: 9,100,000
+
+  Error: Contribution mismatch
+    Player: Alice
+    Expected: -100,000
+    Actual: 3,900,000
+
+  Error: Pot calculation mismatch
+    Player: N/A
+    Expected: 9,400,000
+    Actual: 9,100,000
+    Details: Sum of contributions: 9400000
+TC-22: PASS
+
+TC-23: ERRORS FOUND (1 issue(s))
+  Blinds: SB 50,000 / BB 100,000 / Ante 100,000
+  Pot: 12,700,000
+
+  Error: Contribution mismatch
+    Player: Eve
+    Expected: -200,000
+    Actual: 3,600,000
+TC-24: PASS
+
+TC-25: ERRORS FOUND (1 issue(s))
+  Blinds: SB 500,000 / BB 1,000,000 / Ante 1,000,000
+  Pot: 16,300,000
+
+  Error: Contribution mismatch
+    Player: Charlie
+    Expected: -200,000
+    Actual: 3,700,000
+
+TC-26: ERRORS FOUND (2 issue(s))
+  Blinds: SB 50,000 / BB 100,000 / Ante 100,000
+  Pot: 545,000,000
+
+  Error: Contribution mismatch
+    Player: Bob
+    Expected: -40,000,000
+    Actual: 70,000,000
+
+  Error: Pot calculation mismatch
+    Player: N/A
+    Expected: 430,000,000
+    Actual: 545,000,000
+    Details: Sum of contributions: 430000000
+
+TC-27: ERRORS FOUND (2 issue(s))
+  Blinds: SB 2,500,000 / BB 5,000,000 / Ante 5,000,000
+  Pot: 127,000,000
+
+  Error: Contribution mismatch
+    Player: Eve
+    Expected: -6,000,000
+    Actual: 51,000,000
+
+  Error: Pot calculation mismatch
+    Player: N/A
+    Expected: 142,000,000
+    Actual: 127,000,000
+    Details: Sum of contributions: 142000000
+
+TC-28: ERRORS FOUND (2 issue(s))
+  Blinds: SB 500,000 / BB 1,000,000 / Ante 1,000,000
+  Pot: 145,000,000
+
+  Error: Contribution mismatch
+    Player: Eve
+    Expected: -5,000,000
+    Actual: 47,000,000
+
+  Error: Pot calculation mismatch
+    Player: N/A
+    Expected: 156,000,000
+    Actual: 145,000,000
+    Details: Sum of contributions: 156000000
+TC-29: PASS
+
+TC-30: ERRORS FOUND (2 issue(s))
+  Blinds: SB 500,000 / BB 1,000,000 / Ante 1,000,000
+  Pot: 326,000,000
+
+  Error: Contribution mismatch
+    Player: Frank
+    Expected: -12,000,000
+    Actual: 26,000,000
+
+  Error: Pot calculation mismatch
+    Player: N/A
+    Expected: 280,000,000
+    Actual: 326,000,000
+    Details: Sum of contributions: 280000000
+
+================================================================================
+SUMMARY
+================================================================================
+Total test cases checked: 30
+Test cases PASSED: 19
+Test cases with ERRORS: 11
+Total errors found: 20
+
+Test cases with errors: TC-7, TC-14, TC-19, TC-20, TC-21, TC-23, TC-25, TC-26, TC-27, TC-28, TC-30
+

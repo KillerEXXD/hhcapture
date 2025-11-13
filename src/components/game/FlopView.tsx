@@ -733,27 +733,133 @@ export const FlopView: React.FC<FlopViewProps> = ({
       suffix === '' ? 'base' :
       suffix === '_moreAction' ? 'more' : 'more2';
 
-    // For BASE level: All players enabled, but first player has no 'call' (FR-2)
+    console.log(`🎯 [FlopView getAvailableActionsForPlayer] Called for playerId=${playerId}, suffix="${suffix}", actionLevel="${actionLevel}"`);
+
+    // For BASE level: Apply sequential turn-based logic with postflop betting order
     if (actionLevel === 'base') {
+      // Get active players (not folded in preflop)
       const activePlayers = getActivePlayers();
-      const isFirstPlayer = activePlayers.length > 0 && activePlayers[0].id === playerId;
+      // Use the count of active players to determine action order
+      // (don't filter by flop actions in BASE, as those haven't happened yet)
+      const playerCount = activePlayers.length;
 
-      // Check if player is all-in from previous rounds
-      const playerStatus = checkPlayerNeedsToAct(playerId, 'flop', actionLevel, players, playerData);
+      console.log(`🎯 [FlopView] Active players count: ${playerCount}`);
 
-      if (playerStatus.alreadyAllIn) {
-        // Player is all-in from previous round - skip this player
-        console.log(`🔒 [getAvailableActionsForPlayer-BASE] Player ${playerId} is all-in, showing locked state`);
-        return ['all-in']; // Special locked state
+      // Get current player
+      const currentPlayer = players.find(p => p.id === playerId);
+      if (!currentPlayer) {
+        console.log(`❌ [FlopView] Player ${playerId} NOT FOUND - returning []`);
+        return [];
       }
 
-      if (isFirstPlayer) {
-        // FR-2: First player in post-flop BASE cannot call/fold/no action
-        return ['check', 'bet', 'raise', 'all-in'];
+      console.log(`🎯 [FlopView] Player ${playerId} is ${currentPlayer.name} (${currentPlayer.position})`);
+
+      // Check if player is already all-in from previous street
+      const isAllInFromPrevious = playerData[playerId]?.allInFromPrevious === true;
+      if (isAllInFromPrevious) {
+        return ['all-in']; // Show locked all-in button
       }
 
-      // All other players have full actions in BASE
-      return ['fold', 'check', 'call', 'bet', 'raise', 'all-in', 'no action'];
+      // Determine POSTFLOP action order based on player count
+      let actionOrder: string[];
+      if (playerCount === 2) {
+        // 2P Postflop: BB → SB/Dealer (BB acts first like UTG)
+        actionOrder = ['BB', 'SB', 'Dealer'];
+      } else if (playerCount === 3) {
+        // 3P Postflop: SB → BB → Dealer
+        actionOrder = ['SB', 'BB', 'Dealer'];
+      } else {
+        // 4+ Postflop: SB → BB → UTG → ... → Dealer
+        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer'];
+      }
+
+      console.log(`🎯 [FlopView] Action order for ${playerCount} players: ${actionOrder.join(' → ')}`);
+
+      // Find current player's position in action order
+      const currentPlayerIndex = actionOrder.indexOf(currentPlayer.position);
+      console.log(`🎯 [FlopView] ${currentPlayer.name} (${currentPlayer.position}) is at index ${currentPlayerIndex} in action order`);
+
+      if (currentPlayerIndex === -1) {
+        console.log(`❌ [FlopView] ${currentPlayer.name} position "${currentPlayer.position}" NOT IN action order - returning []`);
+        return []; // Position not in action order
+      }
+
+      // Check if all previous players have acted (or are all-in/folded)
+      // Note: In BASE level, undefined action means player hasn't acted yet (no default)
+      for (let i = 0; i < currentPlayerIndex; i++) {
+        const prevPosition = actionOrder[i];
+        const prevPlayer = players.find(p => p.position === prevPosition && p.name);
+
+        if (prevPlayer) {
+          const prevAction = playerData[prevPlayer.id]?.flopAction as ActionType | undefined;
+          const prevIsAllIn = playerData[prevPlayer.id]?.allInFromPrevious === true;
+
+          // If previous player hasn't acted and is not all-in, current player cannot act yet
+          if (!prevAction && !prevIsAllIn) {
+            return []; // Not current player's turn yet
+          }
+
+          // If previous player action is 'no action' and not all-in, current player cannot act yet
+          if (prevAction === 'no action' && !prevIsAllIn) {
+            return []; // Not current player's turn yet
+          }
+        }
+      }
+
+      // Calculate contributions for flop base
+      const contributions = new Map<number, number>();
+      for (const player of players) {
+        if (!player.name) continue;
+        let contribution = 0;
+
+        // Get action contribution
+        const action = playerData[player.id]?.flopAction as ActionType | undefined;
+        const amount = playerData[player.id]?.flopAmount as number | undefined;
+        if (action && action !== 'no action' && action !== 'fold') {
+          contribution = amount || 0;
+        }
+
+        contributions.set(player.id, contribution);
+      }
+
+      const playerContribution = contributions.get(playerId) || 0;
+      const maxContribution = Math.max(...contributions.values());
+
+      // Available actions based on contribution
+      const actions: ActionType[] = [];
+
+      // Check: Only enabled when contribution matches max
+      if (playerContribution >= maxContribution) {
+        actions.push('check');
+      }
+
+      // Call: Only enabled when facing a bet
+      if (playerContribution < maxContribution) {
+        actions.push('call');
+      }
+
+      // Bet: Only when no one has bet yet
+      if (maxContribution === 0) {
+        actions.push('bet');
+      }
+
+      // Raise: Only when someone has bet
+      if (maxContribution > 0) {
+        actions.push('raise');
+      }
+
+      // Fold: Only enabled when facing a bet
+      if (playerContribution < maxContribution) {
+        actions.push('fold');
+      }
+
+      // All-in: Always available
+      actions.push('all-in');
+
+      // No action: Always available
+      actions.push('no action');
+
+      return actions;
     }
 
     // For MORE ACTION rounds: Sequential enabling logic (FR-1, FR-9)

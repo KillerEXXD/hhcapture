@@ -1,0 +1,393 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - button "Stack" [ref=e6] [cursor=pointer]
+    - button "Pre-flop" [disabled] [ref=e7]
+    - button "Flop" [ref=e8] [cursor=pointer]
+    - button "Turn" [disabled] [ref=e9]
+    - button "River" [disabled] [ref=e10]
+  - generic [ref=e11]:
+    - heading "Preflop" [level=1] [ref=e12]
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]: "Unit:"
+        - generic [ref=e16]:
+          - button "actual" [ref=e17] [cursor=pointer]
+          - button "K" [ref=e18] [cursor=pointer]
+          - button "Mil" [ref=e19] [cursor=pointer]
+      - button "Clear" [ref=e20] [cursor=pointer]
+      - button "Export" [ref=e21] [cursor=pointer]
+  - generic [ref=e25]:
+    - button "← Stack" [ref=e26] [cursor=pointer]
+    - button "Flop →" [disabled] [ref=e27]
+  - generic [ref=e29]:
+    - heading "BASE ACTIONS - Preflop" [level=3] [ref=e31]
+    - table [ref=e32]:
+      - rowgroup [ref=e33]:
+        - row "Player Stack Card 1 Card 2 Action Amount/Unit" [ref=e34]:
+          - cell "Player" [ref=e35]
+          - cell "Stack" [ref=e36]
+          - cell "Card 1" [ref=e37]
+          - cell "Card 2" [ref=e38]
+          - cell "Action" [ref=e39]
+          - cell "Amount/Unit" [ref=e40]
+      - rowgroup [ref=e41]:
+        - 'row "Alice (Dealer) 5♠ J♣ Start: 10.0K Now: 10.0K Card 1: 5♠ Card 2: J♣ x | c | b | r | f | a | n check x call c bet b raise r fold f all-in a none n None K Mil" [ref=e42]':
+          - cell "Alice (Dealer) 5♠ J♣" [ref=e43]:
+            - generic [ref=e44]:
+              - text: Alice
+              - generic [ref=e45]: (Dealer)
+            - generic [ref=e46]:
+              - generic [ref=e47]: 5♠
+              - generic [ref=e48]: J♣
+          - 'cell "Start: 10.0K Now: 10.0K" [ref=e49]':
+            - generic [ref=e50]:
+              - generic [ref=e51]:
+                - generic [ref=e52]: "Start:"
+                - generic [ref=e53]: 10.0K
+              - generic [ref=e54]:
+                - generic [ref=e55]:
+                  - generic [ref=e56]: "Now:"
+                  - generic [ref=e57]: 10.0K
+                - button "Show stack history" [ref=e58] [cursor=pointer]:
+                  - img [ref=e59]
+          - 'cell "Card 1: 5♠" [ref=e61]':
+            - 'button "Card 1: 5♠" [active] [ref=e62] [cursor=pointer]':
+              - generic [ref=e63]:
+                - generic [ref=e64]:
+                  - generic [ref=e65]: "Card 1:"
+                  - text: 5♠
+                - generic [ref=e66]: TAB↓
+              - generic [ref=e67]: a-9,t | d,c,h,s
+              - generic [ref=e68]:
+                - button "A" [ref=e69]
+                - button "2" [ref=e70]
+                - button "3" [ref=e71]
+                - button "4" [ref=e72]
+                - button "5" [ref=e73]
+                - button "6" [ref=e74]
+                - button "7" [ref=e75]
+                - button "8" [ref=e76]
+                - button "9" [ref=e77]
+              - generic [ref=e78]:
+                - button "K" [ref=e79]
+                - button "Q" [ref=e80]
+                - button "J" [ref=e81]
+                - button "T" [ref=e82]
+                - generic [ref=e84]:
+                  - button "♠" [ref=e85]
+                  - button "♥" [ref=e86]
+                  - button "♦" [ref=e87]
+                  - button "♣" [ref=e88]
+          - 'cell "Card 2: J♣" [ref=e89]':
+            - 'button "Card 2: J♣" [ref=e90] [cursor=pointer]':
+              - generic [ref=e91]:
+                - generic [ref=e92]:
+                  - generic [ref=e93]: "Card 2:"
+                  - text: J♣
+                - generic [ref=e94]: TAB↓
+              - generic [ref=e95]: a-9,t | d,c,h,s
+              - generic [ref=e96]:
+                - button "A" [ref=e97]
+                - button "2" [ref=e98]
+                - button "3" [ref=e99]
+                - button "4" [ref=e100]
+                - button "5" [ref=e101]
+                - button "6" [ref=e102]
+                - button "7" [ref=e103]
+                - button "8" [ref=e104]
+                - button "9" [ref=e105]
+              - generic [ref=e106]:
+                - button "K" [ref=e107]
+                - button "Q" [ref=e108]
+                - button "J" [ref=e109]
+                - button "T" [ref=e110]
+                - generic [ref=e112]:
+                  - button "♠" [ref=e113]
+                  - button "♥" [ref=e114]
+                  - button "♦" [ref=e115]
+                  - button "♣" [ref=e116]
+          - cell "x | c | b | r | f | a | n check x call c bet b raise r fold f all-in a none n" [ref=e117]:
+            - generic [ref=e119]:
+              - generic [ref=e120]: x | c | b | r | f | a | n
+              - generic [ref=e121]:
+                - button "check x" [disabled] [ref=e122]:
+                  - generic [ref=e123]:
+                    - generic [ref=e124]: check
+                    - generic [ref=e125]: x
+                - button "call c" [ref=e126] [cursor=pointer]:
+                  - generic [ref=e127]:
+                    - generic [ref=e128]: call
+                    - generic [ref=e129]: c
+                - button "bet b" [disabled] [ref=e130]:
+                  - generic [ref=e131]:
+                    - generic [ref=e132]: bet
+                    - generic [ref=e133]: b
+                - button "raise r" [ref=e134] [cursor=pointer]:
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: raise
+                    - generic [ref=e137]: r
+              - generic [ref=e138]:
+                - button "fold f" [ref=e139] [cursor=pointer]:
+                  - generic [ref=e140]:
+                    - generic [ref=e141]: fold
+                    - generic [ref=e142]: f
+                - button "all-in a" [ref=e143] [cursor=pointer]:
+                  - generic [ref=e144]:
+                    - generic [ref=e145]: all-in
+                    - generic [ref=e146]: a
+                - button "none n" [ref=e147] [cursor=pointer]:
+                  - generic [ref=e148]:
+                    - generic [ref=e149]: none
+                    - generic [ref=e150]: "n"
+          - cell "None K Mil" [ref=e151]:
+            - generic [ref=e152]:
+              - textbox "000" [disabled] [ref=e153]
+              - generic [ref=e154]:
+                - button "None" [disabled] [ref=e155]
+                - button "K" [disabled] [ref=e156]
+                - button "Mil" [disabled] [ref=e157]
+        - 'row "Bob (SB) 9♣ T♥ Start: 8.0K Now: 7.5K Card 1: 9♣ Card 2: T♥ x | c | b | r | f | a | n check x call c bet b raise r fold f all-in a none n None K Mil" [ref=e158]':
+          - cell "Bob (SB) 9♣ T♥" [ref=e159]:
+            - generic [ref=e160]:
+              - text: Bob
+              - generic [ref=e161]: (SB)
+            - generic [ref=e162]:
+              - generic [ref=e163]: 9♣
+              - generic [ref=e164]: T♥
+          - 'cell "Start: 8.0K Now: 7.5K" [ref=e165]':
+            - generic [ref=e166]:
+              - generic [ref=e167]:
+                - generic [ref=e168]: "Start:"
+                - generic [ref=e169]: 8.0K
+              - generic [ref=e170]:
+                - generic [ref=e171]:
+                  - generic [ref=e172]: "Now:"
+                  - generic [ref=e173]: 7.5K
+                - button "Show stack history" [ref=e174] [cursor=pointer]:
+                  - img [ref=e175]
+          - 'cell "Card 1: 9♣" [ref=e177]':
+            - 'button "Card 1: 9♣" [ref=e178] [cursor=pointer]':
+              - generic [ref=e179]:
+                - generic [ref=e180]:
+                  - generic [ref=e181]: "Card 1:"
+                  - text: 9♣
+                - generic [ref=e182]: TAB↓
+              - generic [ref=e183]: a-9,t | d,c,h,s
+              - generic [ref=e184]:
+                - button "A" [ref=e185]
+                - button "2" [ref=e186]
+                - button "3" [ref=e187]
+                - button "4" [ref=e188]
+                - button "5" [ref=e189]
+                - button "6" [ref=e190]
+                - button "7" [ref=e191]
+                - button "8" [ref=e192]
+                - button "9" [ref=e193]
+              - generic [ref=e194]:
+                - button "K" [ref=e195]
+                - button "Q" [ref=e196]
+                - button "J" [ref=e197]
+                - button "T" [ref=e198]
+                - generic [ref=e200]:
+                  - button "♠" [ref=e201]
+                  - button "♥" [ref=e202]
+                  - button "♦" [ref=e203]
+                  - button "♣" [ref=e204]
+          - 'cell "Card 2: T♥" [ref=e205]':
+            - 'button "Card 2: T♥" [ref=e206] [cursor=pointer]':
+              - generic [ref=e207]:
+                - generic [ref=e208]:
+                  - generic [ref=e209]: "Card 2:"
+                  - text: 10♥
+                - generic [ref=e210]: TAB↓
+              - generic [ref=e211]: a-9,t | d,c,h,s
+              - generic [ref=e212]:
+                - button "A" [ref=e213]
+                - button "2" [ref=e214]
+                - button "3" [ref=e215]
+                - button "4" [ref=e216]
+                - button "5" [ref=e217]
+                - button "6" [ref=e218]
+                - button "7" [ref=e219]
+                - button "8" [ref=e220]
+                - button "9" [ref=e221]
+              - generic [ref=e222]:
+                - button "K" [ref=e223]
+                - button "Q" [ref=e224]
+                - button "J" [ref=e225]
+                - button "T" [ref=e226]
+                - generic [ref=e228]:
+                  - button "♠" [ref=e229]
+                  - button "♥" [ref=e230]
+                  - button "♦" [ref=e231]
+                  - button "♣" [ref=e232]
+          - cell "x | c | b | r | f | a | n check x call c bet b raise r fold f all-in a none n" [ref=e233]:
+            - generic [ref=e235]:
+              - generic [ref=e236]: x | c | b | r | f | a | n
+              - generic [ref=e237]:
+                - button "check x" [disabled] [ref=e238]:
+                  - generic [ref=e239]:
+                    - generic [ref=e240]: check
+                    - generic [ref=e241]: x
+                - button "call c" [disabled] [ref=e242]:
+                  - generic [ref=e243]:
+                    - generic [ref=e244]: call
+                    - generic [ref=e245]: c
+                - button "bet b" [disabled] [ref=e246]:
+                  - generic [ref=e247]:
+                    - generic [ref=e248]: bet
+                    - generic [ref=e249]: b
+                - button "raise r" [disabled] [ref=e250]:
+                  - generic [ref=e251]:
+                    - generic [ref=e252]: raise
+                    - generic [ref=e253]: r
+              - generic [ref=e254]:
+                - button "fold f" [disabled] [ref=e255]:
+                  - generic [ref=e256]:
+                    - generic [ref=e257]: fold
+                    - generic [ref=e258]: f
+                - button "all-in a" [disabled] [ref=e259]:
+                  - generic [ref=e260]:
+                    - generic [ref=e261]: all-in
+                    - generic [ref=e262]: a
+                - button "none n" [disabled] [ref=e263]:
+                  - generic [ref=e264]:
+                    - generic [ref=e265]: none
+                    - generic [ref=e266]: "n"
+          - cell "None K Mil" [ref=e267]:
+            - generic [ref=e268]:
+              - textbox "000" [disabled] [ref=e269]
+              - generic [ref=e270]:
+                - button "None" [disabled] [ref=e271]
+                - button "K" [disabled] [ref=e272]
+                - button "Mil" [disabled] [ref=e273]
+        - 'row "Charlie (BB) Q♦ 7♣ Start: 15.0K Now: 13.0K Card 1: Q♦ Card 2: 7♣ x | c | b | r | f | a | n check x call c bet b raise r fold f all-in a none n None K Mil" [ref=e274]':
+          - cell "Charlie (BB) Q♦ 7♣" [ref=e275]:
+            - generic [ref=e276]:
+              - text: Charlie
+              - generic [ref=e277]: (BB)
+            - generic [ref=e278]:
+              - generic [ref=e279]: Q♦
+              - generic [ref=e280]: 7♣
+          - 'cell "Start: 15.0K Now: 13.0K" [ref=e281]':
+            - generic [ref=e282]:
+              - generic [ref=e283]:
+                - generic [ref=e284]: "Start:"
+                - generic [ref=e285]: 15.0K
+              - generic [ref=e286]:
+                - generic [ref=e287]:
+                  - generic [ref=e288]: "Now:"
+                  - generic [ref=e289]: 13.0K
+                - button "Show stack history" [ref=e290] [cursor=pointer]:
+                  - img [ref=e291]
+          - 'cell "Card 1: Q♦" [ref=e293]':
+            - 'button "Card 1: Q♦" [ref=e294] [cursor=pointer]':
+              - generic [ref=e295]:
+                - generic [ref=e296]:
+                  - generic [ref=e297]: "Card 1:"
+                  - text: Q♦
+                - generic [ref=e298]: TAB↓
+              - generic [ref=e299]: a-9,t | d,c,h,s
+              - generic [ref=e300]:
+                - button "A" [ref=e301]
+                - button "2" [ref=e302]
+                - button "3" [ref=e303]
+                - button "4" [ref=e304]
+                - button "5" [ref=e305]
+                - button "6" [ref=e306]
+                - button "7" [ref=e307]
+                - button "8" [ref=e308]
+                - button "9" [ref=e309]
+              - generic [ref=e310]:
+                - button "K" [ref=e311]
+                - button "Q" [ref=e312]
+                - button "J" [ref=e313]
+                - button "T" [ref=e314]
+                - generic [ref=e316]:
+                  - button "♠" [ref=e317]
+                  - button "♥" [ref=e318]
+                  - button "♦" [ref=e319]
+                  - button "♣" [ref=e320]
+          - 'cell "Card 2: 7♣" [ref=e321]':
+            - 'button "Card 2: 7♣" [ref=e322] [cursor=pointer]':
+              - generic [ref=e323]:
+                - generic [ref=e324]:
+                  - generic [ref=e325]: "Card 2:"
+                  - text: 7♣
+                - generic [ref=e326]: TAB↓
+              - generic [ref=e327]: a-9,t | d,c,h,s
+              - generic [ref=e328]:
+                - button "A" [ref=e329]
+                - button "2" [ref=e330]
+                - button "3" [ref=e331]
+                - button "4" [ref=e332]
+                - button "5" [ref=e333]
+                - button "6" [ref=e334]
+                - button "7" [ref=e335]
+                - button "8" [ref=e336]
+                - button "9" [ref=e337]
+              - generic [ref=e338]:
+                - button "K" [ref=e339]
+                - button "Q" [ref=e340]
+                - button "J" [ref=e341]
+                - button "T" [ref=e342]
+                - generic [ref=e344]:
+                  - button "♠" [ref=e345]
+                  - button "♥" [ref=e346]
+                  - button "♦" [ref=e347]
+                  - button "♣" [ref=e348]
+          - cell "x | c | b | r | f | a | n check x call c bet b raise r fold f all-in a none n" [ref=e349]:
+            - generic [ref=e351]:
+              - generic [ref=e352]: x | c | b | r | f | a | n
+              - generic [ref=e353]:
+                - button "check x" [disabled] [ref=e354]:
+                  - generic [ref=e355]:
+                    - generic [ref=e356]: check
+                    - generic [ref=e357]: x
+                - button "call c" [disabled] [ref=e358]:
+                  - generic [ref=e359]:
+                    - generic [ref=e360]: call
+                    - generic [ref=e361]: c
+                - button "bet b" [disabled] [ref=e362]:
+                  - generic [ref=e363]:
+                    - generic [ref=e364]: bet
+                    - generic [ref=e365]: b
+                - button "raise r" [disabled] [ref=e366]:
+                  - generic [ref=e367]:
+                    - generic [ref=e368]: raise
+                    - generic [ref=e369]: r
+              - generic [ref=e370]:
+                - button "fold f" [disabled] [ref=e371]:
+                  - generic [ref=e372]:
+                    - generic [ref=e373]: fold
+                    - generic [ref=e374]: f
+                - button "all-in a" [disabled] [ref=e375]:
+                  - generic [ref=e376]:
+                    - generic [ref=e377]: all-in
+                    - generic [ref=e378]: a
+                - button "none n" [disabled] [ref=e379]:
+                  - generic [ref=e380]:
+                    - generic [ref=e381]: none
+                    - generic [ref=e382]: "n"
+          - cell "None K Mil" [ref=e383]:
+            - generic [ref=e384]:
+              - textbox "000" [disabled] [ref=e385]
+              - generic [ref=e386]:
+                - button "None" [disabled] [ref=e387]
+                - button "K" [disabled] [ref=e388]
+                - button "Mil" [disabled] [ref=e389]
+    - generic [ref=e391]: 3 players
+  - generic [ref=e392]:
+    - button "⚡ Process Stack - Preflop" [ref=e393] [cursor=pointer]:
+      - generic [ref=e394]: ⚡
+      - text: Process Stack - Preflop
+    - button "+ Add More Action 1" [disabled] [ref=e395]:
+      - generic [ref=e396]: +
+      - text: Add More Action 1
+    - button "→ Create Flop" [disabled] [ref=e397]:
+      - generic [ref=e398]: →
+      - text: Create Flop
+```

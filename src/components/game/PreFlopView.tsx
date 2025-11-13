@@ -162,6 +162,33 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
     }
   };
 
+  // Initialize all players with 'fold' action for PreFlop BASE if they don't have an action yet
+  React.useEffect(() => {
+    const currentLevels = visibleActionLevels.preflop || ['base'];
+
+    // Only initialize for BASE level
+    if (currentLevels.includes('base')) {
+      let needsUpdate = false;
+      const updatedData = { ...playerData };
+
+      players.forEach(player => {
+        if (player.name && !playerData[player.id]?.preflopAction) {
+          // Player doesn't have an action set - initialize with 'fold'
+          updatedData[player.id] = {
+            ...updatedData[player.id],
+            preflopAction: 'fold'
+          };
+          needsUpdate = true;
+        }
+      });
+
+      if (needsUpdate) {
+        console.log('🎲 [PreFlopView] Initializing players with default fold action for PreFlop BASE');
+        setPlayerData(updatedData);
+      }
+    }
+  }, [players, playerData, setPlayerData, visibleActionLevels.preflop]);
+
   const getViewTitle = () => {
     if (currentView === 'stack') return 'Stack Setup';
 
@@ -529,9 +556,132 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
       suffix === '' ? 'base' :
       suffix === '_moreAction' ? 'more' : 'more2';
 
-    // For BASE level, all actions are available for all players
+    console.log(`🎯 [getAvailableActionsForPlayer] Called for playerId=${playerId}, suffix="${suffix}", actionLevel="${actionLevel}"`);
+
+    // For BASE level, apply sequential turn-based logic with betting order
     if (actionLevel === 'base') {
-      return ['fold', 'check', 'call', 'bet', 'raise', 'all-in', 'no action'];
+      // In BASE level, use TOTAL players at table (not just active), because 'fold' is the default action
+      // Players haven't actually folded yet - they just have the default 'fold' selection
+      const totalPlayers = players.filter(p => p.name).length;
+      const playerCount = totalPlayers;
+
+      console.log(`🎯 [getAvailableActionsForPlayer] Total players at table: ${playerCount}`);
+
+      // Get current player
+      const currentPlayer = players.find(p => p.id === playerId);
+      if (!currentPlayer) {
+        console.log(`❌ [getAvailableActionsForPlayer] Player ${playerId} NOT FOUND - returning []`);
+        return [];
+      }
+
+      console.log(`🎯 [getAvailableActionsForPlayer] Player ${playerId} is ${currentPlayer.name} (${currentPlayer.position})`);
+
+      // Check if player is already all-in from previous street
+      const isAllInFromPrevious = playerData[playerId]?.allInFromPrevious === true;
+      if (isAllInFromPrevious) {
+        console.log(`🎯 [getAvailableActionsForPlayer] Player ${currentPlayer.name} is all-in from previous street - returning ['all-in']`);
+        return ['all-in']; // Show locked all-in button
+      }
+
+      // Determine action order based on player count
+      let actionOrder: string[];
+      if (playerCount === 2) {
+        // 2P Preflop: SB/Dealer → BB
+        actionOrder = ['SB', 'Dealer', 'BB'];
+      } else if (playerCount === 3) {
+        // 3P Preflop: Dealer/UTG → SB → BB
+        actionOrder = ['Dealer', 'SB', 'BB'];
+      } else {
+        // 4+ Preflop: UTG → ... → Dealer → SB → BB
+        actionOrder = ['UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer', 'SB', 'BB'];
+      }
+
+      console.log(`🎯 [getAvailableActionsForPlayer] Action order for ${playerCount} players: ${actionOrder.join(' → ')}`);
+
+      // Find current player's position in action order
+      const currentPlayerIndex = actionOrder.indexOf(currentPlayer.position);
+      console.log(`🎯 [getAvailableActionsForPlayer] ${currentPlayer.name} (${currentPlayer.position}) is at index ${currentPlayerIndex} in action order`);
+
+      if (currentPlayerIndex === -1) {
+        console.log(`❌ [getAvailableActionsForPlayer] ${currentPlayer.name} position "${currentPlayer.position}" NOT IN action order - returning []`);
+        return []; // Position not in action order
+      }
+
+      // Check if all previous players have acted (or are all-in/folded)
+      // Note: In BASE level, undefined is treated as fold (default action), so it counts as having acted
+      // Note: 'fold' is considered a valid action (counts as having acted)
+      for (let i = 0; i < currentPlayerIndex; i++) {
+        const prevPosition = actionOrder[i];
+        const prevPlayer = players.find(p => p.position === prevPosition && p.name);
+
+        if (prevPlayer) {
+          const prevAction = playerData[prevPlayer.id]?.preflopAction as ActionType | undefined;
+          const prevIsAllIn = playerData[prevPlayer.id]?.allInFromPrevious === true;
+
+          console.log(`🔍 [Turn Check] ${currentPlayer.name} (${currentPlayer.position}) checking prev player ${prevPlayer.name} (${prevPosition}): action="${prevAction}", isAllIn=${prevIsAllIn}`);
+
+          // In BASE level, undefined means player has default 'fold', which counts as having acted
+          // So we DON'T block on undefined in BASE level
+
+          // If previous player action is 'no action' and not all-in, current player cannot act yet
+          if (prevAction === 'no action' && !prevIsAllIn) {
+            console.log(`❌ [Turn Check] ${currentPlayer.name} BLOCKED - ${prevPlayer.name} has 'no action'`);
+            return []; // Not current player's turn yet
+          }
+        }
+      }
+
+      console.log(`✅ [Turn Check] ${currentPlayer.name} (${currentPlayer.position}) - all previous players have acted, buttons ENABLED`);
+
+      // Now calculate contributions for preflop base
+      const contributions = new Map<number, number>();
+      for (const player of players) {
+        if (!player.name) continue;
+        let contribution = 0;
+
+        // Start with blind contributions
+        if (player.position === 'SB') contribution = 50;
+        if (player.position === 'BB') contribution = 100;
+
+        // Add action contribution
+        const action = playerData[player.id]?.preflopAction as ActionType | undefined;
+        const amount = playerData[player.id]?.preflopAmount as number | undefined;
+        if (action && action !== 'no action' && action !== 'fold') {
+          contribution = amount || contribution;
+        }
+
+        contributions.set(player.id, contribution);
+      }
+
+      const playerContribution = contributions.get(playerId) || 0;
+      const maxContribution = Math.max(...contributions.values());
+
+      // Available actions based on contribution
+      const actions: ActionType[] = [];
+
+      // Check: Only enabled when contribution matches max
+      if (playerContribution >= maxContribution) {
+        actions.push('check');
+      }
+
+      // Call: Only enabled when facing a bet
+      if (playerContribution < maxContribution) {
+        actions.push('call');
+      }
+
+      // Raise: Always available (except when capped)
+      actions.push('raise');
+
+      // Fold: ALWAYS enabled in PreFlop BASE (default action)
+      actions.push('fold');
+
+      // All-in: Always available
+      actions.push('all-in');
+
+      // No action: Always available
+      actions.push('no action');
+
+      return actions;
     }
 
     // For MORE ACTION rounds: Sequential enabling logic
@@ -1394,10 +1544,10 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                       const amountKey = `preflop${suffix}Amount`;
                       const unitKey = `preflop${suffix}Unit`;
 
-                      // Get the action, default to 'fold' in base level only, undefined otherwise
+                      // Get the action, default to 'fold' in base level only for DISPLAY (not stored in playerData)
                       let action: ActionType | undefined = (data[actionKey] as ActionType) || undefined;
                       if (!action && actionLevel === 'base') {
-                        action = 'fold';
+                        action = 'fold'; // Default display only - not stored until user acts
                       }
                       const amount = (data[amountKey] as string) || '';
                       const unit = (data[unitKey] as ChipUnit) || defaultUnit;

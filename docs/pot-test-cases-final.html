@@ -51058,11 +51058,41 @@ Henry Dealer 3100
             validations.debugLog.push(`Blinds/Ante Correct: ${validations.blindsAnteCorrect ? 'YES ✓' : 'NO ✗'}`);
             validations.debugLog.push('=== END DEBUG LOG ===');
 
-            // Display results with clear sections
+            // Build comparison result message (for copying)
+            let comparisonMessage = `=== COMPARISON RESULT ===\n`;
+            comparisonMessage += `Test Case: ${testCaseId}\n`;
+            comparisonMessage += `Timestamp: ${new Date().toISOString()}\n\n`;
+            comparisonMessage += `Overall: ${allPassed ? 'PASSED ✓' : 'FAILED ✗'}\n\n`;
+
+            comparisonMessage += `Order: ${validations.orderCorrect ? '✓' : '✗'}\n`;
+            if (!validations.orderCorrect) {
+                validations.orderErrors.forEach(err => {
+                    comparisonMessage += `  - ${err}\n`;
+                });
+            }
+
+            comparisonMessage += `\nStacks: ${validations.stacksCorrect ? '✓' : '✗'}\n`;
+            if (!validations.stacksCorrect) {
+                validations.stackErrors.forEach(err => {
+                    comparisonMessage += `  - ${err}\n`;
+                });
+            }
+
+            comparisonMessage += `\nHand Number: ${validations.handNumberCorrect ? '✓' : '✗'}\n`;
+            if (!validations.handNumberCorrect) {
+                comparisonMessage += `  - ${validations.handNumberError}\n`;
+            }
+
+            comparisonMessage += `\nBlinds/Ante: ${validations.blindsAnteCorrect ? '✓' : '✗'}\n`;
+            if (!validations.blindsAnteCorrect) {
+                comparisonMessage += `  - ${validations.blindsAnteError}\n`;
+            }
+
+            // Display results with simplified format
             let html = `<div class="result-title">${allPassed ? '✅ ALL CHECKS PASSED' : '❌ VALIDATION FAILED'}</div>`;
 
-            // Order Check
-            html += `<div class="check-item ${validations.orderCorrect ? 'pass' : 'fail'}">Order is correct`;
+            // Order Check - SIMPLIFIED
+            html += `<div class="check-item ${validations.orderCorrect ? 'pass' : 'fail'}">Order`;
             if (!validations.orderCorrect) {
                 html += '<div class="diff">';
                 validations.orderErrors.forEach(err => {
@@ -51072,8 +51102,8 @@ Henry Dealer 3100
             }
             html += '</div>';
 
-            // Stack Check
-            html += `<div class="check-item ${validations.stacksCorrect ? 'pass' : 'fail'}">Stacks are correct`;
+            // Stack Check - SIMPLIFIED
+            html += `<div class="check-item ${validations.stacksCorrect ? 'pass' : 'fail'}">Stacks`;
             if (!validations.stacksCorrect) {
                 html += '<div class="diff">';
                 validations.stackErrors.forEach(err => {
@@ -51083,25 +51113,35 @@ Henry Dealer 3100
             }
             html += '</div>';
 
-            // Hand Number Check
-            html += `<div class="check-item ${validations.handNumberCorrect ? 'pass' : 'fail'}">Hand number is correct`;
+            // Hand Number Check - SIMPLIFIED
+            html += `<div class="check-item ${validations.handNumberCorrect ? 'pass' : 'fail'}">Hand Number`;
             if (!validations.handNumberCorrect) {
                 html += `<div class="diff">${validations.handNumberError}</div>`;
             }
             html += '</div>';
 
-            // Blinds/Ante Check
-            html += `<div class="check-item ${validations.blindsAnteCorrect ? 'pass' : 'fail'}">Blinds and ante are correct`;
+            // Blinds/Ante Check - SIMPLIFIED
+            html += `<div class="check-item ${validations.blindsAnteCorrect ? 'pass' : 'fail'}">Blinds/Ante`;
             if (!validations.blindsAnteCorrect) {
                 html += `<div class="diff">${validations.blindsAnteError}</div>`;
             }
             html += '</div>';
 
-            // Copy Debug Logs Button
-            const debugLogText = validations.debugLog.join('\n');
-            html += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">`;
-            html += `<button onclick="copyDebugLog('${testCaseId}', \`${debugLogText.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)"
-                     style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;">
+            // Copy buttons
+            const comparisonResultId = `comparison-result-text-${testCaseId}`;
+            const debugLogId = `debug-log-${testCaseId}`;
+
+            // Store both comparison result and debug log in hidden textareas
+            html += `<textarea id="${comparisonResultId}" style="display:none;">${comparisonMessage}</textarea>`;
+            html += `<textarea id="${debugLogId}" style="display:none;">${validations.debugLog.join('\n')}</textarea>`;
+
+            html += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6; display: flex; gap: 10px;">`;
+            html += `<button onclick="copyTextById(event, '${comparisonResultId}')"
+                     style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; flex: 1;">
+                     📋 Copy Result
+                     </button>`;
+            html += `<button onclick="copyTextById(event, '${debugLogId}')"
+                     style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; flex: 1;">
                      📋 Copy Debug Logs
                      </button>`;
             html += `</div>`;
@@ -51110,19 +51150,31 @@ Henry Dealer 3100
             resultDiv.className = `comparison-result ${allPassed ? 'passed' : 'failed'}`;
         }
 
-        function copyDebugLog(testCaseId, logText) {
-            navigator.clipboard.writeText(logText).then(() => {
+        function copyTextById(event, textareaId) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const textareaElement = document.getElementById(textareaId);
+            if (!textareaElement) {
+                alert('Text not found');
+                return;
+            }
+
+            const text = textareaElement.value;
+
+            navigator.clipboard.writeText(text).then(() => {
                 const btn = event.target;
                 const originalText = btn.innerHTML;
+                const originalBg = btn.style.background;
                 btn.innerHTML = '✓ Copied!';
                 btn.style.background = '#28a745';
                 setTimeout(() => {
                     btn.innerHTML = originalText;
-                    btn.style.background = '#17a2b8';
+                    btn.style.background = originalBg;
                 }, 2000);
             }).catch(err => {
-                console.error('Failed to copy debug log:', err);
-                alert('Failed to copy debug log. Please check console.');
+                console.error('Failed to copy text:', err);
+                alert('Failed to copy. Please check console.');
             });
         }
 

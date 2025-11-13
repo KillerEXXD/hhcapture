@@ -1,0 +1,67 @@
+Bet Amount Validation Report
+======================================================================
+
+Total: 40
+Passed: 22 (55.0%)
+Failed: 18 (45.0%)
+
+Failed Test Cases:
+----------------------------------------------------------------------
+
+TC-7:
+  - Turn Base: Alice Call 200,000 but only has 170,000 remaining! (Started: 340,000, Contributed: 170,000)
+
+TC-9:
+  - Turn Base: Bob Bet 100,000 but only has 75,000 remaining! (Started: 160,000, Contributed: 85,000)
+
+TC-14:
+  - Turn Base: Bob Bet 50,000 but only has 37,500 remaining! (Started: 80,000, Contributed: 42,500)
+
+TC-16:
+  - Turn Base: Charlie Call 200,000 but only has 100,000 remaining! (Started: 300,000, Contributed: 200,000)
+
+TC-19:
+  - Turn Base: Alice Call 200,000 but only has 180,000 remaining! (Started: 340,000, Contributed: 160,000)
+
+TC-21:
+  - Turn Base: Charlie Call 20,000,000 but only has 2,000,000 remaining! (Started: 22,000,000, Contributed: 20,000,000)
+
+TC-22:
+  - Turn Base: David Call 10,000,000 but only has 7,000,000 remaining! (Started: 15,000,000, Contributed: 8,000,000)
+
+TC-23:
+  - Turn Base: David Call 50,000,000 but only has 10,000,000 remaining! (Started: 50,000,000, Contributed: 40,000,000)
+
+TC-24:
+  - Turn Base: Bob Bet 50,000,000 but only has 17,500,000 remaining! (Started: 60,000,000, Contributed: 42,500,000)
+  - Turn Base: David Call 50,000,000 but only has 35,000,000 remaining! (Started: 75,000,000, Contributed: 40,000,000)
+
+TC-25:
+  - Turn Base: Henry Call 20,000,000 but only has 8,000,000 remaining! (Started: 24,000,000, Contributed: 16,000,000)
+  - Turn Base: Alice Call 20,000,000 but only has 6,000,000 remaining! (Started: 22,000,000, Contributed: 16,000,000)
+
+TC-26:
+  - Turn Base: Alice Call 20,000,000 but only has 4,000,000 remaining! (Started: 20,000,000, Contributed: 16,000,000)
+
+TC-27:
+  - Turn Base: Frank Call 5,000,000 but only has 3,500,000 remaining! (Started: 7,500,000, Contributed: 4,000,000)
+
+TC-29:
+  - Turn Base: Alice Call 1,000,000 but only has 500,000 remaining! (Started: 1,300,000, Contributed: 800,000)
+
+TC-30:
+  - Turn Base: Charlie Call 10,000,000 but only has 6,000,000 remaining! (Started: 16,000,000, Contributed: 10,000,000)
+
+TC-31:
+  - Turn Base: Alice Call 40,000 but only has 37,500 remaining! (Started: 80,000, Contributed: 42,500)
+
+TC-33:
+  - Turn Base: Bob Bet 900,000 but only has 850,000 remaining! (Started: 1,700,000, Contributed: 850,000)
+  - Turn Base: Charlie Call 700,000 but only has 600,000 remaining! (Started: 1,600,000, Contributed: 1,000,000)
+
+TC-37:
+  - Turn Base: Charlie Call 20,000,000 but only has 18,000,000 remaining! (Started: 38,000,000, Contributed: 20,000,000)
+
+TC-38:
+  - Turn Base: Charlie Call 700,000 but only has 600,000 remaining! (Started: 1,600,000, Contributed: 1,000,000)
+

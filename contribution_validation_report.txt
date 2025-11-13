@@ -1,0 +1,245 @@
+====================================================================================================
+FULL CONTRIBUTION VALIDATION REPORT - ALL 30 TEST CASES
+====================================================================================================
+
+SUMMARY:
+  Total Test Cases: 30
+  Passed: 30
+  Failed: 0
+
+====================================================================================================
+NO ERRORS FOUND - ALL CONTRIBUTION CALCULATIONS ARE CORRECT!
+====================================================================================================
+
+====================================================================================================
+DETAILED VALIDATION FOR ALL 30 TEST CASES:
+====================================================================================================
+
+[PASS] TC-1: 2P Simple - With Betting (SB:500 BB:1,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(SB)       | Start:     31,000 | Final:     15,000 | Contributed:     16,000 | Calculated:     16,000
+  [OK] Bob(BB)         | Start:     49,000 | Final:     32,000 | Contributed:     17,000 | Calculated:     17,000
+
+[PASS] TC-2: 2P Simple - With Betting (SB:50 BB:100)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(SB)       | Start:      3,700 | Final:      2,100 | Contributed:      1,600 | Calculated:      1,600
+  [OK] Bob(BB)         | Start:      5,800 | Final:      4,100 | Contributed:      1,700 | Calculated:      1,700
+
+[PASS] TC-3: 2P Simple - With Betting (SB:500 BB:1,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(SB)       | Start:     41,000 | Final:     25,000 | Contributed:     16,000 | Calculated:     16,000
+  [OK] Bob(BB)         | Start:     56,000 | Final:     39,000 | Contributed:     17,000 | Calculated:     17,000
+
+[PASS] TC-4: 2P Simple - With Betting (SB:250 BB:500)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(SB)       | Start:     23,500 | Final:     15,500 | Contributed:      8,000 | Calculated:      8,000
+  [OK] Bob(BB)         | Start:     20,000 | Final:     11,500 | Contributed:      8,500 | Calculated:      8,500
+
+[PASS] TC-5: 2P Simple - With Betting (SB:2,500 BB:5,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(SB)       | Start:    280,000 | Final:    200,000 | Contributed:     80,000 | Calculated:     80,000
+  [OK] Bob(BB)         | Start:    205,000 | Final:    120,000 | Contributed:     85,000 | Calculated:     85,000
+
+[PASS] TC-6: 2P Medium - With Betting (SB:25,000 BB:50,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(SB)       | Start:  2,250,000 | Final:  1,350,000 | Contributed:    900,000 | Calculated:    900,000
+  [OK] Bob(BB)         | Start:  2,950,000 | Final:  2,000,000 | Contributed:    950,000 | Calculated:    950,000
+
+[PASS] TC-7: 2P Medium - With Betting (SB:2,500 BB:5,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(SB)       | Start:    215,000 | Final:    125,000 | Contributed:     90,000 | Calculated:     90,000
+  [OK] Bob(BB)         | Start:    120,000 | Final:     25,000 | Contributed:     95,000 | Calculated:     95,000
+
+[PASS] TC-8: 2P Medium - With Betting (SB:10,000 BB:20,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(SB)       | Start:    600,000 | Final:    240,000 | Contributed:    360,000 | Calculated:    360,000
+  [OK] Bob(BB)         | Start:    560,000 | Final:    180,000 | Contributed:    380,000 | Calculated:    380,000
+
+[PASS] TC-9: 3P Medium - With Betting (SB:10,000 BB:20,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  1,080,000 | Final:    720,000 | Contributed:    360,000 | Calculated:    360,000
+  [OK] Bob(SB)         | Start:    680,000 | Final:    320,000 | Contributed:    360,000 | Calculated:    360,000
+  [OK] Charlie(BB)     | Start:    380,000 | Final:          0 | Contributed:    380,000 | Calculated:    380,000
+
+[PASS] TC-10: 3P Medium - Alice All-In Creates Side Pot (SB:2,500 BB:5,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:     80,000 | Final:          0 | Contributed:     80,000 | Calculated:     80,000
+  [OK] Bob(SB)         | Start:    165,000 | Final:     75,000 | Contributed:     90,000 | Calculated:     90,000
+  [OK] Charlie(BB)     | Start:    265,000 | Final:    170,000 | Contributed:     95,000 | Calculated:     95,000
+
+[PASS] TC-11: 3P Medium - With Betting (SB:2,500 BB:5,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:     75,000 | Final:    -15,000 | Contributed:     90,000 | Calculated:     90,000
+  [OK] Bob(SB)         | Start:    120,000 | Final:     30,000 | Contributed:     90,000 | Calculated:     90,000
+  [OK] Charlie(BB)     | Start:    235,000 | Final:    140,000 | Contributed:     95,000 | Calculated:     95,000
+
+[PASS] TC-12: 3P Medium - With Betting (SB:10,000 BB:20,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  1,080,000 | Final:    720,000 | Contributed:    360,000 | Calculated:    360,000
+  [OK] Bob(SB)         | Start:    820,000 | Final:    460,000 | Contributed:    360,000 | Calculated:    360,000
+  [OK] Charlie(BB)     | Start:  1,000,000 | Final:    620,000 | Contributed:    380,000 | Calculated:    380,000
+
+[PASS] TC-13: 4P Medium - With Betting (SB:25,000 BB:50,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  1,450,000 | Final:    550,000 | Contributed:    900,000 | Calculated:    900,000
+  [OK] Bob(SB)         | Start:  2,200,000 | Final:  1,300,000 | Contributed:    900,000 | Calculated:    900,000
+  [OK] Charlie(BB)     | Start:  1,800,000 | Final:    850,000 | Contributed:    950,000 | Calculated:    950,000
+  [OK] David(UTG)      | Start:  2,250,000 | Final:  1,350,000 | Contributed:    900,000 | Calculated:    900,000
+
+[PASS] TC-14: 4P Medium - With Betting (SB:25,000 BB:50,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  1,400,000 | Final:    500,000 | Contributed:    900,000 | Calculated:    900,000
+  [OK] Bob(SB)         | Start:  1,150,000 | Final:    250,000 | Contributed:    900,000 | Calculated:    900,000
+  [OK] Charlie(BB)     | Start:  1,650,000 | Final:    700,000 | Contributed:    950,000 | Calculated:    950,000
+  [OK] David(UTG)      | Start:  2,700,000 | Final:  1,800,000 | Contributed:    900,000 | Calculated:    900,000
+
+[PASS] TC-15: 4P Medium - With Betting (SB:10,000 BB:20,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  1,020,000 | Final:    660,000 | Contributed:    360,000 | Calculated:    360,000
+  [OK] Bob(SB)         | Start:    600,000 | Final:    240,000 | Contributed:    360,000 | Calculated:    360,000
+  [OK] Charlie(BB)     | Start:  1,000,000 | Final:    620,000 | Contributed:    380,000 | Calculated:    380,000
+  [OK] David(UTG)      | Start:    920,000 | Final:    560,000 | Contributed:    360,000 | Calculated:    360,000
+
+[PASS] TC-16: 4P Medium - With Betting (SB:50,000 BB:100,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  5,800,000 | Final:  4,000,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Bob(SB)         | Start:  4,600,000 | Final:  2,800,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Charlie(BB)     | Start:  4,000,000 | Final:  2,100,000 | Contributed:  1,900,000 | Calculated:  1,900,000
+  [OK] David(UTG)      | Start:  5,600,000 | Final:  3,800,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+
+[PASS] TC-17: 2P Medium - With Betting (SB:5,000 BB:10,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(SB)       | Start:    430,000 | Final:    250,000 | Contributed:    180,000 | Calculated:    180,000
+  [OK] Bob(BB)         | Start:    440,000 | Final:    250,000 | Contributed:    190,000 | Calculated:    190,000
+
+[PASS] TC-18: 3P Medium - With Betting (SB:10,000 BB:20,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  1,020,000 | Final:    660,000 | Contributed:    360,000 | Calculated:    360,000
+  [OK] Bob(SB)         | Start:    980,000 | Final:    620,000 | Contributed:    360,000 | Calculated:    360,000
+  [OK] Charlie(BB)     | Start:    880,000 | Final:    500,000 | Contributed:    380,000 | Calculated:    380,000
+
+[PASS] TC-19: 4P Medium - With Betting (SB:5,000 BB:10,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:    210,000 | Final:     30,000 | Contributed:    180,000 | Calculated:    180,000
+  [OK] Bob(SB)         | Start:    200,000 | Final:     20,000 | Contributed:    180,000 | Calculated:    180,000
+  [OK] Charlie(BB)     | Start:    410,000 | Final:    220,000 | Contributed:    190,000 | Calculated:    190,000
+  [OK] David(UTG)      | Start:    420,000 | Final:    240,000 | Contributed:    180,000 | Calculated:    180,000
+
+[PASS] TC-20: 3P Medium - With Betting (SB:2,500 BB:5,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:    175,000 | Final:     85,000 | Contributed:     90,000 | Calculated:     90,000
+  [OK] Bob(SB)         | Start:    295,000 | Final:    205,000 | Contributed:     90,000 | Calculated:     90,000
+  [OK] Charlie(BB)     | Start:    165,000 | Final:     70,000 | Contributed:     95,000 | Calculated:     95,000
+
+[PASS] TC-21: 5P Complex - With Betting (SB:500,000 BB:1,000,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start: 41,000,000 | Final: 23,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Bob(SB)         | Start: 36,000,000 | Final: 18,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Charlie(BB)     | Start: 34,000,000 | Final: 15,000,000 | Contributed: 19,000,000 | Calculated: 19,000,000
+  [OK] David(UTG)      | Start: 52,000,000 | Final: 34,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Eve(CO)         | Start: 33,000,000 | Final: 15,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+
+[PASS] TC-22: 6P Complex - With Betting (SB:500,000 BB:1,000,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start: 51,000,000 | Final: 33,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Bob(SB)         | Start: 15,000,000 | Final: -3,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Charlie(BB)     | Start: 36,000,000 | Final: 17,000,000 | Contributed: 19,000,000 | Calculated: 19,000,000
+  [OK] David(UTG)      | Start: 33,000,000 | Final: 15,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Eve(MP)         | Start: 49,000,000 | Final: 31,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Frank(CO)       | Start: 60,000,000 | Final: 42,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+
+[PASS] TC-23: 7P Complex - With Betting (SB:250,000 BB:500,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  7,500,000 | Final: -1,500,000 | Contributed:  9,000,000 | Calculated:  9,000,000
+  [OK] Bob(SB)         | Start: 16,000,000 | Final:  7,000,000 | Contributed:  9,000,000 | Calculated:  9,000,000
+  [OK] Charlie(BB)     | Start: 12,500,000 | Final:  3,000,000 | Contributed:  9,500,000 | Calculated:  9,500,000
+  [OK] David(UTG)      | Start: 19,000,000 | Final: 10,000,000 | Contributed:  9,000,000 | Calculated:  9,000,000
+  [OK] Eve(MP)         | Start:  7,000,000 | Final: -2,000,000 | Contributed:  9,000,000 | Calculated:  9,000,000
+  [OK] Frank(HJ)       | Start: 26,000,000 | Final: 17,000,000 | Contributed:  9,000,000 | Calculated:  9,000,000
+  [OK] Grace(CO)       | Start: 29,000,000 | Final: 20,000,000 | Contributed:  9,000,000 | Calculated:  9,000,000
+
+[PASS] TC-24: 8P Complex - With Betting (SB:2,500,000 BB:5,000,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start: 165,000,000 | Final: 75,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Bob(SB)         | Start: 195,000,000 | Final: 105,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Charlie(BB)     | Start: 300,000,000 | Final: 205,000,000 | Contributed: 95,000,000 | Calculated: 95,000,000
+  [OK] David(UTG)      | Start: 270,000,000 | Final: 180,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Eve(UTG+1)      | Start: 115,000,000 | Final: 25,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Frank(MP)       | Start: 260,000,000 | Final: 170,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Grace(HJ)       | Start: 160,000,000 | Final: 70,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Henry(CO)       | Start: 235,000,000 | Final: 145,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+
+[PASS] TC-25: 9P Complex - With Betting (SB:50,000 BB:100,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  3,000,000 | Final:  1,200,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Bob(SB)         | Start:  5,000,000 | Final:  3,200,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Charlie(BB)     | Start:  4,100,000 | Final:  2,200,000 | Contributed:  1,900,000 | Calculated:  1,900,000
+  [OK] David(UTG)      | Start:  2,800,000 | Final:  1,000,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Eve(UTG+1)      | Start:  1,100,000 | Final:   -700,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Frank(UTG+2)    | Start:  4,400,000 | Final:  2,600,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Grace(MP)       | Start:  1,400,000 | Final:   -400,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Henry(HJ)       | Start:  4,500,000 | Final:  2,700,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Ivy(CO)         | Start:  2,600,000 | Final:    800,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+
+[PASS] TC-26: 6P Complex - With Betting (SB:500,000 BB:1,000,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start: 60,000,000 | Final: 42,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Bob(SB)         | Start: 50,000,000 | Final: 32,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Charlie(BB)     | Start: 43,000,000 | Final: 24,000,000 | Contributed: 19,000,000 | Calculated: 19,000,000
+  [OK] David(UTG)      | Start: 18,000,000 | Final:          0 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Eve(MP)         | Start: 17,000,000 | Final: -1,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+  [OK] Frank(CO)       | Start: 42,000,000 | Final: 24,000,000 | Contributed: 18,000,000 | Calculated: 18,000,000
+
+[PASS] TC-27: 7P Complex - With Betting (SB:2,500,000 BB:5,000,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start: 95,000,000 | Final:  5,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Bob(SB)         | Start: 105,000,000 | Final: 15,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Charlie(BB)     | Start: 205,000,000 | Final: 110,000,000 | Contributed: 95,000,000 | Calculated: 95,000,000
+  [OK] David(UTG)      | Start: 260,000,000 | Final: 170,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Eve(MP)         | Start: 175,000,000 | Final: 85,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Frank(HJ)       | Start: 100,000,000 | Final: 10,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Grace(CO)       | Start: 190,000,000 | Final: 100,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+
+[PASS] TC-28: 8P Complex - With Betting (SB:2,500,000 BB:5,000,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start: 190,000,000 | Final: 100,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Bob(SB)         | Start: 265,000,000 | Final: 175,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Charlie(BB)     | Start: 75,000,000 | Final: -20,000,000 | Contributed: 95,000,000 | Calculated: 95,000,000
+  [OK] David(UTG)      | Start: 285,000,000 | Final: 195,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Eve(UTG+1)      | Start: 70,000,000 | Final: -20,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Frank(MP)       | Start: 115,000,000 | Final: 25,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Grace(HJ)       | Start: 175,000,000 | Final: 85,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+  [OK] Henry(CO)       | Start: 270,000,000 | Final: 180,000,000 | Contributed: 90,000,000 | Calculated: 90,000,000
+
+[PASS] TC-29: 5P Complex - With Betting (SB:50,000 BB:100,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  2,200,000 | Final:    400,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Bob(SB)         | Start:  3,800,000 | Final:  2,000,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Charlie(BB)     | Start:  5,400,000 | Final:  3,500,000 | Contributed:  1,900,000 | Calculated:  1,900,000
+  [OK] David(UTG)      | Start:  5,500,000 | Final:  3,700,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Eve(CO)         | Start:  2,700,000 | Final:    900,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+
+[PASS] TC-30: 9P Complex - With Betting (SB:50,000 BB:100,000)
+----------------------------------------------------------------------------------------------------
+  [OK] Alice(Dealer)   | Start:  4,600,000 | Final:  2,800,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Bob(SB)         | Start:  5,700,000 | Final:  3,900,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Charlie(BB)     | Start:  3,100,000 | Final:  1,200,000 | Contributed:  1,900,000 | Calculated:  1,900,000
+  [OK] David(UTG)      | Start:  1,800,000 | Final:          0 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Eve(UTG+1)      | Start:  4,200,000 | Final:  2,400,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Frank(UTG+2)    | Start:  5,900,000 | Final:  4,100,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Grace(MP)       | Start:  3,500,000 | Final:  1,700,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Henry(HJ)       | Start:  4,400,000 | Final:  2,600,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+  [OK] Ivy(CO)         | Start:  5,500,000 | Final:  3,700,000 | Contributed:  1,800,000 | Calculated:  1,800,000
+
+====================================================================================================
+ALL TEST CASES SUMMARY:
+====================================================================================================
+  TC-1, TC-2, TC-3, TC-4, TC-5, TC-6, TC-7, TC-8, TC-9, TC-10
+  TC-11, TC-12, TC-13, TC-14, TC-15, TC-16, TC-17, TC-18, TC-19, TC-20
+  TC-21, TC-22, TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30
+
+====================================================================================================
+
+SUCCESS: All 30 test cases have correct contribution calculations!
+The validation rule "Contributed = Starting Stack - Final Stack" is satisfied for all players.
+====================================================================================================

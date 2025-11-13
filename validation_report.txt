@@ -1,0 +1,321 @@
+Reading HTML file...
+Extracting test cases...
+Found 30 test cases
+
+================================================================================
+
+Validating TC-1...
+TC-1: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 2 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Heads-up: positions correctly swapped
+  - Stack Setup Order: PASS - Heads-up: correctly starts with SB
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-2...
+TC-2: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 2 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Heads-up: positions correctly swapped
+  - Stack Setup Order: PASS - Heads-up: correctly starts with SB
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-3...
+TC-3: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 2 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Heads-up: positions correctly swapped
+  - Stack Setup Order: PASS - Heads-up: correctly starts with SB
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-4...
+TC-4: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 2 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Heads-up: positions correctly swapped
+  - Stack Setup Order: PASS - Heads-up: correctly starts with SB
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-5...
+TC-5: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 2 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Heads-up: positions correctly swapped
+  - Stack Setup Order: PASS - Heads-up: correctly starts with SB
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-6...
+TC-6: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 2 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Heads-up: positions correctly swapped
+  - Stack Setup Order: PASS - Heads-up: correctly starts with SB
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-7...
+TC-7: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 2 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Heads-up: positions correctly swapped
+  - Stack Setup Order: PASS - Heads-up: correctly starts with SB
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-8...
+TC-8: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 2 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Heads-up: positions correctly swapped
+  - Stack Setup Order: PASS - Heads-up: correctly starts with SB
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-9...
+TC-9: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 3 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-10...
+TC-10: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 3 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-11...
+TC-11: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 3 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-12...
+TC-12: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 3 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-13...
+TC-13: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 4 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-14...
+TC-14: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 4 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-15...
+TC-15: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 4 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-16...
+TC-16: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 4 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-17...
+TC-17: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 2 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Heads-up: positions correctly swapped
+  - Stack Setup Order: PASS - Heads-up: correctly starts with SB
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-18...
+TC-18: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 3 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-19...
+TC-19: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 4 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-20...
+TC-20: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 3 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-21...
+TC-21: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 5 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-22...
+TC-22: FAIL
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 6 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: FAIL - Bob: Final Stack = -3000000 (negative!)
+  - Contributions: PASS (already validated)
+
+Validating TC-23...
+TC-23: FAIL
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 7 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: FAIL - Eve: Final Stack = -2000000 (negative!)
+  - Contributions: PASS (already validated)
+
+Validating TC-24...
+TC-24: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 8 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-25...
+TC-25: FAIL
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 9 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: FAIL - Eve: Final Stack = -700000 (negative!); Grace: Final Stack = -400000 (negative!)
+  - Contributions: PASS (already validated)
+
+Validating TC-26...
+TC-26: FAIL
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 6 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: FAIL - Eve: Final Stack = -1000000 (negative!)
+  - Contributions: PASS (already validated)
+
+Validating TC-27...
+TC-27: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 7 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-28...
+TC-28: FAIL
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 8 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: FAIL - Charlie: Final Stack = -20000000 (negative!); Eve: Final Stack = -20000000 (negative!)
+  - Contributions: PASS (already validated)
+
+Validating TC-29...
+TC-29: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 5 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+Validating TC-30...
+TC-30: PASS
+  - Winner Stacks: PASS - All winners show correct new stacks
+  - All Players Present: PASS - All 9 players present
+  - Position Labels: PASS - Only Dealer/SB/BB positions used
+  - Button Rotation: PASS - Button rotated correctly
+  - Stack Setup Order: PASS - Starts with Dealer
+  - No Negative Stacks: PASS - No negative stacks
+  - Contributions: PASS (already validated)
+
+================================================================================
+
+SUMMARY
+================================================================================
+TOTAL: 25/30 PASSED, 5/30 FAILED
+
+FAILED TEST CASES:
+  - TC-22: No Negative Stacks
+  - TC-23: No Negative Stacks
+  - TC-25: No Negative Stacks
+  - TC-26: No Negative Stacks
+  - TC-28: No Negative Stacks
+
+PASSED TEST CASES:
+  - TC-1, TC-2, TC-3, TC-4, TC-5, TC-6, TC-7, TC-8, TC-9, TC-10, TC-11, TC-12, TC-13, TC-14, TC-15, TC-16, TC-17, TC-18, TC-19, TC-20, TC-21, TC-24, TC-27, TC-29, TC-30

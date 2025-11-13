@@ -12,6 +12,7 @@ export type Position =
   | 'UTG'
   | 'UTG+1'
   | 'UTG+2'
+  | 'LJ'
   | 'MP'
   | 'MP+1'
   | 'MP+2'

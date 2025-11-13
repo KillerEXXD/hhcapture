@@ -679,27 +679,117 @@ export const RiverView: React.FC<RiverViewProps> = ({
       suffix === '' ? 'base' :
       suffix === '_moreAction' ? 'more' : 'more2';
 
-    // For BASE level: All players enabled, but first player has no 'call' (FR-2)
+    // For BASE level: Apply sequential turn-based logic with postflop betting order
     if (actionLevel === 'base') {
+      // Get active players (not folded in previous streets)
       const activePlayers = getActivePlayers();
-      const isFirstPlayer = activePlayers.length > 0 && activePlayers[0].id === playerId;
+      // Use the count of active players to determine action order
+      const playerCount = activePlayers.length;
 
-      // Check if player is all-in from previous rounds
-      const playerStatus = checkPlayerNeedsToAct(playerId, 'river', actionLevel, players, playerData);
+      // Get current player
+      const currentPlayer = players.find(p => p.id === playerId);
+      if (!currentPlayer) return [];
 
-      if (playerStatus.alreadyAllIn) {
-        // Player is all-in from previous round - skip this player
-        console.log(`🔒 [getAvailableActionsForPlayer-BASE] Player ${playerId} is all-in, showing locked state`);
-        return ['all-in']; // Special locked state
+      // Check if player is already all-in from previous street
+      const isAllInFromPrevious = playerData[playerId]?.allInFromPrevious === true;
+      if (isAllInFromPrevious) {
+        return ['all-in']; // Show locked all-in button
       }
 
-      if (isFirstPlayer) {
-        // FR-2: First player in post-flop BASE cannot call/fold/no action
-        return ['check', 'bet', 'raise', 'all-in'];
+      // Determine POSTFLOP action order based on player count
+      let actionOrder: string[];
+      if (playerCount === 2) {
+        // 2P Postflop: BB → SB/Dealer (BB acts first like UTG)
+        actionOrder = ['BB', 'SB', 'Dealer'];
+      } else if (playerCount === 3) {
+        // 3P Postflop: SB → BB → Dealer
+        actionOrder = ['SB', 'BB', 'Dealer'];
+      } else {
+        // 4+ Postflop: SB → BB → UTG → ... → Dealer
+        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer'];
       }
 
-      // All other players have full actions in BASE
-      return ['fold', 'check', 'call', 'bet', 'raise', 'all-in', 'no action'];
+      // Find current player's position in action order
+      const currentPlayerIndex = actionOrder.indexOf(currentPlayer.position);
+      if (currentPlayerIndex === -1) {
+        return []; // Position not in action order
+      }
+
+      // Check if all previous players have acted (or are all-in/folded)
+      for (let i = 0; i < currentPlayerIndex; i++) {
+        const prevPosition = actionOrder[i];
+        const prevPlayer = players.find(p => p.position === prevPosition && p.name);
+
+        if (prevPlayer) {
+          const prevAction = playerData[prevPlayer.id]?.riverAction as ActionType | undefined;
+          const prevIsAllIn = playerData[prevPlayer.id]?.allInFromPrevious === true;
+
+          // If previous player hasn't acted and is not all-in, current player cannot act yet
+          if (!prevAction && !prevIsAllIn) {
+            return []; // Not current player's turn yet
+          }
+
+          // If previous player action is 'no action' and not all-in, current player cannot act yet
+          if (prevAction === 'no action' && !prevIsAllIn) {
+            return []; // Not current player's turn yet
+          }
+        }
+      }
+
+      // Calculate contributions for river base
+      const contributions = new Map<number, number>();
+      for (const player of players) {
+        if (!player.name) continue;
+        let contribution = 0;
+
+        // Get action contribution
+        const action = playerData[player.id]?.riverAction as ActionType | undefined;
+        const amount = playerData[player.id]?.riverAmount as number | undefined;
+        if (action && action !== 'no action' && action !== 'fold') {
+          contribution = amount || 0;
+        }
+
+        contributions.set(player.id, contribution);
+      }
+
+      const playerContribution = contributions.get(playerId) || 0;
+      const maxContribution = Math.max(...contributions.values());
+
+      // Available actions based on contribution
+      const actions: ActionType[] = [];
+
+      // Check: Only enabled when contribution matches max
+      if (playerContribution >= maxContribution) {
+        actions.push('check');
+      }
+
+      // Call: Only enabled when facing a bet
+      if (playerContribution < maxContribution) {
+        actions.push('call');
+      }
+
+      // Bet: Only when no one has bet yet
+      if (maxContribution === 0) {
+        actions.push('bet');
+      }
+
+      // Raise: Only when someone has bet
+      if (maxContribution > 0) {
+        actions.push('raise');
+      }
+
+      // Fold: Only enabled when facing a bet
+      if (playerContribution < maxContribution) {
+        actions.push('fold');
+      }
+
+      // All-in: Always available
+      actions.push('all-in');
+
+      // No action: Always available
+      actions.push('no action');
+
+      return actions;
     }
 
     // For MORE ACTION rounds: Sequential enabling logic (FR-1, FR-9)

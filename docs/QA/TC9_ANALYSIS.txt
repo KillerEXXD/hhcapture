@@ -1,0 +1,111 @@
+TC-9 STACK CALCULATION ANALYSIS
+================================
+
+Starting Stacks:
+- Alice (Dealer): 240,000
+- Bob (SB): 160,000
+- Charlie (BB): 470,000
+
+BLINDS POSTED:
+--------------
+Bob posts SB: 5,000
+  Bob's stack: 160,000 - 5,000 = 155,000
+
+Charlie posts BB ante: 10,000
+  Charlie's stack: 470,000 - 10,000 = 460,000
+
+Charlie posts BB blind: 10,000
+  Charlie's stack: 460,000 - 10,000 = 450,000
+
+After Blinds:
+- Alice: 240,000 (contributed: 0)
+- Bob: 155,000 (contributed: 5,000)
+- Charlie: 450,000 (contributed: 20,000)
+
+PREFLOP:
+--------
+Alice raises to 30,000
+  Alice contributes: 30,000
+  Alice's stack: 240,000 - 30,000 = 210,000
+  Alice total contributed: 30,000
+
+Bob calls 30,000 (needs 25,000 more to match 30,000)
+  Bob contributes: 25,000 more
+  Bob's stack: 155,000 - 25,000 = 130,000
+  Bob total contributed: 5,000 + 25,000 = 30,000
+
+Charlie calls 30,000 (needs 10,000 more to match 30,000)
+  Charlie contributes: 10,000 more
+  Charlie's stack: 450,000 - 10,000 = 440,000
+  Charlie total contributed: 20,000 + 10,000 = 30,000
+
+After Preflop:
+- Alice: 210,000 (contributed: 30,000)
+- Bob: 130,000 (contributed: 30,000)
+- Charlie: 440,000 (contributed: 30,000)
+
+FLOP (A♠ K♦ Q♣):
+-----------------
+Bob bets 50,000
+  Bob's stack: 130,000 - 50,000 = 80,000
+  Bob total contributed: 30,000 + 50,000 = 80,000
+
+Charlie calls 50,000
+  Charlie's stack: 440,000 - 50,000 = 390,000
+  Charlie total contributed: 30,000 + 50,000 = 80,000
+
+Alice calls 50,000
+  Alice's stack: 210,000 - 50,000 = 160,000
+  Alice total contributed: 30,000 + 50,000 = 80,000
+
+After Flop:
+- Alice: 160,000 (contributed: 80,000)
+- Bob: 80,000 (contributed: 80,000)
+- Charlie: 390,000 (contributed: 80,000)
+
+TURN (7♥):
+----------
+Bob bets 100,000 ❌ IMPOSSIBLE - Bob only has 80,000!
+
+CORRECT Action:
+Bob bets 80,000 (all-in)
+  Bob's stack: 80,000 - 80,000 = 0
+  Bob total contributed: 80,000 + 80,000 = 160,000
+  Bob is ALL-IN
+
+Charlie calls 80,000
+  Charlie's stack: 390,000 - 80,000 = 310,000
+  Charlie total contributed: 80,000 + 80,000 = 160,000
+
+Alice calls 80,000
+  Alice's stack: 160,000 - 80,000 = 80,000
+  Alice total contributed: 80,000 + 80,000 = 160,000
+
+After Turn (CORRECTED):
+- Alice: 80,000 (contributed: 160,000)
+- Bob: 0 (contributed: 160,000) ALL-IN
+- Charlie: 310,000 (contributed: 160,000)
+
+RIVER (3♦):
+-----------
+Bob is all-in, cannot act
+
+Charlie checks
+Alice checks
+
+Final Stacks (after Turn):
+- Alice: 80,000 (contributed: 160,000)
+- Bob: 0 (contributed: 160,000)
+- Charlie: 310,000 (contributed: 160,000)
+
+ISSUE IDENTIFIED:
+=================
+The test case shows Bob betting 100,000 on the turn when he only has 80,000 remaining.
+This violates the fundamental rule: Players cannot bet more than their current stack.
+
+CORRECTION NEEDED:
+==================
+Bob's turn action should be: Bet 80,000 (all-in)
+Not: Bet 100,000
+
+This is a generator bug where the bet amount wasn't capped at the player's available stack.

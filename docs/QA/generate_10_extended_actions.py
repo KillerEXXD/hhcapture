@@ -208,23 +208,26 @@ class ExtendedActionGenerator(TestCaseGenerator):
         if len(active_players) < 2:
             return  # Hand over
 
+        # Get correct postflop action order
+        action_order = self.get_postflop_action_order(active_players)
+
         # BASE ROUND: Bet and raise
         # First player bets
-        bettor = active_players[0]
+        bettor = action_order[0]
         bet_amount = int(self.bb * random.randint(5, 10))
         action, actual_bet = self.process_action(bettor, ActionType.BET, bet_amount)
         actions_base.append(action)
         current_bet = actual_bet  # Use actual amount
 
         # Second player raises
-        raiser = active_players[1]
+        raiser = action_order[1]
         raise_amount = current_bet + int(self.bb * random.randint(5, 10))
         action, actual_raise = self.process_action(raiser, ActionType.RAISE, raise_amount)
         actions_base.append(action)
         current_bet = actual_raise  # Use actual amount
 
-        # Other players respond
-        for player in active_players[2:]:
+        # Other players respond (in correct action order)
+        for player in action_order[2:]:
             if random.random() < 0.6:  # 60% call
                 action, _ = self.process_action(player, ActionType.CALL, current_bet)
             else:
@@ -254,7 +257,9 @@ class ExtendedActionGenerator(TestCaseGenerator):
                 # EXTENDED ACTION 2: Only call/fold
                 active_players = [p for p in self.players if not p.folded and p.current_stack > 0]
                 if len(active_players) >= 2:
-                    responder = active_players[0]
+                    # Get correct action order for extended action 2
+                    action_order_ext2 = self.get_postflop_action_order(active_players)
+                    responder = action_order_ext2[0]
                     if random.random() < 0.7:  # 70% call
                         action, _ = self.process_action(responder, ActionType.CALL, current_bet)
                     else:

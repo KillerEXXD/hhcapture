@@ -21,7 +21,8 @@ def calculate_side_pots(players, bb_ante):
     contributions = []
     for p in players:
         live_contrib = p.total_contribution
-        if bb_player and p.id == bb_player.id:
+        # Compare by name instead of id (Player class doesn't have id attribute)
+        if bb_player and p.name == bb_player.name:
             live_contrib -= bb_ante  # Ante is dead money, not part of live action
 
         contributions.append({
@@ -107,7 +108,7 @@ def generate_pot_html(pot_results, players, bb, ante):
     # Calculate live contributions (excluding ante)
     bb_player = next((p for p in players if p.position == "BB"), None)
     live_contributions = sum(
-        p.total_contribution - (bb_ante if bb_player and p.id == bb_player.id else 0)
+        p.total_contribution - (bb_ante if bb_player and p.name == bb_player.name else 0)
         for p in players
     )
 

@@ -1,0 +1,38 @@
+Bet Amount Validation Report (V2 - Accurate Tracking)
+======================================================================
+
+Total: 40
+Passed: 31 (77.5%)
+Failed: 9 (22.5%)
+
+Failed Test Cases:
+----------------------------------------------------------------------
+
+TC-10:
+  - Turn: Charlie Call 700,000 but only has 600,000 remaining (needs to add 700,000, already contributed 0 this street). [Stack: 1,600,000 - 1,000,000 = 600,000]
+
+TC-11:
+  - Turn: Bob Bet 400,000 but only has 375,000 remaining (needs to add 400,000, already contributed 0 this street). [Stack: 800,000 - 425,000 = 375,000]
+
+TC-16:
+  - Turn: Charlie Call 120,000 but only has 100,000 remaining (needs to add 120,000, already contributed 0 this street). [Stack: 300,000 - 200,000 = 100,000]
+
+TC-24:
+  - Turn: Bob Bet 6,000,000 but only has 5,500,000 remaining (needs to add 6,000,000, already contributed 0 this street). [Stack: 14,000,000 - 8,500,000 = 5,500,000]
+
+TC-30:
+  - Turn: Charlie Call 100,000 but only has 0 remaining (needs to add 100,000, already contributed 0 this street). [Stack: 1,000,000 - 1,000,000 = 0]
+
+TC-31:
+  - Turn: Alice Call 40,000 but only has 37,500 remaining (needs to add 40,000, already contributed 0 this street). [Stack: 80,000 - 42,500 = 37,500]
+
+TC-33:
+  - Turn: Bob Bet 900,000 but only has 850,000 remaining (needs to add 900,000, already contributed 0 this street). [Stack: 1,700,000 - 850,000 = 850,000]
+  - Turn: Charlie Call 700,000 but only has 600,000 remaining (needs to add 700,000, already contributed 0 this street). [Stack: 1,600,000 - 1,000,000 = 600,000]
+
+TC-37:
+  - Turn: Charlie Call 20,000,000 but only has 18,000,000 remaining (needs to add 20,000,000, already contributed 0 this street). [Stack: 38,000,000 - 20,000,000 = 18,000,000]
+
+TC-38:
+  - Turn: Charlie Call 700,000 but only has 600,000 remaining (needs to add 700,000, already contributed 0 this street). [Stack: 1,600,000 - 1,000,000 = 600,000]
+
