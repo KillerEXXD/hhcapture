@@ -232,6 +232,12 @@ function buildStreetBreakdown(
   potAmount: number
 ): StreetContribution[] {
   const streets: Array<'preflop' | 'flop' | 'turn' | 'river'> = ['preflop', 'flop', 'turn', 'river'];
+
+  // Guard: If currentStreet is 'stack', return empty array (pot calculation doesn't happen during stack setup)
+  if (currentStreet === 'stack') {
+    return [];
+  }
+
   const currentIndex = streets.indexOf(currentStreet as 'preflop' | 'flop' | 'turn' | 'river');
 
   // For side pots, show simplified breakdown: just the current street with the pot amount
@@ -313,13 +319,13 @@ function generateCalculation(
   deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number }
 ): DisplayPotInfo['calculation'] {
   const streets: Array<'preflop' | 'flop' | 'turn' | 'river'> = ['preflop', 'flop', 'turn', 'river'];
-  const currentIndex = streets.indexOf(currentStreet as 'preflop' | 'flop' | 'turn' | 'river');
 
   // For the formula display, we just show pot.amount
   // The pot engine has already calculated this correctly
   // The detailed street-by-street breakdown is shown in "Contributions by Street" section
   const formulaLines: string[] = [];
 
+  // Guard: If currentStreet is 'stack', skip Posted money check (only applies to betting streets)
   // For main pot on preflop, show Posted money
   if (potType === 'main' && currentStreet === 'preflop') {
     const postedLine = generatePostedMoneyLine(allPlayers, eligiblePlayers, deadMoneyBreakdown);

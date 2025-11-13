@@ -27,7 +27,8 @@
       "Bash(git ls-tree:*)",
       "Bash(timeout 30 tail:*)",
       "Bash(tc48_output.txt)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(tee:*)"
     ],
     "deny": [],
     "ask": []
