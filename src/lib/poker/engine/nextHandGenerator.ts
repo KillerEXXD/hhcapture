@@ -28,6 +28,8 @@ export interface NextHandPlayer {
   name: string;
   position: string;
   stack: number;
+  previousStack: number;  // Stack before this hand
+  netChange: number;      // + for winnings, - for losses
 }
 
 export interface ValidationResult {
@@ -35,19 +37,38 @@ export interface ValidationResult {
   errors: string[];
 }
 
+export interface PlayerContribution {
+  playerName: string;
+  amount: number;
+}
+
 /**
  * Calculate new stacks based on winner selections
+ * Formula: New Stack = Starting Stack - Total Contributions + Pot Winnings
  */
 export function calculateNewStacks(
   players: Player[],
   pots: Pot[],
-  winnerSelections: WinnerSelection[]
+  winnerSelections: WinnerSelection[],
+  playerContributions?: PlayerContribution[]
 ): Record<string, number> {
-  // Initialize with final stacks (what players have left after all betting)
   const newStacks: Record<string, number> = {};
 
+  // Calculate ending stack for each player
   players.forEach(player => {
-    newStacks[player.name] = player.stack; // Current remaining stack
+    const startingStack = player.stack;
+
+    // Find total contributions for this player
+    let totalContribution = 0;
+    if (playerContributions) {
+      const contribution = playerContributions.find(c => c.playerName === player.name);
+      totalContribution = contribution?.amount || 0;
+    }
+
+    // Starting stack minus contributions = remaining stack
+    newStacks[player.name] = startingStack - totalContribution;
+
+    console.log(`[calculateNewStacks] ${player.name}: ${startingStack} - ${totalContribution} = ${newStacks[player.name]}`);
   });
 
   // Award each pot to its winner
@@ -66,6 +87,7 @@ export function calculateNewStacks(
 
     // Add pot amount to winner's new stack
     newStacks[selection.winnerName] += pot.amount;
+    console.log(`[calculateNewStacks] ${selection.winnerName} wins ${pot.name} (${pot.amount}), new stack: ${newStacks[selection.winnerName]}`);
   });
 
   return newStacks;
@@ -115,11 +137,16 @@ export function generateNextHand(
     const playerIdx = (dealerIdx + 1 + i) % numPlayers;
     const player = players[playerIdx];
     const newPosition = positions[i];
+    const previousStack = player.stack;  // Stack at end of previous hand
+    const newStack = newStacks[player.name];
+    const netChange = newStack - previousStack;
 
     nextHand.push({
       name: player.name,
       position: newPosition,
-      stack: newStacks[player.name]
+      stack: newStack,
+      previousStack: previousStack,
+      netChange: netChange
     });
   }
 
@@ -292,7 +319,8 @@ export function validateNextHand(
 export function processWinnersAndGenerateNextHand(
   currentPlayers: Player[],
   pots: Pot[],
-  winnerSelections: WinnerSelection[]
+  winnerSelections: WinnerSelection[],
+  playerContributions?: PlayerContribution[]
 ): {
   nextHand: NextHandPlayer[];
   validation: ValidationResult;
@@ -302,6 +330,7 @@ export function processWinnersAndGenerateNextHand(
   console.log('Current players count:', currentPlayers.length);
   console.log('Current players details:', currentPlayers.map(p => ({ id: p.id, name: p.name, position: p.position, stack: p.stack })));
   console.log('Winner selections:', winnerSelections);
+  console.log('Player contributions:', playerContributions);
 
   // Filter out any empty/invalid players
   const validPlayers = currentPlayers.filter(p => p.name && p.name.trim() !== '');
@@ -310,7 +339,7 @@ export function processWinnersAndGenerateNextHand(
   }
 
   // Step 1: Calculate new stacks
-  const newStacks = calculateNewStacks(validPlayers, pots, winnerSelections);
+  const newStacks = calculateNewStacks(validPlayers, pots, winnerSelections, playerContributions);
   console.log('New stacks:', newStacks);
 
   // Step 2: Generate next hand

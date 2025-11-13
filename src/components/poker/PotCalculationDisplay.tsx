@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import type { Player, GameConfig } from '../../types/poker';
 import type { GameStateActions } from '../../hooks/useGameState';
-import { HandComparisonModal } from './HandComparisonModal';
 import { WinnerSelectionModal } from './WinnerSelectionModal';
 import {
   processWinnersAndGenerateNextHand,
   type Pot,
   type WinnerSelection,
   type NextHandPlayer,
-  type ValidationResult
+  type ValidationResult,
+  type PlayerContribution as NextHandPlayerContribution
 } from '../../lib/poker/engine/nextHandGenerator';
-import { formatNextHandForDisplay } from '../../lib/poker/utils/handFormatParser';
+import { formatNextHandForDisplay, parseHandFormat } from '../../lib/poker/utils/handFormatParser';
 
 // ===== TYPE DEFINITIONS =====
 
@@ -315,8 +315,14 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
   const [nextHandData, setNextHandData] = useState<NextHandPlayer[] | null>(null);
   const [nextHandFormatted, setNextHandFormatted] = useState<string>('');
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
-  const [comparisonHand, setComparisonHand] = useState('');
-  const [showComparisonModal, setShowComparisonModal] = useState(false);
+  const [comparisonResults, setComparisonResults] = useState<Array<{
+    field: string;
+    expected: string;
+    actual: string;
+    match: boolean;
+  }>>([]);
+  const [showComparison, setShowComparison] = useState(false);
+  const [pastedExpectedHand, setPastedExpectedHand] = useState('');
 
   const convertToPots = (): Pot[] => {
     const pots: Pot[] = [];
@@ -347,7 +353,36 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     const pots = convertToPots();
     console.log('🏆 [WinnerConfirm] Converted pots:', pots);
 
-    const result = processWinnersAndGenerateNextHand(currentPlayers, pots, selections);
+    // Aggregate player contributions from all pots
+    const contributionsMap = new Map<string, number>();
+
+    // Add main pot contributions
+    mainPot.contributions.forEach(contrib => {
+      const player = currentPlayers.find(p => p.id === contrib.playerId);
+      if (player) {
+        contributionsMap.set(player.name, (contributionsMap.get(player.name) || 0) + contrib.amount);
+      }
+    });
+
+    // Add side pot contributions
+    sidePots.forEach(sidePot => {
+      sidePot.contributions.forEach(contrib => {
+        const player = currentPlayers.find(p => p.id === contrib.playerId);
+        if (player) {
+          contributionsMap.set(player.name, (contributionsMap.get(player.name) || 0) + contrib.amount);
+        }
+      });
+    });
+
+    // Convert to array format expected by next hand generator
+    const playerContributions = Array.from(contributionsMap.entries()).map(([playerName, amount]) => ({
+      playerName,
+      amount
+    }));
+
+    console.log('🏆 [WinnerConfirm] Player contributions:', playerContributions);
+
+    const result = processWinnersAndGenerateNextHand(currentPlayers, pots, selections, playerContributions);
     console.log('🏆 [WinnerConfirm] Next hand result:', result.nextHand);
     console.log('🏆 [WinnerConfirm] Validation:', result.validation);
 
@@ -419,13 +454,180 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     }
   };
 
-  const handlePasteFromClipboard = async () => {
+  const handleLoadGSHand = async () => {
+    if (!pastedExpectedHand) return;
     try {
-      const text = await navigator.clipboard.readText();
-      setComparisonHand(text);
+      console.log('🔄 [LoadGSHand] Loading GS hand...');
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(pastedExpectedHand);
+
+      // Update the raw input in stackData so it auto-loads
+      actions.setStackData({ ...stackData, rawInput: pastedExpectedHand });
+      console.log('✅ [LoadGSHand] Stored GS hand in stackData.rawInput');
+
+      // Navigate to stack setup
+      actions.setCurrentView('stack');
+      console.log('✅ [LoadGSHand] Navigated to Stack Setup');
+
+      alert('✅ GS hand loaded in Stack Setup!');
     } catch (error) {
-      console.error('Failed to read clipboard:', error);
-      alert('❌ Failed to read from clipboard');
+      console.error('Failed to load GS hand:', error);
+      alert('❌ Failed to load GS hand');
+    }
+  };
+
+  const handlePasteAndCompare = async () => {
+    try {
+      // Read from clipboard
+      const expectedHand = await navigator.clipboard.readText();
+
+      if (!expectedHand.trim()) {
+        alert('❌ Clipboard is empty');
+        return;
+      }
+
+      // Store pasted data so user can see it
+      setPastedExpectedHand(expectedHand);
+
+      // Parse both hands
+      const generated = parseHandFormat(nextHandFormatted);
+      const expected = parseHandFormat(expectedHand);
+
+      if (!generated || !expected) {
+        alert('❌ Failed to parse one or both hands. Please check the format.');
+        return;
+      }
+
+      // Compare hands
+      const results: Array<{
+        field: string;
+        expected: string;
+        actual: string;
+        match: boolean;
+      }> = [];
+
+      // Compare hand number
+      results.push({
+        field: 'Hand Number',
+        expected: expected.header.handNumber,
+        actual: generated.header.handNumber,
+        match: expected.header.handNumber === generated.header.handNumber
+      });
+
+      // Compare SB
+      results.push({
+        field: 'Small Blind',
+        expected: expected.header.sb.toString(),
+        actual: generated.header.sb.toString(),
+        match: expected.header.sb === generated.header.sb
+      });
+
+      // Compare BB
+      results.push({
+        field: 'Big Blind',
+        expected: expected.header.bb.toString(),
+        actual: generated.header.bb.toString(),
+        match: expected.header.bb === generated.header.bb
+      });
+
+      // Compare Ante
+      results.push({
+        field: 'Ante',
+        expected: expected.header.ante.toString(),
+        actual: generated.header.ante.toString(),
+        match: expected.header.ante === generated.header.ante
+      });
+
+      // Compare player count
+      results.push({
+        field: 'Player Count',
+        expected: expected.players.length.toString(),
+        actual: generated.players.length.toString(),
+        match: expected.players.length === generated.players.length
+      });
+
+      // Compare each player
+      const maxPlayers = Math.max(expected.players.length, generated.players.length);
+      for (let i = 0; i < maxPlayers; i++) {
+        const expPlayer = expected.players[i];
+        const actPlayer = generated.players[i];
+
+        if (expPlayer && actPlayer) {
+          // Compare name
+          results.push({
+            field: `Player ${i + 1} Name`,
+            expected: expPlayer.name,
+            actual: actPlayer.name,
+            match: expPlayer.name === actPlayer.name
+          });
+
+          // Compare position ONLY for Dealer, SB, BB
+          const expPos = expPlayer.position?.toLowerCase();
+          const actPos = actPlayer.position?.toLowerCase();
+          const isButtonPosition = (pos: string | undefined) => {
+            if (!pos) return false;
+            return pos === 'dealer' || pos === 'sb' || pos === 'bb';
+          };
+
+          if (isButtonPosition(expPos) || isButtonPosition(actPos)) {
+            results.push({
+              field: `Player ${i + 1} Position`,
+              expected: expPlayer.position || '(none)',
+              actual: actPlayer.position || '(none)',
+              match: expPlayer.position === actPlayer.position
+            });
+          }
+
+          // Compare stack
+          results.push({
+            field: `Player ${i + 1} Stack`,
+            expected: expPlayer.stack.toLocaleString(),
+            actual: actPlayer.stack.toLocaleString(),
+            match: expPlayer.stack === actPlayer.stack
+          });
+        } else if (expPlayer) {
+          results.push({
+            field: `Player ${i + 1}`,
+            expected: `${expPlayer.name} (${expPlayer.position || 'no pos'}) ${expPlayer.stack}`,
+            actual: '(missing)',
+            match: false
+          });
+        } else if (actPlayer) {
+          results.push({
+            field: `Player ${i + 1}`,
+            expected: '(missing)',
+            actual: `${actPlayer.name} (${actPlayer.position || 'no pos'}) ${actPlayer.stack}`,
+            match: false
+          });
+        }
+      }
+
+      setComparisonResults(results);
+      setShowComparison(true);
+    } catch (error) {
+      console.error('Failed to paste and compare:', error);
+      alert('❌ Failed to read from clipboard or compare hands');
+    }
+  };
+
+  const handleCopyFailures = async () => {
+    const failures = comparisonResults.filter(r => !r.match);
+    if (failures.length === 0) {
+      alert('✅ No failures to copy - all fields match!');
+      return;
+    }
+
+    const failureText = failures
+      .map(f => `${f.field}: Expected "${f.expected}" but got "${f.actual}"`)
+      .join('\n');
+
+    try {
+      await navigator.clipboard.writeText(failureText);
+      alert(`✅ Copied ${failures.length} failure(s) to clipboard!`);
+    } catch (error) {
+      console.error('Failed to copy failures:', error);
+      alert('❌ Failed to copy to clipboard');
     }
   };
 
@@ -504,8 +706,23 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
             {nextHandData.map(player => (
               <div key={player.name} className={`p-4 rounded-lg ${player.stack > 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'} border-2`}>
                 <div className="font-bold text-lg">{player.name}</div>
-                <div className="text-sm">{player.position}</div>
-                <div className="text-2xl font-mono">{player.stack.toLocaleString()}</div>
+                <div className="text-sm text-gray-600">{player.position}</div>
+
+                {/* Previous Stack */}
+                <div className="text-xs text-gray-500 mt-2">Previous:</div>
+                <div className="text-sm font-mono text-gray-700">{player.previousStack.toLocaleString()}</div>
+
+                {/* Net Change */}
+                <div className={`text-sm font-semibold mt-1 ${player.netChange > 0 ? 'text-green-700' : player.netChange < 0 ? 'text-red-700' : 'text-gray-600'}`}>
+                  {player.netChange > 0 ? '+' : ''}{player.netChange.toLocaleString()}
+                </div>
+
+                {/* Divider */}
+                <div className="border-t-2 border-gray-300 my-2"></div>
+
+                {/* New Stack */}
+                <div className="text-xs text-gray-500">New Stack:</div>
+                <div className="text-2xl font-mono font-bold">{player.stack.toLocaleString()}</div>
               </div>
             ))}
           </div>
@@ -544,43 +761,89 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
 
           <div className="mt-6 border-t-2 border-purple-300 pt-6">
             <h4 className="text-lg font-bold mb-4">🔍 Compare with Expected Hand</h4>
-            <div className="mb-4">
-              <label className="font-semibold block mb-2">Generated Hand:</label>
-              <pre className="bg-white p-4 rounded border font-mono text-sm whitespace-pre-wrap">{nextHandFormatted}</pre>
-            </div>
-            <div className="mb-4">
-              <label className="font-semibold block mb-2">Paste from GS (Google Sheets):</label>
-              <textarea
-                value={comparisonHand}
-                onChange={(e) => setComparisonHand(e.target.value)}
-                className="w-full p-4 border rounded font-mono text-sm"
-                rows={10}
-                placeholder="Paste expected hand here..."
-              />
-              <button
-                onClick={handlePasteFromClipboard}
-                className="mt-2 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-              >
-                📋 Paste from Clipboard
-              </button>
-            </div>
+
             <button
-              onClick={() => setShowComparisonModal(true)}
-              disabled={!comparisonHand.trim()}
-              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${comparisonHand.trim() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+              onClick={handlePasteAndCompare}
+              className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold shadow-md mb-4"
             >
-              🔍 Compare Hands
+              📋 Paste & Compare
             </button>
+
+            {pastedExpectedHand && (
+              <div className="mb-4">
+                <label className="font-semibold block mb-2 text-gray-700">Pasted Expected Hand from GS Tool:</label>
+                <pre className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
+                  {pastedExpectedHand}
+                </pre>
+                <button
+                  onClick={handleLoadGSHand}
+                  className="mt-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold shadow-md"
+                >
+                  🔄 Load GS as Next Hand
+                </button>
+              </div>
+            )}
+
+            {showComparison && comparisonResults.length > 0 && (
+              <div className="mt-6">
+                {/* Summary */}
+                <div className={`p-4 rounded-lg mb-4 ${comparisonResults.every(r => r.match) ? 'bg-green-100 border-2 border-green-500' : 'bg-red-100 border-2 border-red-500'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{comparisonResults.every(r => r.match) ? '✅' : '❌'}</span>
+                      <div>
+                        <h3 className="text-lg font-bold">
+                          {comparisonResults.every(r => r.match) ? 'Perfect Match!' : 'Differences Found'}
+                        </h3>
+                        <p className="text-sm">
+                          {comparisonResults.filter(r => r.match).length} of {comparisonResults.length} fields match
+                          ({Math.round((comparisonResults.filter(r => r.match).length / comparisonResults.length) * 100)}%)
+                        </p>
+                      </div>
+                    </div>
+                    {!comparisonResults.every(r => r.match) && (
+                      <button
+                        onClick={handleCopyFailures}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md whitespace-nowrap"
+                      >
+                        📋 Copy Failures
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Detailed Results Table */}
+                <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-200">
+                      <tr>
+                        <th className="px-4 py-2 text-left font-bold">Field</th>
+                        <th className="px-4 py-2 text-left font-bold">Expected</th>
+                        <th className="px-4 py-2 text-left font-bold">Actual</th>
+                        <th className="px-4 py-2 text-center font-bold">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonResults.map((result, index) => (
+                        <tr
+                          key={index}
+                          className={`${result.match ? 'bg-green-50' : 'bg-red-50'} border-t border-gray-300`}
+                        >
+                          <td className="px-4 py-2 font-medium">{result.field}</td>
+                          <td className="px-4 py-2 font-mono">{result.expected}</td>
+                          <td className="px-4 py-2 font-mono">{result.actual}</td>
+                          <td className="px-4 py-2 text-center">
+                            <span className="text-xl">{result.match ? '✅' : '❌'}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
-
-      {showComparisonModal && (
-        <HandComparisonModal
-          generatedHand={nextHandFormatted}
-          expectedHand={comparisonHand}
-          onClose={() => setShowComparisonModal(false)}
-        />
       )}
     </div>
   );
