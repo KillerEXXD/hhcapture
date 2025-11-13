@@ -639,7 +639,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
         // If player has acted (and it's not fold or no action), use the action amount
         // Note: "none" and "no action" are treated the same - player hasn't voluntarily acted yet
-        if (action && action !== 'no action' && action !== 'fold' && action !== 'none' && action !== undefined) {
+        if (action && action !== 'no action' && action !== 'fold' && (action as string) !== 'none' && action !== undefined) {
           // Convert amount based on unit
           let convertedAmount = amount || 0;
           if (effectiveUnit === 'K') {

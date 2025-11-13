@@ -452,20 +452,35 @@ export function validateRaiseAmount(
   const currentMaxBet = getMaxBet(stage, actionLevel, players, playerData, playerId, maxPlayerIdToConsider);
   console.log(`   Current max bet: ${currentMaxBet}`);
 
+  // FR-12.3: Get previous bet for minimum raise increment calculation
+  const previousBet = getPreviousBet(stage, actionLevel, players, playerData);
+  console.log(`   Previous bet: ${previousBet}`);
+
   if (actualRaiseToAmount <= currentMaxBet) {
+    // For preflop with no raises yet, currentMaxBet is the BB
+    // In this case, minimum raise should be 2x BB
+    const isBigBlindScenario = stage === 'preflop' && previousBet === 0;
+    const minRaise = isBigBlindScenario ? currentMaxBet * 2 : currentMaxBet + 1;
+
+    let errorMessage: string;
+    if (isBigBlindScenario) {
+      errorMessage = `Raise amount (${actualRaiseToAmount}) is less than the big blind (${currentMaxBet}). Minimum raise must be at least 2x BB = ${minRaise}.`;
+    } else {
+      errorMessage = `Raise amount (${actualRaiseToAmount}) must be greater than current max bet (${currentMaxBet}).`;
+    }
+
     return {
       isValid: false,
-      errorMessage: `Raise amount (${actualRaiseToAmount}) must be greater than current max bet (${currentMaxBet}).`,
-      minRequired: currentMaxBet + 1
+      errorMessage,
+      minRequired: minRaise
     };
   }
 
   // FR-12.3: Minimum raise increment
-  const previousBet = getPreviousBet(stage, actionLevel, players, playerData);
   const raiseIncrement = currentMaxBet - previousBet;
   const minValidRaise = currentMaxBet + raiseIncrement;
 
-  console.log(`   Previous bet: ${previousBet}, Raise increment: ${raiseIncrement}, Min valid raise: ${minValidRaise}`);
+  console.log(`   Raise increment: ${raiseIncrement}, Min valid raise: ${minValidRaise}`);
 
   if (actualRaiseToAmount < minValidRaise && raiseIncrement > 0) {
     return {
