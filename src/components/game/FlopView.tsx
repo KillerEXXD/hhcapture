@@ -739,11 +739,12 @@ export const FlopView: React.FC<FlopViewProps> = ({
     if (actionLevel === 'base') {
       // Get active players (not folded in preflop)
       const activePlayers = getActivePlayers();
-      // Use the count of active players to determine action order
-      // (don't filter by flop actions in BASE, as those haven't happened yet)
-      const playerCount = activePlayers.length;
+      // IMPORTANT: Use ORIGINAL player count at game start (not current active count)
+      // Action order structure is determined by how many players started the hand
+      const originalPlayerCount = players.filter(p => p.name).length;
+      const playerCount = originalPlayerCount;
 
-      console.log(`🎯 [FlopView] Active players count: ${playerCount}`);
+      console.log(`🎯 [FlopView] Original player count: ${playerCount}, Active players: ${activePlayers.length}`);
 
       // Get current player
       const currentPlayer = players.find(p => p.id === playerId);
@@ -791,6 +792,12 @@ export const FlopView: React.FC<FlopViewProps> = ({
         const prevPlayer = players.find(p => p.position === prevPosition && p.name);
 
         if (prevPlayer) {
+          // Check if player folded in PreFlop - if so, skip them (they don't need to act in Flop)
+          const prevPreflopAction = playerData[prevPlayer.id]?.preflopAction as ActionType | undefined;
+          if (prevPreflopAction === 'fold') {
+            continue; // Player folded in previous street, skip
+          }
+
           const prevAction = playerData[prevPlayer.id]?.flopAction as ActionType | undefined;
           const prevIsAllIn = playerData[prevPlayer.id]?.allInFromPrevious === true;
 

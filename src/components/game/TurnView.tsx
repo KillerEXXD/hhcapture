@@ -735,8 +735,10 @@ export const TurnView: React.FC<TurnViewProps> = ({
     if (actionLevel === 'base') {
       // Get active players (not folded in previous streets)
       const activePlayers = getActivePlayers();
-      // Use the count of active players to determine action order
-      const playerCount = activePlayers.length;
+      // IMPORTANT: Use ORIGINAL player count at game start (not current active count)
+      // Action order structure is determined by how many players started the hand
+      const originalPlayerCount = players.filter(p => p.name).length;
+      const playerCount = originalPlayerCount;
 
       // Get current player
       const currentPlayer = players.find(p => p.id === playerId);
@@ -773,6 +775,13 @@ export const TurnView: React.FC<TurnViewProps> = ({
         const prevPlayer = players.find(p => p.position === prevPosition && p.name);
 
         if (prevPlayer) {
+          // Check if player folded in previous streets - if so, skip them
+          const prevPreflopAction = playerData[prevPlayer.id]?.preflopAction as ActionType | undefined;
+          const prevFlopAction = playerData[prevPlayer.id]?.flopAction as ActionType | undefined;
+          if (prevPreflopAction === 'fold' || prevFlopAction === 'fold') {
+            continue; // Player folded in previous street, skip
+          }
+
           const prevAction = playerData[prevPlayer.id]?.turnAction as ActionType | undefined;
           const prevIsAllIn = playerData[prevPlayer.id]?.allInFromPrevious === true;
 
