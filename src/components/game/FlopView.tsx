@@ -992,22 +992,65 @@ export const FlopView: React.FC<FlopViewProps> = ({
             }
           }
         } else {
-          // Base level: Simple sequential navigation
-          const nextPlayerIndex = playerIndex + 1;
-          if (nextPlayerIndex < activePlayers.length) {
-            const nextPlayer = activePlayers[nextPlayerIndex];
-            const selector = `[data-action-focus="${nextPlayer.id}-flop${suffix}"]`;
-            console.log(`🎯 [navigateAfterAction] Looking for next element: ${selector}`);
-            const nextElement = document.querySelector(selector) as HTMLElement;
-            if (nextElement) {
-              console.log(`✅ [navigateAfterAction] Found next element, focusing on ${nextPlayer.name}`);
-              nextElement.focus();
-            } else {
-              console.log(`❌ [navigateAfterAction] Next element not found`);
-            }
+          // Base level: Use action order to find next active player
+          const originalPlayerCount = players.filter(p => p.name).length;
+
+          // Determine action order based on original player count
+          let actionOrder: string[];
+          if (originalPlayerCount === 2) {
+            actionOrder = ['BB', 'SB', 'Dealer'];
+          } else if (originalPlayerCount === 3) {
+            actionOrder = ['SB', 'BB', 'Dealer'];
           } else {
-            // Last player - navigate to Process Stack button
-            console.log(`🏁 [navigateAfterAction] Last player, navigating to Process Stack`);
+            actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer'];
+          }
+
+          // Find current player's position in action order
+          const currentPlayer = players.find(p => p.id === currentPlayerId);
+          if (!currentPlayer) {
+            console.log(`❌ [navigateAfterAction] Current player not found`);
+            return;
+          }
+
+          const currentPlayerIndex = actionOrder.indexOf(currentPlayer.position);
+          console.log(`🔍 [navigateAfterAction] Current player ${currentPlayer.name} (${currentPlayer.position}) at index ${currentPlayerIndex} in action order`);
+
+          // Find next active player in action order
+          let foundNextPlayer = false;
+          for (let i = currentPlayerIndex + 1; i < actionOrder.length; i++) {
+            const nextPosition = actionOrder[i];
+            const nextPlayer = players.find(p => p.position === nextPosition && p.name);
+
+            if (nextPlayer) {
+              // Check if this player is active (not folded in previous streets)
+              const isFolded = (
+                playerData[nextPlayer.id]?.preflopAction === 'fold' ||
+                playerData[nextPlayer.id]?.preflop_moreActionAction === 'fold' ||
+                playerData[nextPlayer.id]?.preflop_moreAction2Action === 'fold'
+              );
+
+              if (!isFolded) {
+                // Found next active player
+                const selector = `[data-action-focus="${nextPlayer.id}-flop${suffix}"]`;
+                console.log(`🎯 [navigateAfterAction] Next active player: ${nextPlayer.name} (${nextPlayer.position}), looking for ${selector}`);
+                const nextElement = document.querySelector(selector) as HTMLElement;
+                if (nextElement) {
+                  console.log(`✅ [navigateAfterAction] Found next element, focusing on ${nextPlayer.name}`);
+                  nextElement.focus();
+                  foundNextPlayer = true;
+                  break;
+                } else {
+                  console.log(`❌ [navigateAfterAction] Next element not found for ${nextPlayer.name}`);
+                }
+              } else {
+                console.log(`⏭️ [navigateAfterAction] Skipping ${nextPlayer.name} (folded in previous street)`);
+              }
+            }
+          }
+
+          if (!foundNextPlayer) {
+            // No more active players - navigate to Process Stack button
+            console.log(`🏁 [navigateAfterAction] No more active players, navigating to Process Stack`);
             const processStackButton = document.querySelector('[data-process-stack-focus]') as HTMLElement;
             if (processStackButton) {
               processStackButton.focus();

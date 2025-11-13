@@ -13,12 +13,14 @@ import type { UsePotCalculationReturn } from '../../hooks/usePotCalculation';
 import { CardSelector } from '../poker/CardSelector';
 import { ActionButtons } from '../poker/ActionButtons';
 import { AmountInput } from '../poker/AmountInput';
+import { PotCalculationDisplay } from '../poker/PotCalculationDisplay';
 import { processStackSynchronous } from '../../lib/poker/engine/processStack';
 import { calculatePotsForBettingRound } from '../../lib/poker/engine/potCalculationEngine';
 import { checkBettingRoundComplete } from '../../lib/poker/validators/roundCompletionValidator';
 import { checkPlayerNeedsToAct } from '../../lib/poker/validators/playerActionStatus';
 import { returnFocusAfterProcessStack } from '../../lib/poker/utils/focusManagement';
 import { validateRaiseAmount } from '../../lib/poker/validators/raiseValidator';
+import { formatPotsForDisplay, type DisplayPotData } from '../../lib/poker/engine/potDisplayFormatter';
 
 interface PreFlopViewProps {
   state: GameState;
@@ -79,6 +81,10 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
   // State for tracking last processed playerData to detect changes
   const [lastProcessedPlayerDataHash, setLastProcessedPlayerDataHash] = React.useState<string>('');
+
+  // State for pot display
+  const [potDisplayData, setPotDisplayData] = React.useState<DisplayPotData | null>(null);
+  const [showPotDisplay, setShowPotDisplay] = React.useState(false);
 
   // Detect playerData changes and invalidate processed state
   React.useEffect(() => {
@@ -823,22 +829,55 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
             }
           }
         } else {
-          // Base level: Simple sequential navigation (original logic)
-          const nextPlayerIndex = playerIndex + 1;
-          if (nextPlayerIndex < activePlayers.length) {
-            const nextPlayer = activePlayers[nextPlayerIndex];
-            const selector = `[data-card-focus="${nextPlayer.id}-1-preflop${suffix}"]`;
-            console.log(`🎯 [navigateAfterAction] Looking for next element: ${selector}`);
-            const nextElement = document.querySelector(selector) as HTMLElement;
-            if (nextElement) {
-              console.log(`✅ [navigateAfterAction] Found next element, focusing on ${nextPlayer.name}`);
-              nextElement.focus();
-            } else {
-              console.log(`❌ [navigateAfterAction] Next element not found`);
-            }
+          // Base level: Use action order to find next active player
+          const totalPlayers = players.filter(p => p.name).length;
+
+          // Determine PREFLOP action order based on original player count
+          let actionOrder: string[];
+          if (totalPlayers === 2) {
+            actionOrder = ['SB', 'Dealer', 'BB'];
+          } else if (totalPlayers === 3) {
+            actionOrder = ['Dealer', 'SB', 'BB'];
           } else {
-            // Last player - navigate to Process Stack button
-            console.log(`🏁 [navigateAfterAction] Last player, navigating to Process Stack`);
+            actionOrder = ['UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer', 'SB', 'BB'];
+          }
+
+          // Find current player's position in action order
+          const currentPlayer = players.find(p => p.id === currentPlayerId);
+          if (!currentPlayer) {
+            console.log(`❌ [navigateAfterAction] Current player not found`);
+            return;
+          }
+
+          const currentPlayerIndex = actionOrder.indexOf(currentPlayer.position);
+          console.log(`🔍 [navigateAfterAction] Current player ${currentPlayer.name} (${currentPlayer.position}) at index ${currentPlayerIndex} in action order`);
+
+          // Find next active player in action order (who hasn't folded and has a name)
+          let foundNextPlayer = false;
+          for (let i = currentPlayerIndex + 1; i < actionOrder.length; i++) {
+            const nextPosition = actionOrder[i];
+            const nextPlayer = players.find(p => p.position === nextPosition && p.name);
+
+            if (nextPlayer) {
+              // In PreFlop BASE, all players with names are active (fold is just a default selection)
+              // So we just need to find the next player in action order who has a name
+              const selector = `[data-card-focus="${nextPlayer.id}-1-preflop${suffix}"]`;
+              console.log(`🎯 [navigateAfterAction] Next player: ${nextPlayer.name} (${nextPlayer.position}), looking for ${selector}`);
+              const nextElement = document.querySelector(selector) as HTMLElement;
+              if (nextElement) {
+                console.log(`✅ [navigateAfterAction] Found next element, focusing on ${nextPlayer.name}`);
+                nextElement.focus();
+                foundNextPlayer = true;
+                break;
+              } else {
+                console.log(`❌ [navigateAfterAction] Next element not found for ${nextPlayer.name}`);
+              }
+            }
+          }
+
+          if (!foundNextPlayer) {
+            // No more players in action order - navigate to Process Stack button
+            console.log(`🏁 [navigateAfterAction] No more players in action order, navigating to Process Stack`);
             const processStackButton = document.querySelector('[data-process-stack-focus]') as HTMLElement;
             if (processStackButton) {
               processStackButton.focus();
@@ -1118,6 +1157,21 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         players,
         latestPlayerData
       );
+
+      // Format and display pot breakdown if round is complete
+      if (isRoundComplete.isComplete && finalPotInfo) {
+        const displayData = formatPotsForDisplay(
+          finalPotInfo,
+          players,
+          latestContributedAmounts,
+          'preflop'
+        );
+        setPotDisplayData(displayData);
+        setShowPotDisplay(true);
+        console.log('💰 [PreFlopView] Pot display data prepared:', displayData);
+      } else {
+        setShowPotDisplay(false);
+      }
 
       // Disable "Add More Action" button if round is complete
       setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
