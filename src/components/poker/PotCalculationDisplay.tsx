@@ -341,19 +341,33 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
   };
 
   const handleWinnerConfirm = (selections: WinnerSelection[]) => {
+    console.log('🏆 [WinnerConfirm] Winner selections:', selections);
+    console.log('🏆 [WinnerConfirm] Current players:', currentPlayers);
+
     const pots = convertToPots();
+    console.log('🏆 [WinnerConfirm] Converted pots:', pots);
+
     const result = processWinnersAndGenerateNextHand(currentPlayers, pots, selections);
+    console.log('🏆 [WinnerConfirm] Next hand result:', result.nextHand);
+    console.log('🏆 [WinnerConfirm] Validation:', result.validation);
+
     setNextHandData(result.nextHand);
     setValidationResult(result.validation);
     const handNumber = parseInt(stackData.handNumber?.replace(/[^0-9]/g, '') || '1') + 1;
+
+    const playerData = result.nextHand.map(p => ({ name: p.name, position: p.position, stack: p.stack }));
+    console.log('🏆 [WinnerConfirm] Player data for formatting:', playerData);
+
     const formatted = formatNextHandForDisplay(
       handNumber.toString(),
       stackData.startedAt || '00:00:00',
       stackData.smallBlind || 0,
       stackData.bigBlind || 0,
       stackData.ante || 0,
-      result.nextHand.map(p => ({ name: p.name, position: p.position, stack: p.stack }))
+      playerData
     );
+    console.log('🏆 [WinnerConfirm] Formatted hand:', formatted);
+
     setNextHandFormatted(formatted);
     setShowWinnerModal(false);
   };

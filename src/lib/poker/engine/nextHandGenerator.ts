@@ -299,18 +299,26 @@ export function processWinnersAndGenerateNextHand(
   newStacks: Record<string, number>;
 } {
   console.log('🎯 Processing winners and generating next hand...');
+  console.log('Current players count:', currentPlayers.length);
+  console.log('Current players details:', currentPlayers.map(p => ({ id: p.id, name: p.name, position: p.position, stack: p.stack })));
   console.log('Winner selections:', winnerSelections);
 
+  // Filter out any empty/invalid players
+  const validPlayers = currentPlayers.filter(p => p.name && p.name.trim() !== '');
+  if (validPlayers.length !== currentPlayers.length) {
+    console.warn(`⚠️ Filtered out ${currentPlayers.length - validPlayers.length} invalid players`);
+  }
+
   // Step 1: Calculate new stacks
-  const newStacks = calculateNewStacks(currentPlayers, pots, winnerSelections);
+  const newStacks = calculateNewStacks(validPlayers, pots, winnerSelections);
   console.log('New stacks:', newStacks);
 
   // Step 2: Generate next hand
-  const nextHand = generateNextHand(currentPlayers, newStacks);
+  const nextHand = generateNextHand(validPlayers, newStacks);
   console.log('Next hand:', nextHand);
 
   // Step 3: Validate everything
-  const validation = validateNextHand(currentPlayers, nextHand, pots, winnerSelections);
+  const validation = validateNextHand(validPlayers, nextHand, pots, winnerSelections);
 
   if (!validation.isValid) {
     console.error('❌ Validation failed:', validation.errors);
