@@ -624,15 +624,33 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         if (!player.name) continue;
         let contribution = 0;
 
-        // Start with blind contributions
-        if (player.position === 'SB') contribution = 50;
-        if (player.position === 'BB') contribution = 100;
+        // Start with blind contributions (use actual blind values from stackData)
+        if (player.position === 'SB') contribution = stackData.smallBlind;
+        if (player.position === 'BB') contribution = stackData.bigBlind;
 
         // Add action contribution
         const action = playerData[player.id]?.preflopAction as ActionType | undefined;
         const amount = playerData[player.id]?.preflopAmount as number | undefined;
-        if (action && action !== 'no action' && action !== 'fold') {
-          contribution = amount || contribution;
+        const unit = playerData[player.id]?.preflopUnit as string | undefined;
+        // Use stackData unit as fallback if player unit is not set
+        const effectiveUnit = (unit && unit !== 'undefined') ? unit : stackData.unit;
+
+        console.log(`   🔍 [Contribution Calc] ${player.name} (${player.position}): action="${action}", amount=${amount}, unit="${unit}", effectiveUnit="${effectiveUnit}", blind=${contribution}`);
+
+        // If player has acted (and it's not fold or no action), use the action amount
+        // Note: "none" and "no action" are treated the same - player hasn't voluntarily acted yet
+        if (action && action !== 'no action' && action !== 'fold' && action !== 'none' && action !== undefined) {
+          // Convert amount based on unit
+          let convertedAmount = amount || 0;
+          if (effectiveUnit === 'K') {
+            convertedAmount = (amount || 0) * 1000;
+          } else if (effectiveUnit === 'Mil') {
+            convertedAmount = (amount || 0) * 1000000;
+          }
+          contribution = convertedAmount || contribution;
+          console.log(`   → Using action amount: ${amount}${effectiveUnit || ''} = ${contribution}`);
+        } else {
+          console.log(`   → Using blind: ${contribution}`);
         }
 
         contributions.set(player.id, contribution);
@@ -641,16 +659,20 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
       const playerContribution = contributions.get(playerId) || 0;
       const maxContribution = Math.max(...contributions.values());
 
+      console.log(`🎯 [getAvailableActionsForPlayer] ${currentPlayer.name} contribution: ${playerContribution}, max contribution: ${maxContribution}`);
+
       // Available actions based on contribution
       const actions: ActionType[] = [];
 
       // Check: Only enabled when contribution matches max
       if (playerContribution >= maxContribution) {
+        console.log(`✅ [getAvailableActionsForPlayer] ${currentPlayer.name} can CHECK (${playerContribution} >= ${maxContribution})`);
         actions.push('check');
       }
 
       // Call: Only enabled when facing a bet
       if (playerContribution < maxContribution) {
+        console.log(`✅ [getAvailableActionsForPlayer] ${currentPlayer.name} can CALL (${playerContribution} < ${maxContribution})`);
         actions.push('call');
       }
 
