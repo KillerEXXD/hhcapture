@@ -38,21 +38,7 @@ export const HandComparisonModal: React.FC<HandComparisonModalProps> = ({ genera
       match: expected.header.handNumber === generated.header.handNumber
     });
 
-    // Compare start time
-    results.push({
-      field: 'Started At',
-      expected: expected.header.startedAt,
-      actual: generated.header.startedAt,
-      match: expected.header.startedAt === generated.header.startedAt
-    });
-
-    // Compare end time
-    results.push({
-      field: 'Ended At',
-      expected: expected.header.endedAt || 'HH:MM:SS',
-      actual: generated.header.endedAt || 'HH:MM:SS',
-      match: (expected.header.endedAt || 'HH:MM:SS') === (generated.header.endedAt || 'HH:MM:SS')
-    });
+    // SKIP: Start time and End time comparison (timestamps are ignored)
 
     // Compare SB
     results.push({
@@ -101,13 +87,22 @@ export const HandComparisonModal: React.FC<HandComparisonModalProps> = ({ genera
           match: expPlayer.name === actPlayer.name
         });
 
-        // Compare position
-        results.push({
-          field: `Player ${i + 1} Position`,
-          expected: expPlayer.position || '(none)',
-          actual: actPlayer.position || '(none)',
-          match: expPlayer.position === actPlayer.position
-        });
+        // Compare position ONLY for Dealer, SB, BB (skip other positions)
+        const expPos = expPlayer.position?.toLowerCase();
+        const actPos = actPlayer.position?.toLowerCase();
+        const isButtonPosition = (pos: string | undefined) => {
+          if (!pos) return false;
+          return pos === 'dealer' || pos === 'sb' || pos === 'bb';
+        };
+
+        if (isButtonPosition(expPos) || isButtonPosition(actPos)) {
+          results.push({
+            field: `Player ${i + 1} Position`,
+            expected: expPlayer.position || '(none)',
+            actual: actPlayer.position || '(none)',
+            match: expPlayer.position === actPlayer.position
+          });
+        }
 
         // Compare stack
         results.push({
@@ -140,6 +135,27 @@ export const HandComparisonModal: React.FC<HandComparisonModalProps> = ({ genera
   const allMatch = comparisonResults.every(r => r.match);
   const matchCount = comparisonResults.filter(r => r.match).length;
   const totalCount = comparisonResults.length;
+
+  const copyFailuresOnly = async () => {
+    const failures = comparisonResults.filter(r => !r.match);
+    if (failures.length === 0) {
+      alert('✅ No failures to copy - all fields match!');
+      return;
+    }
+
+    // Format failures as a single-cell string (newlines will appear in one cell)
+    const failureText = failures
+      .map(f => `${f.field}: Expected "${f.expected}" but got "${f.actual}"`)
+      .join('\n');
+
+    try {
+      await navigator.clipboard.writeText(failureText);
+      alert(`✅ Copied ${failures.length} failure(s) to clipboard!\n\nYou can paste this into a single Google Sheets cell.`);
+    } catch (error) {
+      console.error('Failed to copy failures:', error);
+      alert('❌ Failed to copy to clipboard');
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -205,16 +221,26 @@ export const HandComparisonModal: React.FC<HandComparisonModalProps> = ({ genera
               <div className="mt-6">
                 {/* Summary */}
                 <div className={`p-4 rounded-lg mb-4 ${allMatch ? 'bg-green-100 border-2 border-green-500' : 'bg-red-100 border-2 border-red-500'}`}>
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{allMatch ? '✅' : '❌'}</span>
-                    <div>
-                      <h3 className="text-lg font-bold">
-                        {allMatch ? 'Perfect Match!' : 'Differences Found'}
-                      </h3>
-                      <p className="text-sm">
-                        {matchCount} of {totalCount} fields match ({Math.round((matchCount / totalCount) * 100)}%)
-                      </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{allMatch ? '✅' : '❌'}</span>
+                      <div>
+                        <h3 className="text-lg font-bold">
+                          {allMatch ? 'Perfect Match!' : 'Differences Found'}
+                        </h3>
+                        <p className="text-sm">
+                          {matchCount} of {totalCount} fields match ({Math.round((matchCount / totalCount) * 100)}%)
+                        </p>
+                      </div>
                     </div>
+                    {!allMatch && (
+                      <button
+                        onClick={copyFailuresOnly}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md whitespace-nowrap"
+                      >
+                        📋 Copy Failures Only
+                      </button>
+                    )}
                   </div>
                 </div>
 
