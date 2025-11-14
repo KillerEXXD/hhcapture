@@ -8,13 +8,12 @@
 import { useCallback, useMemo } from 'react';
 import type { Player, PlayerData, Stage, ActionLevel } from '../types/poker';
 import type { GameState, GameStateActions } from './useGameState';
+import type { PotStructure, BettingRoundStatus } from '../types/poker/pot.types';
 import {
   calculatePotsForBettingRound,
   checkBettingRoundStatus,
-  gatherContributions,
-  type PotStructure,
-  type BettingRoundStatus
-} from '../lib/poker/engine/potEngine';
+  gatherContributions
+} from '../lib/poker/engine/potCalculationEngine';
 
 /**
  * Pot calculation hook return type
@@ -93,8 +92,7 @@ export function usePotCalculation(
       state.processedSections,
       state.sectionStacks,
       state.stackData,
-      previousStreetPot,
-      state.defaultUnit
+      previousStreetPot
     );
 
     return result;
@@ -104,8 +102,7 @@ export function usePotCalculation(
     state.contributedAmounts,
     state.processedSections,
     state.sectionStacks,
-    state.stackData,
-    state.defaultUnit
+    state.stackData
   ]);
 
   /**

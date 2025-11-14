@@ -8,7 +8,8 @@
  */
 
 import type { Player, PlayerData, Stage, ActionLevel, ChipUnit, ProcessedSections, SectionStacks } from '../../../types/poker';
-import type { ContributedAmounts } from '../../../types/poker/pot.types';
+import type { ContributedAmounts, BettingRoundStatus, PreviousRoundInfo, PotStructure } from '../../../types/poker/pot.types';
+import { convertToActualValue } from '../utils/formatUtils';
 
 /**
  * Contribution object for a single player
@@ -575,7 +576,7 @@ export function calculatePotsForBettingRound(
   sectionStacks: SectionStacks,
   stackData: { bigBlind: number; smallBlind: number; ante: number },
   previousStreetPot: number = 0
-): PotInfo {
+): PotStructure {
   console.log(`\n\n🎰 ${'='.repeat(60)}`);
   console.log(`🎰 CALCULATE POTS FOR BETTING ROUND: ${stage.toUpperCase()} ${level.toUpperCase()}`);
   console.log(`🎰 ${'='.repeat(60)}`);
@@ -593,6 +594,9 @@ export function calculatePotsForBettingRound(
     false // Cumulative
   );
 
+  // Step 1.5: Check if betting round is complete
+  const bettingRoundStatus = checkBettingRoundStatus(contributions);
+
   // Step 2: Calculate dead money
   const deadMoney = calculateDeadMoney(stage, contributions);
 
@@ -603,5 +607,153 @@ export function calculatePotsForBettingRound(
   console.log(`🎰 POT CALCULATION COMPLETE`);
   console.log(`🎰 ${'='.repeat(60)}\n\n`);
 
-  return potInfo;
+  // Return complete pot structure with betting round status
+  return {
+    ...potInfo,
+    bettingRoundStatus
+  };
+}
+
+/**
+ * Check if betting round is complete or if action is still pending
+ *
+ * A betting round is complete when:
+ * - All players have folded
+ * - Only one player remains
+ * - All active players have acted and contributions are equal (or all-in)
+ *
+ * @param contributions - Array of player contributions
+ * @returns Betting round completion status
+ */
+export function checkBettingRoundStatus(
+  contributions: PlayerContribution[]
+): BettingRoundStatus {
+  const activePlayers = contributions.filter(c => !c.isFolded);
+
+  if (activePlayers.length === 0) {
+    return { complete: true, reason: 'All players folded', pendingPlayers: [] };
+  }
+
+  if (activePlayers.length === 1) {
+    return { complete: true, reason: 'Only one player remaining', pendingPlayers: [] };
+  }
+
+  // Check if all non-all-in players have matching contributions
+  const nonAllInPlayers = activePlayers.filter(p => !p.isAllIn);
+
+  if (nonAllInPlayers.length === 0) {
+    // All remaining players are all-in
+    return { complete: true, reason: 'All remaining players are all-in', pendingPlayers: [] };
+  }
+
+  // Check if all non-all-in players have the same contribution
+  const maxContribution = Math.max(...nonAllInPlayers.map(p => p.totalContributed));
+  const allMatched = nonAllInPlayers.every(p => p.totalContributed === maxContribution);
+
+  if (allMatched) {
+    return { complete: true, reason: 'All active players have matched bets', pendingPlayers: [] };
+  }
+
+  // Identify pending players
+  const pendingPlayers = nonAllInPlayers
+    .filter(p => p.totalContributed < maxContribution)
+    .map(p => p.playerName);
+
+  return {
+    complete: false,
+    reason: 'Action pending from some players',
+    pendingPlayers: pendingPlayers
+  };
+}
+
+/**
+ * Get the previous round information for a player
+ *
+ * This looks backwards through betting rounds to find the player's most recent action
+ * before the current section. Used for display purposes in pot calculation UI.
+ *
+ * @param playerId - The player ID to check
+ * @param currentStage - Current betting stage
+ * @param currentLevel - Current action level
+ * @param playerData - All player action data
+ * @param defaultUnit - Default chip unit
+ * @returns Previous round info, or null if no previous action
+ */
+export function getPreviousRoundInfo(
+  playerId: number,
+  currentStage: Stage,
+  currentLevel: ActionLevel,
+  playerData: PlayerData,
+  defaultUnit: ChipUnit = 'K'
+): PreviousRoundInfo | null {
+  try {
+    // Define the order of sections
+    const sectionOrder = [
+      'preflop_base', 'preflop_more', 'preflop_more2',
+      'flop_base', 'flop_more', 'flop_more2',
+      'turn_base', 'turn_more', 'turn_more2',
+      'river_base', 'river_more', 'river_more2'
+    ];
+
+    // Map level names to section keys
+    const levelToKey: Record<ActionLevel, string> = {
+      'base': 'base',
+      'more': 'more',
+      'more2': 'more2'
+    };
+
+    const currentSectionKey = `${currentStage}_${levelToKey[currentLevel] || currentLevel}`;
+    const currentIndex = sectionOrder.indexOf(currentSectionKey);
+
+    if (currentIndex <= 0) {
+      return null; // No previous round
+    }
+
+    // Look backwards to find the most recent action by this player
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      const prevSectionKey = sectionOrder[i];
+      const [prevStage, prevLevelRaw] = prevSectionKey.split('_');
+      const prevLevel: ActionLevel = prevLevelRaw === 'base' ? 'base' :
+                        prevLevelRaw === 'more' ? 'more' : 'more2';
+
+      // Map level to suffix for data keys
+      const suffix = prevLevel === 'base' ? '' :
+                     prevLevel === 'more' ? '_moreAction' : '_moreAction2';
+
+      const actionKey = `${prevStage}${suffix}_action`;
+      const amountKey = `${prevStage}${suffix}_amount`;
+      const unitKey = `${prevStage}${suffix}_unit`;
+
+      // Check if player has action data for this section
+      const prevAction = playerData[playerId]?.[actionKey];
+
+      if (prevAction && typeof prevAction === 'string' && prevAction !== 'no action' && prevAction !== '') {
+        // Found a previous action!
+        const amountValue = playerData[playerId]?.[amountKey];
+        const amount = typeof amountValue === 'number' ? amountValue : 0;
+        const unitValue = playerData[playerId]?.[unitKey];
+        let unit: ChipUnit = defaultUnit;
+        if (unitValue === 'K' || unitValue === 'Mil' || unitValue === 'actual') {
+          unit = unitValue;
+        }
+        const actualAmount = convertToActualValue(amount, unit);
+
+        const prevInfo: PreviousRoundInfo = {
+          stageName: prevStage.toUpperCase(),
+          levelName: prevLevel === 'base' ? 'BASE' :
+                    prevLevel === 'more' ? 'MORE ACTION 1' : 'MORE ACTION 2',
+          action: prevAction.charAt(0).toUpperCase() + prevAction.slice(1), // Capitalize
+          amount: actualAmount,
+          sectionKey: prevSectionKey
+        };
+
+        return prevInfo;
+      }
+    }
+
+    return null; // No previous action found
+  } catch (error) {
+    console.error(`Error in getPreviousRoundInfo:`, error);
+    return null; // Return null on error to avoid breaking pot calculation
+  }
 }

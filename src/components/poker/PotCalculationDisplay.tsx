@@ -369,11 +369,14 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     // Blind contribution based on PREVIOUS position
     const blindContribution = wasSB ? sb : wasBB ? bb : 0;
 
+    // Ante contribution (only BB)
+    const anteContribution = wasBB ? ante : 0;
+
     // Total contribution from pot
     const totalContribution = contributionsMap.get(player.name) || 0;
 
-    // Action contribution = total - blind
-    const actionContribution = totalContribution - blindContribution;
+    // Action contribution = total - blind - ante
+    const actionContribution = totalContribution - blindContribution - anteContribution;
 
     // Calculate pot winnings
     let potWinnings = 0;
@@ -388,7 +391,7 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
 
     return {
       previousPosition,
-      anteContribution: wasBB ? ante : 0, // Only BB posts ante
+      anteContribution, // Only BB posts ante
       blindContribution,
       actionContribution,
       totalContribution,
@@ -449,11 +452,15 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
           console.log(`💀 [Contribution] ${player.name} (BB) folded: Adding ${bb} BB + ${ante} Ante = ${bb + ante} as dead money`);
         }
       } else {
-        // Player stayed - ante for BB is dead money (separate from contribution)
-        // but needs to be tracked for stack deduction
-        if (player.position === 'BB') {
-          contributionsMap.set(player.name, currentContribution + ante);
-          console.log(`💰 [Contribution] ${player.name} (BB) stayed: Adding ${ante} Ante as dead money for stack deduction`);
+        // Player stayed in the pot
+        // Add blinds back to contribution (they were already posted but not included in pot contributions)
+        // Also add ante for BB
+        if (player.position === 'SB') {
+          contributionsMap.set(player.name, currentContribution + sb);
+          console.log(`💰 [Contribution] ${player.name} (SB) stayed: Adding ${sb} SB to total contribution`);
+        } else if (player.position === 'BB') {
+          contributionsMap.set(player.name, currentContribution + bb + ante);
+          console.log(`💰 [Contribution] ${player.name} (BB) stayed: Adding ${bb} BB + ${ante} Ante to total contribution`);
         }
       }
     });
