@@ -479,8 +479,8 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     setValidationResult(result.validation);
     const handNumber = parseInt(stackData.handNumber?.replace(/[^0-9]/g, '') || '1') + 1;
 
-    const playerData = result.nextHand.map(p => ({ name: p.name, position: p.position, stack: p.stack }));
-    console.log('🏆 [WinnerConfirm] Player data for formatting:', playerData);
+    const nextHandPlayerData = result.nextHand.map(p => ({ name: p.name, position: p.position, stack: p.stack }));
+    console.log('🏆 [WinnerConfirm] Player data for formatting:', nextHandPlayerData);
 
     const formatted = formatNextHandForDisplay(
       handNumber.toString(),
@@ -488,7 +488,7 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
       stackData.smallBlind || 0,
       stackData.bigBlind || 0,
       stackData.ante || 0,
-      playerData
+      nextHandPlayerData
     );
     console.log('🏆 [WinnerConfirm] Formatted hand:', formatted);
 
