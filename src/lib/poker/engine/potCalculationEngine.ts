@@ -342,7 +342,7 @@ export function calculateDeadMoney(
     if (contrib.isFolded && contrib.totalContributed > 0) {
       if (stage === 'preflop') {
         // Subtract blinds and ante already counted
-        const additionalBets = contrib.totalContributed - contrib.postedSB - contrib.postedBB;
+        const additionalBets = contrib.totalContributed - contrib.postedSB - contrib.postedBB - contrib.postedAnte;
         if (additionalBets > 0) {
           foldedBets += additionalBets;
           console.log(`   💀 ${contrib.playerName} folded bets: ${additionalBets}`);

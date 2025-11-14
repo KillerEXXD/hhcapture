@@ -201,13 +201,25 @@ export function gatherContributions(
     // contributedAmounts contains ADDITIONAL amount beyond posted blinds
     // So we need to add the posted blind to get the total contribution
     if (stage === 'preflop' && includeSections.base) {
+      console.log(`   🎲 [potEngine] ${player.name} preflop blind handling:`);
+      console.log(`      - Base contribution from actions: ${contributedAmounts[baseSectionKey]?.[player.id] || 0}`);
+      console.log(`      - Posted SB: ${postedSB}`);
+      console.log(`      - Posted BB: ${postedBB}`);
+      console.log(`      - Posted Ante: ${postedAnte}`);
+      console.log(`      - Is folded: ${isFolded}`);
+      console.log(`      - Total contributed before blinds: ${totalContributed}`);
+
       if (postedSB > 0) {
         totalContributed += postedSB;
+        console.log(`      ✅ Added SB ${postedSB} → totalContributed now: ${totalContributed}`);
       }
       if (postedBB > 0) {
         totalContributed += postedBB;
+        console.log(`      ✅ Added BB ${postedBB} → totalContributed now: ${totalContributed}`);
       }
-      // Note: Ante is NOT added to totalContributed - it's dead money, handled separately in calculateDeadMoney
+      if (postedAnte > 0) {
+        console.log(`      ⚠️ Ante ${postedAnte} NOT added (dead money, handled separately)`);
+      }
     }
 
     // Get current stack from latest processed section
@@ -244,6 +256,8 @@ export function gatherContributions(
       isAllIn: isAllIn,
       currentStack: Math.max(0, currentStack)
     };
+
+    console.log(`   📊 [potEngine] ${player.name} final contribution: ${totalContributed} (folded: ${isFolded})`);
 
     contributions.push(contrib);
   });
@@ -310,6 +324,12 @@ export function calculateDeadMoney(
   });
 
   const total = anteAmount + foldedBlinds + foldedBets;
+
+  console.log(`   💀 [calculateDeadMoney] Dead money breakdown:`);
+  console.log(`      - Ante: ${anteAmount}`);
+  console.log(`      - Folded blinds: ${foldedBlinds}`);
+  console.log(`      - Folded bets: ${foldedBets}`);
+  console.log(`      - Total dead money: ${total}`);
 
   return {
     total: total,
@@ -485,6 +505,12 @@ export function createPots(
     // NO ALL-INS: Everything goes to main pot (simple case)
     const totalContributions = sortedPlayers.reduce((sum, p) => sum + p.totalContributed, 0);
 
+    console.log(`   🎰 [createPots] No all-ins - creating main pot:`);
+    console.log(`      - Total contributions: ${totalContributions}`);
+    console.log(`      - Dead money: ${deadMoney.total}`);
+    console.log(`      - Previous street pot: ${previousStreetPot}`);
+    console.log(`      - Main pot amount: ${totalContributions + deadMoney.total + previousStreetPot}`);
+
     pots.push({
       potNumber: 0,
       amount: totalContributions,
@@ -605,6 +631,16 @@ export function createPots(
   // Calculate total pot
   const totalContributions = sortedPlayers.reduce((sum, p) => sum + p.totalContributed, 0);
   const totalPot = totalContributions + deadMoney.total + previousStreetPot;
+
+  console.log(`   💰 [createPots] FINAL POT CALCULATION:`);
+  console.log(`      - Total contributions from active players: ${totalContributions}`);
+  console.log(`      - Dead money total: ${deadMoney.total}`);
+  console.log(`      - Previous street pot: ${previousStreetPot}`);
+  console.log(`      - TOTAL POT: ${totalPot}`);
+  console.log(`      - Active players breakdown:`);
+  sortedPlayers.forEach(p => {
+    console.log(`        * ${p.playerName}: ${p.totalContributed}`);
+  });
 
   // Calculate percentages
   pots.forEach(pot => {
