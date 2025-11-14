@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Player, GameConfig } from '../../types/poker';
+import type { Player, GameConfig, PlayerData, PlayerDataEntry } from '../../types/poker';
 import type { GameStateActions } from '../../hooks/useGameState';
 import type { ContributedAmounts } from '../../types/poker/pot.types';
 import { WinnerSelectionModal } from './WinnerSelectionModal';
@@ -54,6 +54,7 @@ interface PotCalculationDisplayProps {
   stackData: GameConfig;
   actions: GameStateActions;
   contributedAmounts: ContributedAmounts;
+  playerData: PlayerData;
 }
 
 // ===== COMPONENTS =====
@@ -313,6 +314,7 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
   stackData,
   actions,
   contributedAmounts,
+  playerData,
 }) => {
   const [showWinnerModal, setShowWinnerModal] = useState(false);
   const [nextHandData, setNextHandData] = useState<NextHandPlayer[] | null>(null);
@@ -414,7 +416,35 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     // Calculate player contributions from contributedAmounts (includes ALL players, even folded)
     const contributionsMap = new Map<string, number>();
 
-    // Sum contributions across all sections for each player
+    // STEP 1: Add posted blinds/ante for preflop (these may not be in contributedAmounts if player folded without action)
+    currentPlayers.forEach(player => {
+      const data: PlayerDataEntry | undefined = playerData[player.id];
+      if (!data) return;
+
+      const position = player.position?.toLowerCase();
+      let blindContribution = 0;
+
+      if (position === 'sb' && typeof data.postedSB === 'number') {
+        blindContribution += data.postedSB;
+        console.log(`💰 [Blind] ${player.name} (SB): ${blindContribution}`);
+      }
+      if (position === 'bb') {
+        if (typeof data.postedBB === 'number') {
+          blindContribution += data.postedBB;
+          console.log(`💰 [Blind] ${player.name} (BB): ${data.postedBB}`);
+        }
+        if (typeof data.postedAnte === 'number') {
+          blindContribution += data.postedAnte;
+          console.log(`💰 [Ante] ${player.name} (BB): ${data.postedAnte}`);
+        }
+      }
+
+      if (blindContribution > 0) {
+        contributionsMap.set(player.name, blindContribution);
+      }
+    });
+
+    // STEP 2: Sum contributions across all sections for each player (additional contributions beyond blinds)
     Object.entries(contributedAmounts).forEach(([sectionKey, playerAmounts]) => {
       Object.entries(playerAmounts).forEach(([playerIdStr, amount]) => {
         const playerId = parseInt(playerIdStr);

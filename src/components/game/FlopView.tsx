@@ -2073,6 +2073,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
                 stackData={state.stackData}
                 actions={actions}
                 contributedAmounts={potDisplayData.contributedAmounts}
+                playerData={state.playerData}
               />
             </div>
           </div>

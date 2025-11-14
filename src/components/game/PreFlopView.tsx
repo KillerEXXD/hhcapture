@@ -2334,6 +2334,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
                 stackData={state.stackData}
                 actions={actions}
                 contributedAmounts={potDisplayData.contributedAmounts}
+                playerData={state.playerData}
               />
             </div>
           </div>

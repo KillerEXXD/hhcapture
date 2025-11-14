@@ -923,15 +923,24 @@ export const TurnView: React.FC<TurnViewProps> = ({
     const activePlayers = getActivePlayers();
     const currentPlayerIndex = activePlayers.findIndex(p => p.id === playerId);
 
+    console.log(`🎯 [TurnView MORE ACTION] Checking player ${playerId}, actionLevel: ${actionLevel}, suffix: ${suffix}`);
+    console.log(`🎯 [TurnView MORE ACTION] Active players:`, activePlayers.map(p => `${p.name} (${p.position})`));
+    console.log(`🎯 [TurnView MORE ACTION] Current player index: ${currentPlayerIndex}`);
+
     if (currentPlayerIndex === -1) {
+      console.log(`❌ [TurnView MORE ACTION] Player ${playerId} not found in active players`);
       return []; // Player not found
     }
+
+    const currentPlayer = players.find(p => p.id === playerId);
+    console.log(`🎯 [TurnView MORE ACTION] Current player: ${currentPlayer?.name} (${currentPlayer?.position})`);
 
     // IMPORTANT: Check if player is all-in FIRST (before checking action order)
     // A player who is all-in cannot take any further actions
     const playerStatus = checkPlayerNeedsToAct(playerId, 'turn', actionLevel, players, playerData);
 
     if (playerStatus.alreadyAllIn) {
+      console.log(`🔒 [TurnView MORE ACTION] Player ${currentPlayer?.name} is already all-in`);
       // Player is all-in from previous round - show locked all-in button (FR-11)
       return ['all-in']; // Special locked state
     }
@@ -940,13 +949,17 @@ export const TurnView: React.FC<TurnViewProps> = ({
     const actionKey = `turn${suffix}Action` as keyof PlayerData[number];
     const playerAction = playerData[playerId]?.[actionKey];
 
+    console.log(`🎯 [TurnView MORE ACTION] Player ${currentPlayer?.name} action: ${playerAction}`);
+
     // If player has already acted, allow them to modify their action (FR-1.3)
     if (playerAction && playerAction !== 'no action') {
+      console.log(`✅ [TurnView MORE ACTION] Player ${currentPlayer?.name} has acted, allowing modification`);
       return ['call', 'raise', 'all-in', 'fold']; // FR-9.2: No check/bet/no action in More Actions
     }
 
     // First player in more action: Enable buttons
     if (currentPlayerIndex === 0) {
+      console.log(`✅ [TurnView MORE ACTION] Player ${currentPlayer?.name} is first, enabling buttons`);
       return ['call', 'raise', 'all-in', 'fold']; // FR-9.2
     }
 
@@ -955,10 +968,17 @@ export const TurnView: React.FC<TurnViewProps> = ({
     const previousPlayerData = playerData[previousPlayer.id];
     const previousPlayerAction = previousPlayerData?.[actionKey];
 
+    console.log(`🔍 [TurnView MORE ACTION] Previous player: ${previousPlayer.name} (${previousPlayer.position})`);
+    console.log(`🔍 [TurnView MORE ACTION] Previous player action: ${previousPlayerAction}`);
+
     // If previous player hasn't acted yet, disable all buttons
     if (!previousPlayerAction || previousPlayerAction === 'no action') {
+      console.log(`❌ [TurnView MORE ACTION] Previous player ${previousPlayer.name} hasn't acted, disabling buttons for ${currentPlayer?.name}`);
       return []; // Disabled - sequential enabling
     }
+
+    console.log(`✅ [TurnView MORE ACTION] Previous player ${previousPlayer.name} has acted, checking if ${currentPlayer?.name} needs to act`);
+
 
     if (playerStatus.alreadyMatchedMaxBet) {
       // Player already matched max bet from previous round - no action required
@@ -2137,6 +2157,7 @@ export const TurnView: React.FC<TurnViewProps> = ({
                 stackData={state.stackData}
                 actions={actions}
                 contributedAmounts={potDisplayData.contributedAmounts}
+                playerData={state.playerData}
               />
             </div>
           </div>

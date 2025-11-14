@@ -202,6 +202,95 @@ function calculateCumulativeContribution(
 }
 
 /**
+ * Calculate player's contribution WITHIN a specific MORE ACTION level only
+ * (not cumulative from BASE). This is used to compare against max contribution
+ * in MORE ACTION rounds.
+ */
+function calculateContributionInActionLevel(
+  playerId: number,
+  stage: Stage,
+  actionLevel: ActionLevel,
+  playerData: PlayerData
+): number {
+  const data = playerData[playerId];
+  if (!data) return 0;
+
+  console.log(`   🔍 [calculateContributionInActionLevel] Player ${playerId}, stage: ${stage}, action level: ${actionLevel}`);
+
+  // Build field names dynamically based on stage
+  const baseActionKey = `${stage}Action` as keyof PlayerData[number];
+  const baseAmountKey = `${stage}Amount` as keyof PlayerData[number];
+  const baseUnitKey = `${stage}Unit` as keyof PlayerData[number];
+  const moreAction1ActionKey = `${stage}_moreActionAction` as keyof PlayerData[number];
+  const moreAction1AmountKey = `${stage}_moreActionAmount` as keyof PlayerData[number];
+  const moreAction1UnitKey = `${stage}_moreActionUnit` as keyof PlayerData[number];
+  const moreAction2ActionKey = `${stage}_moreAction2Action` as keyof PlayerData[number];
+  const moreAction2AmountKey = `${stage}_moreAction2Amount` as keyof PlayerData[number];
+  const moreAction2UnitKey = `${stage}_moreAction2Unit` as keyof PlayerData[number];
+
+  // For More Action 1: Calculate contribution WITHIN More Action 1 only
+  if (actionLevel === 'more') {
+    const moreAction1 = data[moreAction1ActionKey];
+    const moreAction1Amount = convertAmount(
+      data[moreAction1AmountKey] as string | undefined,
+      data[moreAction1UnitKey] as ChipUnit | undefined
+    );
+
+    // Get BASE amount to subtract
+    const baseAction = data[baseActionKey];
+    let baseAmount = 0;
+    if (baseAction && baseAction !== 'fold' && baseAction !== 'check' && baseAction !== 'no action') {
+      baseAmount = convertAmount(data[baseAmountKey] as string | undefined, data[baseUnitKey] as ChipUnit | undefined);
+    } else {
+      // No BASE action, just blinds
+      const blindsAntes = stage === 'preflop' ? ((data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0)) : 0;
+      baseAmount = blindsAntes;
+    }
+
+    // Contribution in More Action 1 = Total MA1 amount - BASE amount
+    const contributionInLevel = moreAction1Amount - baseAmount;
+    console.log(`   🔍 [calculateContributionInActionLevel] Player ${playerId} MA1: ${moreAction1Amount} - ${baseAmount} = ${contributionInLevel}`);
+    return contributionInLevel;
+  }
+
+  // For More Action 2: Calculate contribution WITHIN More Action 2 only
+  else if (actionLevel === 'more2') {
+    const moreAction2 = data[moreAction2ActionKey];
+    const moreAction2Amount = convertAmount(
+      data[moreAction2AmountKey] as string | undefined,
+      data[moreAction2UnitKey] as ChipUnit | undefined
+    );
+
+    // Get More Action 1 total amount to subtract
+    const moreAction1 = data[moreAction1ActionKey];
+    let moreAction1Amount = 0;
+    if (moreAction1 && moreAction1 !== 'fold' && moreAction1 !== 'check' && moreAction1 !== 'no action') {
+      moreAction1Amount = convertAmount(
+        data[moreAction1AmountKey] as string | undefined,
+        data[moreAction1UnitKey] as ChipUnit | undefined
+      );
+    } else {
+      // No MA1 action, get BASE amount
+      const baseAction = data[baseActionKey];
+      if (baseAction && baseAction !== 'fold' && baseAction !== 'check' && baseAction !== 'no action') {
+        moreAction1Amount = convertAmount(data[baseAmountKey] as string | undefined, data[baseUnitKey] as ChipUnit | undefined);
+      } else {
+        // No BASE action, just blinds
+        const blindsAntes = stage === 'preflop' ? ((data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0)) : 0;
+        moreAction1Amount = blindsAntes;
+      }
+    }
+
+    // Contribution in More Action 2 = Total MA2 amount - MA1 total amount
+    const contributionInLevel = moreAction2Amount - moreAction1Amount;
+    console.log(`   🔍 [calculateContributionInActionLevel] Player ${playerId} MA2: ${moreAction2Amount} - ${moreAction1Amount} = ${contributionInLevel}`);
+    return contributionInLevel;
+  }
+
+  return 0;
+}
+
+/**
  * Calculate the maximum contribution among all active players
  * IMPORTANT: This includes contributions made in the CURRENT More Action round
  *
@@ -299,6 +388,109 @@ function calculateMaxContribution(
 }
 
 /**
+ * Calculate the maximum contribution WITHIN a specific MORE ACTION level only
+ * (not cumulative from BASE). This is used to determine if players need to act
+ * in MORE ACTION rounds.
+ */
+function calculateMaxContributionInActionLevel(
+  stage: Stage,
+  actionLevel: ActionLevel,
+  players: Player[],
+  playerData: PlayerData
+): number {
+  let maxInLevel = 0;
+
+  console.log(`   🔍 [calculateMaxContributionInActionLevel] Stage: ${stage}, Action level: ${actionLevel}`);
+
+  // Build field names dynamically based on stage
+  const baseActionKey = `${stage}Action` as keyof PlayerData[number];
+  const moreAction1ActionKey = `${stage}_moreActionAction` as keyof PlayerData[number];
+  const moreAction1AmountKey = `${stage}_moreActionAmount` as keyof PlayerData[number];
+  const moreAction1UnitKey = `${stage}_moreActionUnit` as keyof PlayerData[number];
+  const baseAmountKey = `${stage}Amount` as keyof PlayerData[number];
+  const baseUnitKey = `${stage}Unit` as keyof PlayerData[number];
+  const moreAction2ActionKey = `${stage}_moreAction2Action` as keyof PlayerData[number];
+  const moreAction2AmountKey = `${stage}_moreAction2Amount` as keyof PlayerData[number];
+  const moreAction2UnitKey = `${stage}_moreAction2Unit` as keyof PlayerData[number];
+
+  for (const player of players) {
+    if (!player.name) continue;
+
+    const data = playerData[player.id];
+    if (!data) continue;
+
+    // Skip folded players
+    if (data[baseActionKey] === 'fold') continue;
+    if (actionLevel === 'more' && data[moreAction1ActionKey] === 'fold') continue;
+    if (actionLevel === 'more2' && (data[moreAction1ActionKey] === 'fold' || data[moreAction2ActionKey] === 'fold')) continue;
+
+    let contributionInLevel = 0;
+
+    // For More Action 1: Calculate contribution WITHIN More Action 1 only
+    if (actionLevel === 'more') {
+      const moreAction1 = data[moreAction1ActionKey];
+      const moreAction1Amount = convertAmount(
+        data[moreAction1AmountKey] as string | undefined,
+        data[moreAction1UnitKey] as ChipUnit | undefined
+      );
+
+      // Get BASE amount to subtract
+      const baseAction = data[baseActionKey];
+      let baseAmount = 0;
+      if (baseAction && baseAction !== 'fold' && baseAction !== 'check' && baseAction !== 'no action') {
+        baseAmount = convertAmount(data[baseAmountKey] as string | undefined, data[baseUnitKey] as ChipUnit | undefined);
+      } else {
+        // No BASE action, just blinds
+        const blindsAntes = stage === 'preflop' ? ((data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0)) : 0;
+        baseAmount = blindsAntes;
+      }
+
+      // Contribution in More Action 1 = Total MA1 amount - BASE amount
+      contributionInLevel = moreAction1Amount - baseAmount;
+      console.log(`   🔍 [calculateMaxContributionInActionLevel] Player ${player.id} (${player.name}) MA1 contribution: ${moreAction1Amount} - ${baseAmount} = ${contributionInLevel}`);
+    }
+
+    // For More Action 2: Calculate contribution WITHIN More Action 2 only
+    else if (actionLevel === 'more2') {
+      const moreAction2 = data[moreAction2ActionKey];
+      const moreAction2Amount = convertAmount(
+        data[moreAction2AmountKey] as string | undefined,
+        data[moreAction2UnitKey] as ChipUnit | undefined
+      );
+
+      // Get More Action 1 total amount to subtract
+      const moreAction1 = data[moreAction1ActionKey];
+      let moreAction1Amount = 0;
+      if (moreAction1 && moreAction1 !== 'fold' && moreAction1 !== 'check' && moreAction1 !== 'no action') {
+        moreAction1Amount = convertAmount(
+          data[moreAction1AmountKey] as string | undefined,
+          data[moreAction1UnitKey] as ChipUnit | undefined
+        );
+      } else {
+        // No MA1 action, get BASE amount
+        const baseAction = data[baseActionKey];
+        if (baseAction && baseAction !== 'fold' && baseAction !== 'check' && baseAction !== 'no action') {
+          moreAction1Amount = convertAmount(data[baseAmountKey] as string | undefined, data[baseUnitKey] as ChipUnit | undefined);
+        } else {
+          // No BASE action, just blinds
+          const blindsAntes = stage === 'preflop' ? ((data.postedSB || 0) + (data.postedBB || 0) + (data.postedAnte || 0)) : 0;
+          moreAction1Amount = blindsAntes;
+        }
+      }
+
+      // Contribution in More Action 2 = Total MA2 amount - MA1 total amount
+      contributionInLevel = moreAction2Amount - moreAction1Amount;
+      console.log(`   🔍 [calculateMaxContributionInActionLevel] Player ${player.id} (${player.name}) MA2 contribution: ${moreAction2Amount} - ${moreAction1Amount} = ${contributionInLevel}`);
+    }
+
+    maxInLevel = Math.max(maxInLevel, contributionInLevel);
+  }
+
+  console.log(`   🔍 [calculateMaxContributionInActionLevel] MAX contribution in level: ${maxInLevel}`);
+  return maxInLevel;
+}
+
+/**
  * Check if a specific player needs to act in the current More Action round
  *
  * @param playerId - ID of the player to check
@@ -365,14 +557,6 @@ export function checkPlayerNeedsToAct(
     };
   }
 
-  // Calculate cumulative contribution for this player
-  const cumulativeContribution = calculateCumulativeContribution(playerId, stage, actionLevel, playerData);
-  console.log(`   Player ${playerId} cumulative contribution: ${cumulativeContribution}`);
-
-  // Calculate max contribution among all players
-  const maxContribution = calculateMaxContribution(stage, actionLevel, players, playerData);
-  console.log(`   Max contribution: ${maxContribution}`);
-
   // Check if player is all-in from previous rounds
   const alreadyAllIn = checkIfPlayerAllIn(playerId, stage, actionLevel, playerData);
   console.log(`   Player ${playerId} all-in: ${alreadyAllIn}`);
@@ -383,14 +567,33 @@ export function checkPlayerNeedsToAct(
       needsToAct: false,
       alreadyMatchedMaxBet: false,
       alreadyAllIn: true,
-      cumulativeContribution,
-      maxContribution,
+      cumulativeContribution: 0,
+      maxContribution: 0,
     };
   }
 
+  // For MORE ACTION rounds: Compare contributions WITHIN the action level only
+  // For BASE rounds: Compare cumulative contributions
+  let playerContribution: number;
+  let maxBet: number;
+
+  if (actionLevel === 'more' || actionLevel === 'more2') {
+    console.log(`   🎯 [MORE ACTION] Comparing action-level-specific contributions`);
+    playerContribution = calculateContributionInActionLevel(playerId, stage, actionLevel, playerData);
+    maxBet = calculateMaxContributionInActionLevel(stage, actionLevel, players, playerData);
+    console.log(`   Player ${playerId} contribution in ${actionLevel}: ${playerContribution}`);
+    console.log(`   Max contribution in ${actionLevel}: ${maxBet}`);
+  } else {
+    console.log(`   🎯 [BASE] Comparing cumulative contributions`);
+    playerContribution = calculateCumulativeContribution(playerId, stage, actionLevel, playerData);
+    maxBet = calculateMaxContribution(stage, actionLevel, players, playerData);
+    console.log(`   Player ${playerId} cumulative contribution: ${playerContribution}`);
+    console.log(`   Max cumulative contribution: ${maxBet}`);
+  }
+
   // Check if player already matched max bet
-  const alreadyMatchedMaxBet = cumulativeContribution >= maxContribution;
-  console.log(`   Player ${playerId} matched max bet: ${alreadyMatchedMaxBet}`);
+  const alreadyMatchedMaxBet = playerContribution >= maxBet;
+  console.log(`   Player ${playerId} matched max bet: ${alreadyMatchedMaxBet} (${playerContribution} >= ${maxBet})`);
 
   if (alreadyMatchedMaxBet) {
     console.log(`   → Player ${playerId} already matched max bet, does NOT need to act`);
@@ -398,18 +601,18 @@ export function checkPlayerNeedsToAct(
       needsToAct: false,
       alreadyMatchedMaxBet: true,
       alreadyAllIn: false,
-      cumulativeContribution,
-      maxContribution,
+      cumulativeContribution: playerContribution,
+      maxContribution: maxBet,
     };
   }
 
   // Player needs to act
-  console.log(`   → Player ${playerId} NEEDS to act (contribution ${cumulativeContribution} < max ${maxContribution})`);
+  console.log(`   → Player ${playerId} NEEDS to act (contribution ${playerContribution} < max ${maxBet})`);
   return {
     needsToAct: true,
     alreadyMatchedMaxBet: false,
     alreadyAllIn: false,
-    cumulativeContribution,
-    maxContribution,
+    cumulativeContribution: playerContribution,
+    maxContribution: maxBet,
   };
 }

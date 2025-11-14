@@ -2224,6 +2224,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
                 stackData={state.stackData}
                 actions={actions}
                 contributedAmounts={potDisplayData.contributedAmounts}
+                playerData={state.playerData}
               />
             </div>
           </div>
