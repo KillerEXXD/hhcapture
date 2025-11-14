@@ -488,23 +488,49 @@ export function StackSetupView({
   /**
    * Navigation buttons
    */
+  // Determine which streets are available based on potsByStage
+  const hasPreflop = state.potsByStage && Object.keys(state.potsByStage).some(key => key.startsWith('preflop'));
+  const hasFlop = state.potsByStage && Object.keys(state.potsByStage).some(key => key.startsWith('flop'));
+  const hasTurn = state.potsByStage && Object.keys(state.potsByStage).some(key => key.startsWith('turn'));
+  const hasRiver = state.potsByStage && Object.keys(state.potsByStage).some(key => key.startsWith('river'));
+
   const navigationButtons = (
     <div className="flex flex-wrap gap-1">
       <button className="px-2 py-1 rounded text-xs font-medium bg-purple-600 text-white">
         Stack
       </button>
-      <button
-        className="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
-        disabled
-      >
-        Pre-flop
-      </button>
-      <button
-        className="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
-        disabled
-      >
-        Flop
-      </button>
+      {hasPreflop && (
+        <button
+          onClick={() => actions.setCurrentView('preflop')}
+          className="px-2 py-1 rounded text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+        >
+          Pre-flop
+        </button>
+      )}
+      {hasFlop && (
+        <button
+          onClick={() => actions.setCurrentView('flop')}
+          className="px-2 py-1 rounded text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+        >
+          Flop
+        </button>
+      )}
+      {hasTurn && (
+        <button
+          onClick={() => actions.setCurrentView('turn')}
+          className="px-2 py-1 rounded text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+        >
+          Turn
+        </button>
+      )}
+      {hasRiver && (
+        <button
+          onClick={() => actions.setCurrentView('river')}
+          className="px-2 py-1 rounded text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+        >
+          River
+        </button>
+      )}
     </div>
   );
 

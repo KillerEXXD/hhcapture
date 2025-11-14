@@ -928,6 +928,12 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
           <div className="mt-6 border-t-2 border-purple-300 pt-6">
             <h4 className="text-lg font-bold mb-4">🔍 Compare with Expected Hand</h4>
 
+            <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                💡 <span className="font-semibold">Tip:</span> Copy the GS output for generated next hand and click "Paste & Compare" below
+              </p>
+            </div>
+
             <button
               onClick={handlePasteAndCompare}
               className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold shadow-md mb-4"

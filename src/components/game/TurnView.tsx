@@ -1116,6 +1116,12 @@ export const TurnView: React.FC<TurnViewProps> = ({
     );
   };
 
+  // Determine which streets are available based on potsByStage
+  const hasPreflop = potsByStage && Object.keys(potsByStage).some(key => key.startsWith('preflop'));
+  const hasFlop = potsByStage && Object.keys(potsByStage).some(key => key.startsWith('flop'));
+  const hasTurn = potsByStage && Object.keys(potsByStage).some(key => key.startsWith('turn'));
+  const hasRiver = potsByStage && Object.keys(potsByStage).some(key => key.startsWith('river'));
+
   return (
     <div className="p-2 max-w-full mx-auto bg-gray-50 min-h-screen">
       <div className="bg-white rounded-lg shadow-lg p-3">
@@ -1127,30 +1133,36 @@ export const TurnView: React.FC<TurnViewProps> = ({
           >
             Stack
           </button>
-          <button
-            onClick={() => setCurrentView('preflop')}
-            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
-          >
-            Pre-flop
-          </button>
-          <button
-            onClick={() => setCurrentView('flop')}
-            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
-          >
-            Flop
-          </button>
+          {hasPreflop && (
+            <button
+              onClick={() => setCurrentView('preflop')}
+              className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              Pre-flop
+            </button>
+          )}
+          {hasFlop && (
+            <button
+              onClick={() => setCurrentView('flop')}
+              className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              Flop
+            </button>
+          )}
           <button
             className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-blue-600 text-white"
             disabled
           >
             Turn
           </button>
-          <button
-            onClick={() => setCurrentView('river')}
-            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
-          >
-            River
-          </button>
+          {hasRiver && (
+            <button
+              onClick={() => setCurrentView('river')}
+              className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              River
+            </button>
+          )}
         </div>
 
         {/* HEADER */}

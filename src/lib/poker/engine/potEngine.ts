@@ -162,17 +162,16 @@ export function gatherContributions(
     let postedBB = 0;
     let postedAnte = 0;
 
-    // For preflop, handle posted amounts (blinds/ante) - only in base level
+    // For preflop, track posted amounts (blinds/ante) - only in base level
+    // Don't add to totalContributed yet - will be added based on fold/stay status
     if (stage === 'preflop' && includeSections.base) {
       if (position === 'sb') {
         postedSB = data.postedSB || 0;
-        totalContributed += postedSB;  // ADD posted SB
       }
 
       if (position === 'bb') {
         postedAnte = data.postedAnte || 0;
         postedBB = data.postedBB || 0;
-        totalContributed += postedBB;  // ADD posted BB (not ante!)
       }
     }
 
@@ -197,6 +196,19 @@ export function gatherContributions(
 
     // Check if player folded
     const isFolded = hasPlayerFolded(player.id, stage, playerData);
+
+    // Add blind contributions (NOT ante - that's dead money)
+    // contributedAmounts contains ADDITIONAL amount beyond posted blinds
+    // So we need to add the posted blind to get the total contribution
+    if (stage === 'preflop' && includeSections.base) {
+      if (postedSB > 0) {
+        totalContributed += postedSB;
+      }
+      if (postedBB > 0) {
+        totalContributed += postedBB;
+      }
+      // Note: Ante is NOT added to totalContributed - it's dead money, handled separately in calculateDeadMoney
+    }
 
     // Get current stack from latest processed section
     let currentStack = player.stack;

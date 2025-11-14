@@ -50,7 +50,8 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
     stackData,
     processedSections,
     sectionStacks,
-    contributedAmounts
+    contributedAmounts,
+    potsByStage
   } = state;
   const {
     setCurrentView,
@@ -1032,6 +1033,18 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         // Update state with normalized data
         setPlayerData(normalizedPlayerData);
         console.log('✅ Normalized base level actions (undefined → fold)');
+
+        // Check if all players have folded
+        const allFolded = players.filter(p => p.name).every(player => {
+          const data = normalizedPlayerData[player.id] || {};
+          return data.preflopAction === 'fold';
+        });
+
+        if (allFolded) {
+          alert('❌ No players to process - all players have folded.');
+          console.error('❌ [ProcessStack] All players folded - nothing to process');
+          return;
+        }
       }
 
       // Track the latest result across all levels
@@ -1341,6 +1354,12 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
     );
   };
 
+  // Determine which streets are available based on potsByStage
+  const hasPreflop = potsByStage && Object.keys(potsByStage).some(key => key.startsWith('preflop'));
+  const hasFlop = potsByStage && Object.keys(potsByStage).some(key => key.startsWith('flop'));
+  const hasTurn = potsByStage && Object.keys(potsByStage).some(key => key.startsWith('turn'));
+  const hasRiver = potsByStage && Object.keys(potsByStage).some(key => key.startsWith('river'));
+
   return (
     <div className="p-2 max-w-full mx-auto bg-gray-50 min-h-screen">
       <div className="bg-white rounded-lg shadow-lg p-3">
@@ -1358,24 +1377,30 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
           >
             Pre-flop
           </button>
-          <button
-            onClick={() => setCurrentView('flop')}
-            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
-          >
-            Flop
-          </button>
-          <button
-            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-100 text-gray-400 cursor-not-allowed"
-            disabled
-          >
-            Turn
-          </button>
-          <button
-            className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-100 text-gray-400 cursor-not-allowed"
-            disabled
-          >
-            River
-          </button>
+          {hasFlop && (
+            <button
+              onClick={() => setCurrentView('flop')}
+              className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              Flop
+            </button>
+          )}
+          {hasTurn && (
+            <button
+              onClick={() => setCurrentView('turn')}
+              className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              Turn
+            </button>
+          )}
+          {hasRiver && (
+            <button
+              onClick={() => setCurrentView('river')}
+              className="px-4 py-2 rounded-t text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              River
+            </button>
+          )}
         </div>
 
         {/* HEADER */}
