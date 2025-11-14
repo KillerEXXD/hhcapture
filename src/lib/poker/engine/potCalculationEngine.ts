@@ -237,19 +237,21 @@ export function gatherContributions(
           console.log(`   💀 ${player.name} (BB) folded: ${postedBB} (BB) + ${postedAnte} (Ante) = ${bbAnteTotal} goes to pot as dead money`);
         }
       } else {
-        // When player stays, their actions should already include the posted blinds
-        // The contributedAmounts from actions include the blind as part of the total bet
+        // When player stays, contributedAmounts contains ADDITIONAL amount beyond posted blinds
+        // So we need to add the posted blind to get the total contribution
         // Ante for BB is always dead money (not counted in contribution matching)
+        if (postedSB > 0) {
+          totalContributed += postedSB;
+          console.log(`   💰 ${player.name} (SB) stayed: ${postedSB} SB included in actions`);
+        }
+        if (postedBB > 0) {
+          totalContributed += postedBB;
+          console.log(`   💰 ${player.name} (BB) stayed: ${postedBB} BB included in actions`);
+        }
         if (postedAnte > 0) {
           // Ante is dead money but needs to be deducted from stack
           // It's NOT part of contribution matching, so we don't add it to totalContributed here
           console.log(`   💰 ${player.name} (BB) stayed: ${postedAnte} ante is dead money (separate from contribution)`);
-        }
-        if (postedSB > 0) {
-          console.log(`   💰 ${player.name} (SB) stayed: ${postedSB} SB included in actions`);
-        }
-        if (postedBB > 0) {
-          console.log(`   💰 ${player.name} (BB) stayed: ${postedBB} BB included in actions`);
         }
       }
     }

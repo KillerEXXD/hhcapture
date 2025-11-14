@@ -32,6 +32,7 @@ export interface NextHandPlayer {
   netChange: number;      // + for winnings, - for losses
   // Detailed breakdown for transparency
   breakdown?: {
+    previousPosition: string;      // Position in the previous hand
     anteContribution: number;      // Ante paid
     blindContribution: number;     // SB/BB paid (if applicable)
     actionContribution: number;    // Additional bets/raises beyond blind

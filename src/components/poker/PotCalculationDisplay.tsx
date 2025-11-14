@@ -351,18 +351,23 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     player: NextHandPlayer,
     selections: WinnerSelection[],
     pots: Pot[],
-    contributionsMap: Map<string, number>
+    contributionsMap: Map<string, number>,
+    previousHandPlayers: Player[]
   ) => {
     const ante = stackData.ante || 0;
     const sb = stackData.smallBlind || 0;
     const bb = stackData.bigBlind || 0;
 
-    // Determine if this player is SB or BB
-    const isSB = player.position === 'SB';
-    const isBB = player.position === 'BB';
+    // Find the player's PREVIOUS hand position (from the hand that just completed)
+    const previousPlayer = previousHandPlayers.find(p => p.name === player.name);
+    const previousPosition = previousPlayer?.position || '';
 
-    // Blind contribution
-    const blindContribution = isSB ? sb : isBB ? bb : 0;
+    // Determine if this player WAS SB or BB in the PREVIOUS hand
+    const wasSB = previousPosition === 'SB';
+    const wasBB = previousPosition === 'BB';
+
+    // Blind contribution based on PREVIOUS position
+    const blindContribution = wasSB ? sb : wasBB ? bb : 0;
 
     // Total contribution from pot
     const totalContribution = contributionsMap.get(player.name) || 0;
@@ -382,13 +387,14 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     });
 
     return {
-      anteContribution: isBB ? ante : 0, // Only BB posts ante
+      previousPosition,
+      anteContribution: wasBB ? ante : 0, // Only BB posts ante
       blindContribution,
       actionContribution,
       totalContribution,
       potWinnings,
-      isBlindPosition: isSB || isBB,
-      blindType: isSB ? 'SB' as const : isBB ? 'BB' as const : undefined
+      isBlindPosition: wasSB || wasBB,
+      blindType: wasSB ? 'SB' as const : wasBB ? 'BB' as const : undefined
     };
   };
 
@@ -467,7 +473,7 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     // Add breakdown to each player
     const nextHandWithBreakdown = result.nextHand.map(player => ({
       ...player,
-      breakdown: calculatePlayerBreakdown(player, selections, pots, contributionsMap)
+      breakdown: calculatePlayerBreakdown(player, selections, pots, contributionsMap, currentPlayers)
     }));
 
     setNextHandData(nextHandWithBreakdown);
@@ -826,7 +832,17 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
                 return (
                   <div key={player.name} className={`p-4 rounded-lg ${player.stack > 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'} border-2`}>
                     <div className="font-bold text-lg">{player.name}</div>
-                    <div className="text-sm text-gray-600 mb-3">{player.position}</div>
+
+                    {/* Show Previous → Next Position */}
+                    <div className="text-sm mb-3">
+                      {breakdown.previousPosition && (
+                        <span className="text-gray-600">
+                          Previous: <span className="font-semibold">{breakdown.previousPosition}</span>
+                          <span className="mx-1">→</span>
+                        </span>
+                      )}
+                      <span className="text-blue-600 font-semibold">Next: {player.position}</span>
+                    </div>
 
                     {/* Detailed Calculation */}
                     <div className="bg-white rounded-lg p-3 mb-2 text-xs font-mono">
