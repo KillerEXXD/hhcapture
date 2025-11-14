@@ -95,7 +95,8 @@ const PotHeader: React.FC<{
   isExpanded: boolean;
   onToggle: () => void;
   headerColorClasses: string;
-}> = ({ potInfo, isExpanded, onToggle, headerColorClasses }) => {
+  winners?: string[]; // Winner names for this pot
+}> = ({ potInfo, isExpanded, onToggle, headerColorClasses, winners }) => {
   const icon = potInfo.potType === 'main' ? '🏆' : potInfo.potNumber === 1 ? '💼' : '💎';
   const title = potInfo.potType === 'main'
     ? 'Main Pot'
@@ -117,9 +118,23 @@ const PotHeader: React.FC<{
         <div className="flex items-center gap-4">
           <div className="text-3xl drop-shadow-md">{icon}</div>
           <div>
-            <h3 className="text-2xl font-extrabold text-white drop-shadow-md mb-1">
-              {title}
-            </h3>
+            <div className="flex items-center gap-3 mb-1">
+              <h3 className="text-2xl font-extrabold text-white drop-shadow-md">
+                {title}
+              </h3>
+              {winners && winners.length > 0 && (
+                <div className="flex gap-1.5 flex-wrap">
+                  {winners.map((winner) => (
+                    <span
+                      key={winner}
+                      className="px-2.5 py-0.5 bg-red-600 text-white text-xs font-bold rounded-md shadow-md border border-red-700"
+                    >
+                      🏆 {winner}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="text-sm text-white/95 font-semibold">
               {subtitle}
             </div>
@@ -272,7 +287,8 @@ const InfoBox: React.FC<{
 const PotCard: React.FC<{
   potInfo: PotInfo;
   headerColorClasses: string;
-}> = ({ potInfo, headerColorClasses }) => {
+  winners?: string[]; // Winner names for this pot
+}> = ({ potInfo, headerColorClasses, winners }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -282,6 +298,7 @@ const PotCard: React.FC<{
         isExpanded={isExpanded}
         onToggle={() => setIsExpanded(!isExpanded)}
         headerColorClasses={headerColorClasses}
+        winners={winners}
       />
 
       {/* Expandable Body */}
@@ -317,6 +334,7 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
   playerData,
 }) => {
   const [showWinnerModal, setShowWinnerModal] = useState(false);
+  const [winnerSelections, setWinnerSelections] = useState<WinnerSelection[]>([]);
   const [nextHandData, setNextHandData] = useState<NextHandPlayer[] | null>(null);
   const [nextHandFormatted, setNextHandFormatted] = useState<string>('');
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
@@ -350,6 +368,12 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
       });
     });
     return pots;
+  };
+
+  // Get winners for a specific pot
+  const getWinnersForPot = (potName: string): string[] | undefined => {
+    const selection = winnerSelections.find(s => s.potName === potName);
+    return selection?.winnerNames;
   };
 
   const calculatePlayerBreakdown = (
@@ -409,6 +433,9 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
   const handleWinnerConfirm = (selections: WinnerSelection[]) => {
     console.log('🏆 [WinnerConfirm] Winner selections:', selections);
     console.log('🏆 [WinnerConfirm] Current players:', currentPlayers);
+
+    // Store winner selections to display in pot headers
+    setWinnerSelections(selections);
 
     const pots = convertToPots();
     console.log('🏆 [WinnerConfirm] Converted pots:', pots);
@@ -754,6 +781,7 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
       <PotCard
         potInfo={mainPot}
         headerColorClasses="bg-gradient-to-br from-yellow-400 to-yellow-500"
+        winners={getWinnersForPot('Main Pot')}
       />
 
       {/* Side Pots */}
@@ -761,12 +789,14 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
         const colorClasses = index === 0
           ? "bg-gradient-to-br from-blue-400 to-blue-500"
           : "bg-gradient-to-br from-purple-400 to-purple-500";
+        const potName = `Side Pot ${sidePot.potNumber || 1}`;
 
         return (
           <PotCard
             key={sidePot.potNumber}
             potInfo={sidePot}
             headerColorClasses={colorClasses}
+            winners={getWinnersForPot(potName)}
           />
         );
       })}
