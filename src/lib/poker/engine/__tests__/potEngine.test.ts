@@ -3,19 +3,23 @@
  * Comprehensive tests for pot calculation functions
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from '@jest/globals';
+// Import helper functions from playerActionUtils
 import {
   getLastActionInBettingRound,
-  hasPlayerFolded,
+  hasPlayerFolded
+} from '../../utils/playerActionUtils';
+// Import pot calculation functions from potCalculationEngine
+import {
   gatherContributions,
   calculateDeadMoney,
   getPreviousRoundInfo,
   createPots,
   checkBettingRoundStatus,
-  calculatePotsForBettingRound
-} from '../potEngine';
+  calculatePotsForBettingRound,
+  type PlayerContribution
+} from '../potCalculationEngine';
 import type {
-  Contribution,
   ContributedAmounts,
   DeadMoney
 } from '../../../../types/poker/pot.types';
@@ -416,7 +420,7 @@ describe('gatherContributions()', () => {
 
 describe('calculateDeadMoney()', () => {
   it('should calculate ante as dead money', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 2,
         playerName: 'Bob',
@@ -439,7 +443,7 @@ describe('calculateDeadMoney()', () => {
   });
 
   it('should calculate folded SB blind as dead money', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -462,7 +466,7 @@ describe('calculateDeadMoney()', () => {
   });
 
   it('should calculate folded BB blind as dead money', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 2,
         playerName: 'Bob',
@@ -486,7 +490,7 @@ describe('calculateDeadMoney()', () => {
   });
 
   it('should calculate folded bets as dead money (preflop)', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 3,
         playerName: 'Charlie',
@@ -509,7 +513,7 @@ describe('calculateDeadMoney()', () => {
   });
 
   it('should calculate folded bets correctly with blinds (preflop)', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -533,7 +537,7 @@ describe('calculateDeadMoney()', () => {
   });
 
   it('should calculate folded bets as dead money (postflop)', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -556,7 +560,7 @@ describe('calculateDeadMoney()', () => {
   });
 
   it('should combine all dead money sources', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -676,10 +680,9 @@ describe('getPreviousRoundInfo()', () => {
 
 describe('createPots()', () => {
   const deadMoney: DeadMoney = { total: 0, ante: 0, foldedBlinds: 0, foldedBets: 0 };
-  const playerData: PlayerData = {};
 
   it('should create single main pot with no all-ins', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -708,7 +711,7 @@ describe('createPots()', () => {
       }
     ];
 
-    const result = createPots(contributions, deadMoney, 0, 'flop', 'base', playerData);
+    const result = createPots(contributions, deadMoney, 0, 'flop', 'base');
 
     expect(result.mainPot.amount).toBe(2000);
     expect(result.sidePots).toHaveLength(0);
@@ -717,7 +720,7 @@ describe('createPots()', () => {
   });
 
   it('should create side pots with one all-in', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -746,7 +749,7 @@ describe('createPots()', () => {
       }
     ];
 
-    const result = createPots(contributions, deadMoney, 0, 'flop', 'base', playerData);
+    const result = createPots(contributions, deadMoney, 0, 'flop', 'base');
 
     // Main pot: 5000 (Alice) + 5000 (Bob matching Alice) = 10000
     expect(result.mainPot.amount).toBe(10000);
@@ -763,7 +766,7 @@ describe('createPots()', () => {
   });
 
   it('should create multiple side pots with multiple all-ins', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -805,7 +808,7 @@ describe('createPots()', () => {
       }
     ];
 
-    const result = createPots(contributions, deadMoney, 0, 'flop', 'base', playerData);
+    const result = createPots(contributions, deadMoney, 0, 'flop', 'base');
 
     // Main pot: 3000 * 3 = 9000 (capped at Alice's all-in)
     expect(result.mainPot.amount).toBe(9000);
@@ -825,7 +828,7 @@ describe('createPots()', () => {
   });
 
   it('should add dead money to main pot', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -847,14 +850,14 @@ describe('createPots()', () => {
       foldedBets: 0
     };
 
-    const result = createPots(contributions, deadMoneyWithAnte, 0, 'flop', 'base', playerData);
+    const result = createPots(contributions, deadMoneyWithAnte, 0, 'flop', 'base');
 
     expect(result.mainPot.amount).toBe(1500); // 1000 contribution + 500 dead money
     expect(result.deadMoney).toBe(500);
   });
 
   it('should add previous street pot to main pot', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -870,14 +873,14 @@ describe('createPots()', () => {
       }
     ];
 
-    const result = createPots(contributions, deadMoney, 5000, 'flop', 'base', playerData);
+    const result = createPots(contributions, deadMoney, 5000, 'flop', 'base');
 
     expect(result.mainPot.amount).toBe(6000); // 1000 contribution + 5000 previous
     expect(result.totalPot).toBe(6000);
   });
 
   it('should handle everyone folded scenario', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -899,7 +902,7 @@ describe('createPots()', () => {
       foldedBets: 500
     };
 
-    const result = createPots(contributions, deadMoneyWithBet, 0, 'flop', 'base', playerData);
+    const result = createPots(contributions, deadMoneyWithBet, 0, 'flop', 'base');
 
     expect(result.mainPot.amount).toBe(500);
     expect(result.mainPot.eligiblePlayers).toHaveLength(0);
@@ -907,7 +910,7 @@ describe('createPots()', () => {
   });
 
   it('should calculate pot percentages correctly', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -936,7 +939,7 @@ describe('createPots()', () => {
       }
     ];
 
-    const result = createPots(contributions, deadMoney, 0, 'flop', 'base', playerData);
+    const result = createPots(contributions, deadMoney, 0, 'flop', 'base');
 
     // Main pot: 10000, Side pot: 5000, Total: 15000
     expect(result.mainPot.percentage).toBeCloseTo(66.67, 1);
@@ -944,7 +947,7 @@ describe('createPots()', () => {
   });
 
   it('should identify zero contributors', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -973,7 +976,7 @@ describe('createPots()', () => {
       }
     ];
 
-    const result = createPots(contributions, deadMoney, 0, 'flop', 'base', playerData);
+    const result = createPots(contributions, deadMoney, 0, 'flop', 'base');
 
     expect(result.hasZeroContributor).toBe(true);
     expect(result.zeroContributors).toHaveLength(1);
@@ -987,7 +990,7 @@ describe('createPots()', () => {
 
 describe('checkBettingRoundStatus()', () => {
   it('should return complete if all players folded', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -1010,7 +1013,7 @@ describe('checkBettingRoundStatus()', () => {
   });
 
   it('should return complete if only one player remaining', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -1046,7 +1049,7 @@ describe('checkBettingRoundStatus()', () => {
   });
 
   it('should return complete if all remaining players are all-in', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -1082,7 +1085,7 @@ describe('checkBettingRoundStatus()', () => {
   });
 
   it('should return complete if all active players matched bets', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
@@ -1118,7 +1121,7 @@ describe('checkBettingRoundStatus()', () => {
   });
 
   it('should return incomplete if some players have not matched', () => {
-    const contributions: Contribution[] = [
+    const contributions: PlayerContribution[] = [
       {
         playerId: 1,
         playerName: 'Alice',
