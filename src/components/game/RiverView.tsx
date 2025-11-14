@@ -387,7 +387,9 @@ export const RiverView: React.FC<RiverViewProps> = ({
             return; // Skip FR-12 validation if basic validation fails
           }
 
-          // Run FR-12 validation (order-aware: only consider raises from players who acted before this player)
+          // Run FR-12 validation
+          // NOTE: During Process Stack, all actions are complete, so we don't filter by action order
+          // The validation logic will see ALL raises, which is correct for final validation
           const validationResult = validateRaiseAmount(
             player.id,
             raiseToAmount,
@@ -396,8 +398,8 @@ export const RiverView: React.FC<RiverViewProps> = ({
             players,
             playerData,
             sectionStacks,
-            unit || defaultUnit,
-            player.id // Only consider raises from players with ID <= this player's ID
+            unit || defaultUnit
+            // No maxPlayerIdToConsider parameter - consider all players for Process Stack validation
           );
 
           if (!validationResult.isValid) {
@@ -2221,6 +2223,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
                 currentPlayers={state.players}
                 stackData={state.stackData}
                 actions={actions}
+                contributedAmounts={potDisplayData.contributedAmounts}
               />
             </div>
           </div>

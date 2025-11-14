@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Player, GameConfig } from '../../types/poker';
 import type { GameStateActions } from '../../hooks/useGameState';
+import type { ContributedAmounts } from '../../types/poker/pot.types';
 import { WinnerSelectionModal } from './WinnerSelectionModal';
 import {
   processWinnersAndGenerateNextHand,
@@ -52,6 +53,7 @@ interface PotCalculationDisplayProps {
   currentPlayers: Player[];
   stackData: GameConfig;
   actions: GameStateActions;
+  contributedAmounts: ContributedAmounts;
 }
 
 // ===== COMPONENTS =====
@@ -310,6 +312,7 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
   currentPlayers,
   stackData,
   actions,
+  contributedAmounts,
 }) => {
   const [showWinnerModal, setShowWinnerModal] = useState(false);
   const [nextHandData, setNextHandData] = useState<NextHandPlayer[] | null>(null);
@@ -408,61 +411,20 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     const pots = convertToPots();
     console.log('🏆 [WinnerConfirm] Converted pots:', pots);
 
-    // Aggregate player contributions from all pots
+    // Calculate player contributions from contributedAmounts (includes ALL players, even folded)
     const contributionsMap = new Map<string, number>();
 
-    // Add main pot contributions
-    mainPot.contributions.forEach(contrib => {
-      const player = currentPlayers.find(p => p.id === contrib.playerId);
-      if (player) {
-        contributionsMap.set(player.name, (contributionsMap.get(player.name) || 0) + contrib.amount);
-      }
-    });
-
-    // Add side pot contributions
-    sidePots.forEach(sidePot => {
-      sidePot.contributions.forEach(contrib => {
-        const player = currentPlayers.find(p => p.id === contrib.playerId);
-        if (player) {
-          contributionsMap.set(player.name, (contributionsMap.get(player.name) || 0) + contrib.amount);
+    // Sum contributions across all sections for each player
+    Object.entries(contributedAmounts).forEach(([sectionKey, playerAmounts]) => {
+      Object.entries(playerAmounts).forEach(([playerIdStr, amount]) => {
+        const playerId = parseInt(playerIdStr);
+        const player = currentPlayers.find(p => p.id === playerId);
+        if (player && amount > 0) {
+          const currentTotal = contributionsMap.get(player.name) || 0;
+          contributionsMap.set(player.name, currentTotal + amount);
+          console.log(`💰 [Contribution] ${player.name}: +${amount} from ${sectionKey}, total: ${currentTotal + amount}`);
         }
       });
-    });
-
-    // Add blinds/antes for folded players (dead money)
-    const ante = stackData.ante || 0;
-    const sb = stackData.smallBlind || 0;
-    const bb = stackData.bigBlind || 0;
-
-    currentPlayers.forEach(player => {
-      const currentContribution = contributionsMap.get(player.name) || 0;
-
-      // Check if player folded (has no contribution in any pot)
-      const playerInMainPot = mainPot.contributions.some(c => c.playerId === player.id);
-      const playerInSidePots = sidePots.some(sp => sp.contributions.some(c => c.playerId === player.id));
-      const playerFolded = !playerInMainPot && !playerInSidePots;
-
-      if (playerFolded) {
-        // Add posted blinds/antes as dead money
-        if (player.position === 'SB') {
-          contributionsMap.set(player.name, currentContribution + sb);
-          console.log(`💀 [Contribution] ${player.name} (SB) folded: Adding ${sb} SB as dead money`);
-        } else if (player.position === 'BB') {
-          contributionsMap.set(player.name, currentContribution + bb + ante);
-          console.log(`💀 [Contribution] ${player.name} (BB) folded: Adding ${bb} BB + ${ante} Ante = ${bb + ante} as dead money`);
-        }
-      } else {
-        // Player stayed in the pot
-        // Add blinds back to contribution (they were already posted but not included in pot contributions)
-        // Also add ante for BB
-        if (player.position === 'SB') {
-          contributionsMap.set(player.name, currentContribution + sb);
-          console.log(`💰 [Contribution] ${player.name} (SB) stayed: Adding ${sb} SB to total contribution`);
-        } else if (player.position === 'BB') {
-          contributionsMap.set(player.name, currentContribution + bb + ante);
-          console.log(`💰 [Contribution] ${player.name} (BB) stayed: Adding ${bb} BB + ${ante} Ante to total contribution`);
-        }
-      }
     });
 
     // Convert to array format expected by next hand generator

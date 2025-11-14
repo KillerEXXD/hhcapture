@@ -46,6 +46,7 @@ export interface DisplayPotData {
   mainPot: DisplayPotInfo;
   sidePots: DisplayPotInfo[];
   players: Player[];
+  contributedAmounts: ContributedAmounts; // All player contributions including folded players
 }
 
 /**
@@ -91,6 +92,7 @@ export function formatPotsForDisplay(
     mainPot: formattedMainPot,
     sidePots: formattedSidePots,
     players: players.filter(p => p.name), // Only include named players
+    contributedAmounts, // Pass through for next hand calculation
   };
 }
 

@@ -383,7 +383,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
             return; // Skip FR-12 validation if basic validation fails
           }
 
-          // Run FR-12 validation (order-aware: only consider raises from players who acted before this player)
+          // Run FR-12 validation (Process Stack: all actions complete, no order filtering needed)
           const validationResult = validateRaiseAmount(
             player.id,
             raiseToAmount,
@@ -393,7 +393,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
             playerData,
             sectionStacks,
             unit || defaultUnit,
-            player.id // Only consider raises from players with ID <= this player's ID
+            undefined // Process Stack: consider all players, actions are already validated during input
           );
 
           if (!validationResult.isValid) {
@@ -2072,6 +2072,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
                 currentPlayers={state.players}
                 stackData={state.stackData}
                 actions={actions}
+                contributedAmounts={potDisplayData.contributedAmounts}
               />
             </div>
           </div>
