@@ -784,11 +784,8 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
           </div>
 
           {/* Collapsible Player Details */}
-          <div
-            className={`overflow-hidden transition-all duration-400 ease-in-out ${
-              isNextHandExpanded ? 'max-h-[5000px]' : 'max-h-0'
-            }`}
-          >
+          {isNextHandExpanded && (
+            <div className="transition-all duration-300 ease-in-out">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
               {nextHandData.map(player => {
                 const breakdown = player.breakdown;
@@ -861,22 +858,23 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
                 );
               })}
             </div>
-          </div>
 
-          {validationResult && (
-            <div className={`p-4 rounded-lg mb-4 ${validationResult.isValid ? 'bg-green-100' : 'bg-red-100'}`}>
-              {validationResult.isValid ? (
-                <span className="text-green-800 font-semibold">✅ All validations passed</span>
-              ) : (
-                <div>
-                  <span className="text-red-800 font-semibold">❌ Validation errors:</span>
-                  <ul className="list-disc list-inside mt-2">
-                    {validationResult.errors.map((error, idx) => (
-                      <li key={idx} className="text-red-700 text-sm">{error}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+            {validationResult && (
+              <div className={`p-4 rounded-lg mb-4 ${validationResult.isValid ? 'bg-green-100' : 'bg-red-100'}`}>
+                {validationResult.isValid ? (
+                  <span className="text-green-800 font-semibold">✅ All validations passed</span>
+                ) : (
+                  <div>
+                    <span className="text-red-800 font-semibold">❌ Validation errors:</span>
+                    <ul className="list-disc list-inside mt-2">
+                      {validationResult.errors.map((error, idx) => (
+                        <li key={idx} className="text-red-700 text-sm">{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
             </div>
           )}
 
