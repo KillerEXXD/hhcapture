@@ -8,7 +8,7 @@
  */
 
 import type { Player, PlayerData, Stage, ActionLevel, ChipUnit, ProcessedSections, SectionStacks } from '../../../types/poker';
-import type { ContributedAmounts, BettingRoundStatus, PreviousRoundInfo, PotStructure } from '../../../types/poker/pot.types';
+import type { ContributedAmounts, BettingRoundStatus, PreviousRoundInfo, PotStructure, Pot, DeadMoney, PotPlayer } from '../../../types/poker/pot.types';
 import { convertToActualValue } from '../utils/formatUtils';
 
 /**
@@ -33,26 +33,19 @@ export interface PlayerContribution {
 }
 
 /**
- * Dead money breakdown
+ * Helper function to create a PotPlayer from a PlayerContribution
  */
-export interface DeadMoney {
-  total: number;
-  ante: number;
-  foldedBlinds: number;
-  foldedBets: number;
+function createPotPlayer(player: PlayerContribution): PotPlayer {
+  return {
+    id: player.playerId,
+    name: player.playerName,
+    position: player.position,
+    contribution: player.totalContributed,
+    totalContribution: player.totalContributed,
+    isAllIn: player.isAllIn
+  };
 }
 
-/**
- * Single pot structure
- */
-export interface Pot {
-  potNumber: number;
-  amount: number;
-  cappedAt: number;
-  eligiblePlayers: { id: number; name: string }[];
-  excludedPlayers: { id: number; name: string }[];
-  percentage?: number;
-}
 
 /**
  * Complete pot information
@@ -64,7 +57,7 @@ export interface PotInfo {
   deadMoney: number;
   deadMoneyBreakdown: DeadMoney;
   hasZeroContributor: boolean;
-  zeroContributors: { id: number; name: string }[];
+  zeroContributors: PotPlayer[];
 }
 
 /**
@@ -449,7 +442,7 @@ export function createPots(
       potNumber: 0,
       amount: mainPotAmount,
       cappedAt: maxContribution,
-      eligiblePlayers: activePlayers.map(p => ({ id: p.playerId, name: p.playerName })),
+      eligiblePlayers: activePlayers.map(createPotPlayer),
       excludedPlayers: [],
       percentage: 100
     };
@@ -465,7 +458,7 @@ export function createPots(
       deadMoney: deadMoney.total,
       deadMoneyBreakdown: deadMoney,
       hasZeroContributor: activePlayers.some(p => p.totalContributed === 0),
-      zeroContributors: activePlayers.filter(p => p.totalContributed === 0).map(p => ({ id: p.playerId, name: p.playerName }))
+      zeroContributors: activePlayers.filter(p => p.totalContributed === 0).map(createPotPlayer)
     };
   }
 
@@ -495,14 +488,15 @@ export function createPots(
     // Excluded players are those below this level
     const excludedPlayers = sortedPlayers
       .filter(p => p.totalContributed < currentCap)
-      .map(p => ({ id: p.playerId, name: p.playerName }));
+      .map(p => ({ ...createPotPlayer(p), reason: 'Below contribution level' }));
 
     const pot: Pot = {
       potNumber: pots.length,
       amount: potAmount,
       cappedAt: currentCap,
-      eligiblePlayers: playersAtThisLevel.map(p => ({ id: p.playerId, name: p.playerName })),
-      excludedPlayers
+      eligiblePlayers: playersAtThisLevel.map(createPotPlayer),
+      excludedPlayers,
+      percentage: 0 // Will be calculated later
     };
 
     pots.push(pot);
@@ -546,7 +540,7 @@ export function createPots(
     deadMoney: deadMoney.total,
     deadMoneyBreakdown: deadMoney,
     hasZeroContributor: activePlayers.some(p => p.totalContributed === 0),
-    zeroContributors: activePlayers.filter(p => p.totalContributed === 0).map(p => ({ id: p.playerId, name: p.playerName }))
+    zeroContributors: activePlayers.filter(p => p.totalContributed === 0).map(createPotPlayer)
   };
 }
 

@@ -1,4 +1,19 @@
 /**
+ * @deprecated This file is deprecated. Use potCalculationEngine.ts instead.
+ *
+ * This file will be removed in a future version.
+ * All new code should use potCalculationEngine.ts.
+ *
+ * Migration:
+ * - Helper functions moved to src/lib/poker/utils/playerActionUtils.ts
+ * - Main pot calculation functions available in potCalculationEngine.ts
+ * - checkBettingRoundStatus() and getPreviousRoundInfo() now in potCalculationEngine.ts
+ *
+ * Migration date: 2025-11-14
+ * Target removal: Next major version
+ *
+ * ---
+ *
  * Pot Engine
  * Pure functions for pot calculations in poker
  *
