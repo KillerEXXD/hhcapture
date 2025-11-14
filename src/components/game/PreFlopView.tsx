@@ -1171,7 +1171,12 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
           finalPotInfo,
           players,
           latestContributedAmounts,
-          'preflop'
+          'preflop',
+          {
+            sb: stackData.smallBlind || 0,
+            bb: stackData.bigBlind || 0,
+            ante: stackData.ante || 0
+          }
         );
         setPotDisplayData(displayData);
         setShowPotDisplay(true);

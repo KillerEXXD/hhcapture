@@ -55,7 +55,8 @@ export function formatPotsForDisplay(
   enginePotInfo: EnginePotInfo,
   players: Player[],
   contributedAmounts: ContributedAmounts,
-  currentStreet: Stage
+  currentStreet: Stage,
+  blindAnte?: { sb: number; bb: number; ante: number }
 ): DisplayPotData {
   const { mainPot, sidePots, totalPot, deadMoneyBreakdown } = enginePotInfo;
 
@@ -67,7 +68,8 @@ export function formatPotsForDisplay(
     players,
     contributedAmounts,
     currentStreet,
-    deadMoneyBreakdown
+    deadMoneyBreakdown,
+    blindAnte
   );
 
   // Format side pots
@@ -79,7 +81,8 @@ export function formatPotsForDisplay(
       players,
       contributedAmounts,
       currentStreet,
-      deadMoneyBreakdown
+      deadMoneyBreakdown,
+      blindAnte
     )
   );
 
@@ -101,7 +104,8 @@ function formatPotInfo(
   players: Player[],
   contributedAmounts: ContributedAmounts,
   currentStreet: Stage,
-  deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number }
+  deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number },
+  blindAnte?: { sb: number; bb: number; ante: number }
 ): DisplayPotInfo {
   // Get eligible and excluded players
   const eligiblePlayers = players.filter(p =>
@@ -130,7 +134,9 @@ function formatPotInfo(
     contributedAmounts,
     currentStreet,
     potType,
-    pot.amount
+    pot.amount,
+    blindAnte,
+    players
   );
 
   // Generate calculation formula
@@ -142,7 +148,8 @@ function formatPotInfo(
     players,
     contributedAmounts,
     currentStreet,
-    deadMoneyBreakdown
+    deadMoneyBreakdown,
+    blindAnte
   );
 
   // Generate description
@@ -229,7 +236,9 @@ function buildStreetBreakdown(
   contributedAmounts: ContributedAmounts,
   currentStreet: Stage,
   potType: 'main' | 'side',
-  potAmount: number
+  potAmount: number,
+  blindAnte?: { sb: number; bb: number; ante: number },
+  players?: Player[]
 ): StreetContribution[] {
   const streets: Array<'preflop' | 'flop' | 'turn' | 'river'> = ['preflop', 'flop', 'turn', 'river'];
 
@@ -280,6 +289,20 @@ function buildStreetBreakdown(
       }
     }
 
+    // Add blinds and antes for preflop (they are posted before action but not in contributedAmounts)
+    // Include ALL players who posted blinds/antes, even if they folded (dead money goes into pot)
+    if (street === 'preflop' && blindAnte && players) {
+      players.forEach(player => {
+        if (player.position === 'SB') {
+          amount += blindAnte.sb;
+          playersWhoContributed.add(player.id);
+        } else if (player.position === 'BB') {
+          amount += blindAnte.bb + blindAnte.ante;
+          playersWhoContributed.add(player.id);
+        }
+      });
+    }
+
     const contributingPlayers = playersWhoContributed.size;
 
     return {
@@ -316,7 +339,8 @@ function generateCalculation(
   allPlayers: Player[],
   contributedAmounts: ContributedAmounts,
   currentStreet: Stage,
-  deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number }
+  deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number },
+  blindAnte?: { sb: number; bb: number; ante: number }
 ): DisplayPotInfo['calculation'] {
   const streets: Array<'preflop' | 'flop' | 'turn' | 'river'> = ['preflop', 'flop', 'turn', 'river'];
 
@@ -326,21 +350,17 @@ function generateCalculation(
   const formulaLines: string[] = [];
 
   // Guard: If currentStreet is 'stack', skip Posted money check (only applies to betting streets)
-  // For main pot on preflop, show Posted money
+  // For main pot on preflop, show Posted money and player contributions
   if (potType === 'main' && currentStreet === 'preflop') {
-    const postedLine = generatePostedMoneyLine(allPlayers, eligiblePlayers, deadMoneyBreakdown);
-    if (postedLine) {
-      formulaLines.push(postedLine);
-    }
+    const contributionLines = generateContributionLines(
+      allPlayers,
+      eligiblePlayers,
+      contributedAmounts,
+      deadMoneyBreakdown,
+      blindAnte
+    );
+    formulaLines.push(...contributionLines);
   }
-
-  // Simple display: Just show the pot total
-  // The pot engine calculated this based on eligible players and pot caps
-  const potDescription = potType === 'main'
-    ? `Main Pot Amount:`
-    : `Side Pot ${potNumber} Amount:`;
-
-  formulaLines.push(`${potDescription}`.padEnd(25) + `$${pot.amount.toLocaleString()}`.padEnd(20));
 
   const formula = formulaLines.join('\n');
 
@@ -352,69 +372,83 @@ function generateCalculation(
 }
 
 /**
- * Generate Posted money line based on who folded
- * Returns formatted string or empty if no posted money to show
+ * Generate contribution lines showing each player's contribution
+ * Shows player name and their total contribution to the pot
  */
-function generatePostedMoneyLine(
+function generateContributionLines(
   allPlayers: Player[],
   eligiblePlayers: Player[],
-  deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number }
-): string {
+  contributedAmounts: ContributedAmounts,
+  deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number },
+  blindAnte?: { sb: number; bb: number; ante: number }
+): string[] {
+  console.log('📊 [generateContributionLines] Called with:', {
+    allPlayers: allPlayers.map(p => `${p.name} (${p.position})`),
+    eligiblePlayers: eligiblePlayers.map(p => `${p.name} (${p.position})`),
+    blindAnte
+  });
+
+  const lines: string[] = [];
+
   // Find SB and BB players
-  const sbPlayer = allPlayers.find(p =>
-    p.position?.toLowerCase() === 'sb' ||
-    p.position?.toLowerCase() === 'small blind'
-  );
-  const bbPlayer = allPlayers.find(p =>
-    p.position?.toLowerCase() === 'bb' ||
-    p.position?.toLowerCase() === 'big blind'
-  );
+  const sbPlayer = allPlayers.find(p => p.position === 'SB');
+  const bbPlayer = allPlayers.find(p => p.position === 'BB');
+
+  console.log('📊 [generateContributionLines] SB player:', sbPlayer ? `${sbPlayer.name} (${sbPlayer.position})` : 'none');
+  console.log('📊 [generateContributionLines] BB player:', bbPlayer ? `${bbPlayer.name} (${bbPlayer.position})` : 'none');
 
   // Check if they're in the pot (eligible)
   const sbInPot = sbPlayer && eligiblePlayers.some(ep => ep.id === sbPlayer.id);
   const bbInPot = bbPlayer && eligiblePlayers.some(ep => ep.id === bbPlayer.id);
 
-  // Determine what to show based on logic
-  const parts: string[] = [];
-  let total = 0;
+  console.log('📊 [generateContributionLines] SB in pot:', sbInPot, 'BB in pot:', bbInPot);
 
-  // If SB folded, include SB
-  if (sbPlayer && !sbInPot) {
-    parts.push('SB');
+  // Show Posted (BB + Ante) if BB folded
+  if (bbPlayer && !bbInPot && blindAnte) {
+    const postedAmount = blindAnte.bb + blindAnte.ante;
+    lines.push(`Posted (BB + Ante):`.padEnd(25) + `$${postedAmount.toLocaleString()}`.padEnd(20));
   }
 
-  // If BB folded, include BB
-  if (bbPlayer && !bbInPot) {
-    parts.push('BB');
+  // Show Posted (Ante) if BB is in pot
+  if (bbPlayer && bbInPot && blindAnte && blindAnte.ante > 0) {
+    lines.push(`Posted (Ante):`.padEnd(25) + `$${blindAnte.ante.toLocaleString()}`.padEnd(20));
   }
 
-  // Add folded blinds amount
-  if (deadMoneyBreakdown.foldedBlinds > 0) {
-    total += deadMoneyBreakdown.foldedBlinds;
+  // Show Posted (SB) if SB folded
+  if (sbPlayer && !sbInPot && blindAnte) {
+    lines.push(`Posted (SB):`.padEnd(25) + `$${blindAnte.sb.toLocaleString()}`.padEnd(20));
   }
 
-  // Always include ante if > 0
-  if (deadMoneyBreakdown.ante > 0) {
-    parts.push('Ante');
-    total += deadMoneyBreakdown.ante;
-  }
+  // Show each eligible player's contribution
+  eligiblePlayers.forEach(player => {
+    let totalContribution = 0;
 
-  // If both blinds in pot, only show ante
-  if (sbInPot && bbInPot) {
-    if (deadMoneyBreakdown.ante > 0) {
-      return `Posted (Ante):`.padEnd(25) + `$${deadMoneyBreakdown.ante.toLocaleString()}`.padEnd(20);
+    // Sum all contributions from this player in preflop
+    for (const sectionKey in contributedAmounts) {
+      if (sectionKey.startsWith('preflop')) {
+        const sectionContributions = contributedAmounts[sectionKey] || {};
+        totalContribution += sectionContributions[player.id] || 0;
+      }
     }
-    return ''; // No posted money to show
-  }
 
-  if (parts.length === 0) {
-    return ''; // No posted money to show
-  }
+    // Add blind if this player is SB or BB
+    if (blindAnte) {
+      if (player.position === 'SB') {
+        totalContribution += blindAnte.sb;
+      } else if (player.position === 'BB') {
+        totalContribution += blindAnte.bb;
+      }
+    }
 
-  const label = `Posted (${parts.join(' + ')}):`;
-  const formattedAmount = `$${total.toLocaleString()}`;
+    if (totalContribution > 0) {
+      const label = `${player.name}${player.position ? ` (${player.position})` : ''}:`;
+      lines.push(label.padEnd(25) + `$${totalContribution.toLocaleString()}`.padEnd(20));
+      console.log(`📊 [generateContributionLines] Added player line: "${label.padEnd(25)}$${totalContribution.toLocaleString()}"`);
+    }
+  });
 
-  return label.padEnd(25) + formattedAmount.padEnd(20);
+  console.log('📊 [generateContributionLines] Generated lines:', lines);
+  return lines;
 }
 
 /**
