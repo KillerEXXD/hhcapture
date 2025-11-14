@@ -420,6 +420,38 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
       });
     });
 
+    // Add blinds/antes for folded players (dead money)
+    const ante = stackData.ante || 0;
+    const sb = stackData.smallBlind || 0;
+    const bb = stackData.bigBlind || 0;
+
+    currentPlayers.forEach(player => {
+      const currentContribution = contributionsMap.get(player.name) || 0;
+
+      // Check if player folded (has no contribution in any pot)
+      const playerInMainPot = mainPot.contributions.some(c => c.playerId === player.id);
+      const playerInSidePots = sidePots.some(sp => sp.contributions.some(c => c.playerId === player.id));
+      const playerFolded = !playerInMainPot && !playerInSidePots;
+
+      if (playerFolded) {
+        // Add posted blinds/antes as dead money
+        if (player.position === 'SB') {
+          contributionsMap.set(player.name, currentContribution + sb);
+          console.log(`💀 [Contribution] ${player.name} (SB) folded: Adding ${sb} SB as dead money`);
+        } else if (player.position === 'BB') {
+          contributionsMap.set(player.name, currentContribution + bb + ante);
+          console.log(`💀 [Contribution] ${player.name} (BB) folded: Adding ${bb} BB + ${ante} Ante = ${bb + ante} as dead money`);
+        }
+      } else {
+        // Player stayed - ante for BB is dead money (separate from contribution)
+        // but needs to be tracked for stack deduction
+        if (player.position === 'BB') {
+          contributionsMap.set(player.name, currentContribution + ante);
+          console.log(`💰 [Contribution] ${player.name} (BB) stayed: Adding ${ante} Ante as dead money for stack deduction`);
+        }
+      }
+    });
+
     // Convert to array format expected by next hand generator
     const playerContributions = Array.from(contributionsMap.entries()).map(([playerName, amount]) => ({
       playerName,

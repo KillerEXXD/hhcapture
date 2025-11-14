@@ -181,7 +181,7 @@ export function gatherContributions(
     let totalContributed = 0;
     const contributionBreakdown = { base: 0, more: 0, more2: 0 };
 
-    // For preflop base ONLY: Add posted blinds
+    // For preflop base ONLY: Add posted blinds and antes
     let postedSB = 0;
     let postedBB = 0;
     let postedAnte = 0;
@@ -191,14 +191,13 @@ export function gatherContributions(
 
       if (position === 'sb') {
         postedSB = data.postedSB || 0;
-        totalContributed += postedSB;
+        // Don't add to totalContributed yet - will be added with actions if player stays
         console.log(`   💵 ${player.name} (SB): Posted SB ${postedSB}`);
       } else if (position === 'bb') {
         postedBB = data.postedBB || 0;
         postedAnte = data.postedAnte || 0;
-        totalContributed += postedBB; // ⚠️ Ante NOT added (dead money)
-        console.log(`   💵 ${player.name} (BB): Posted BB ${postedBB}, Ante ${postedAnte} (DEAD MONEY)`);
-        console.log(`      ✅ BB's Live Contribution: ${postedBB} (excluding ${postedAnte} ante)`);
+        // Don't add to totalContributed yet - will be added based on whether player stays or folds
+        console.log(`   💵 ${player.name} (BB): Posted BB ${postedBB}, Ante ${postedAnte}`);
       }
     }
 
@@ -223,6 +222,37 @@ export function gatherContributions(
 
     // Check if folded
     const isFolded = isPlayerFolded(player.id, stage, playerData);
+
+    // Add blind/ante contributions based on fold/stay status
+    if (stage === 'preflop' && includeBase) {
+      if (isFolded) {
+        // When player folds, posted blinds/antes become dead money for pot
+        if (postedSB > 0) {
+          totalContributed += postedSB;
+          console.log(`   💀 ${player.name} (SB) folded: ${postedSB} goes to pot as dead money`);
+        }
+        if (postedBB > 0 || postedAnte > 0) {
+          const bbAnteTotal = postedBB + postedAnte;
+          totalContributed += bbAnteTotal;
+          console.log(`   💀 ${player.name} (BB) folded: ${postedBB} (BB) + ${postedAnte} (Ante) = ${bbAnteTotal} goes to pot as dead money`);
+        }
+      } else {
+        // When player stays, their actions should already include the posted blinds
+        // The contributedAmounts from actions include the blind as part of the total bet
+        // Ante for BB is always dead money (not counted in contribution matching)
+        if (postedAnte > 0) {
+          // Ante is dead money but needs to be deducted from stack
+          // It's NOT part of contribution matching, so we don't add it to totalContributed here
+          console.log(`   💰 ${player.name} (BB) stayed: ${postedAnte} ante is dead money (separate from contribution)`);
+        }
+        if (postedSB > 0) {
+          console.log(`   💰 ${player.name} (SB) stayed: ${postedSB} SB included in actions`);
+        }
+        if (postedBB > 0) {
+          console.log(`   💰 ${player.name} (BB) stayed: ${postedBB} BB included in actions`);
+        }
+      }
+    }
 
     // Get current stack from latest processed section
     let currentStack = player.stack;
