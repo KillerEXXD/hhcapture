@@ -38,7 +38,9 @@
       "Bash(npm test:*)",
       "Bash(start http://127.0.0.1:3001)",
       "Bash(netstat:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(taskkill //F //PID 53160)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

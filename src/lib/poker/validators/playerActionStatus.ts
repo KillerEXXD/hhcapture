@@ -231,6 +231,13 @@ function calculateContributionInActionLevel(
   // For More Action 1: Calculate contribution WITHIN More Action 1 only
   if (actionLevel === 'more') {
     const moreAction1 = data[moreAction1ActionKey];
+
+    // If player hasn't acted in MA1, contribution is 0
+    if (!moreAction1 || moreAction1 === 'no action') {
+      console.log(`   🔍 [calculateContributionInActionLevel] Player ${playerId} MA1: No action yet, contribution = 0`);
+      return 0;
+    }
+
     const moreAction1Amount = convertAmount(
       data[moreAction1AmountKey] as string | undefined,
       data[moreAction1UnitKey] as ChipUnit | undefined
@@ -256,6 +263,13 @@ function calculateContributionInActionLevel(
   // For More Action 2: Calculate contribution WITHIN More Action 2 only
   else if (actionLevel === 'more2') {
     const moreAction2 = data[moreAction2ActionKey];
+
+    // If player hasn't acted in MA2, contribution is 0
+    if (!moreAction2 || moreAction2 === 'no action') {
+      console.log(`   🔍 [calculateContributionInActionLevel] Player ${playerId} MA2: No action yet, contribution = 0`);
+      return 0;
+    }
+
     const moreAction2Amount = convertAmount(
       data[moreAction2AmountKey] as string | undefined,
       data[moreAction2UnitKey] as ChipUnit | undefined
@@ -429,6 +443,13 @@ function calculateMaxContributionInActionLevel(
     // For More Action 1: Calculate contribution WITHIN More Action 1 only
     if (actionLevel === 'more') {
       const moreAction1 = data[moreAction1ActionKey];
+
+      // If player hasn't acted in MA1, skip them (contribution is 0)
+      if (!moreAction1 || moreAction1 === 'no action') {
+        console.log(`   🔍 [calculateMaxContributionInActionLevel] Player ${player.id} (${player.name}) MA1: No action yet, skipping`);
+        continue;
+      }
+
       const moreAction1Amount = convertAmount(
         data[moreAction1AmountKey] as string | undefined,
         data[moreAction1UnitKey] as ChipUnit | undefined
@@ -453,6 +474,13 @@ function calculateMaxContributionInActionLevel(
     // For More Action 2: Calculate contribution WITHIN More Action 2 only
     else if (actionLevel === 'more2') {
       const moreAction2 = data[moreAction2ActionKey];
+
+      // If player hasn't acted in MA2, skip them (contribution is 0)
+      if (!moreAction2 || moreAction2 === 'no action') {
+        console.log(`   🔍 [calculateMaxContributionInActionLevel] Player ${player.id} (${player.name}) MA2: No action yet, skipping`);
+        continue;
+      }
+
       const moreAction2Amount = convertAmount(
         data[moreAction2AmountKey] as string | undefined,
         data[moreAction2UnitKey] as ChipUnit | undefined
