@@ -323,6 +323,7 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
   }>>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [pastedExpectedHand, setPastedExpectedHand] = useState('');
+  const [isNextHandExpanded, setIsNextHandExpanded] = useState(false);
 
   const convertToPots = (): Pot[] => {
     const pots: Pot[] = [];
@@ -344,6 +345,51 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
       });
     });
     return pots;
+  };
+
+  const calculatePlayerBreakdown = (
+    player: NextHandPlayer,
+    selections: WinnerSelection[],
+    pots: Pot[],
+    contributionsMap: Map<string, number>
+  ) => {
+    const ante = stackData.ante || 0;
+    const sb = stackData.smallBlind || 0;
+    const bb = stackData.bigBlind || 0;
+
+    // Determine if this player is SB or BB
+    const isSB = player.position === 'SB';
+    const isBB = player.position === 'BB';
+
+    // Blind contribution
+    const blindContribution = isSB ? sb : isBB ? bb : 0;
+
+    // Total contribution from pot
+    const totalContribution = contributionsMap.get(player.name) || 0;
+
+    // Action contribution = total - blind
+    const actionContribution = totalContribution - blindContribution;
+
+    // Calculate pot winnings
+    let potWinnings = 0;
+    selections.forEach(selection => {
+      if (selection.winnerNames.includes(player.name)) {
+        const pot = pots.find(p => p.name === selection.potName);
+        if (pot) {
+          potWinnings += pot.amount / selection.winnerNames.length;
+        }
+      }
+    });
+
+    return {
+      anteContribution: isBB ? ante : 0, // Only BB posts ante
+      blindContribution,
+      actionContribution,
+      totalContribution,
+      potWinnings,
+      isBlindPosition: isSB || isBB,
+      blindType: isSB ? 'SB' as const : isBB ? 'BB' as const : undefined
+    };
   };
 
   const handleWinnerConfirm = (selections: WinnerSelection[]) => {
@@ -386,7 +432,13 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
     console.log('🏆 [WinnerConfirm] Next hand result:', result.nextHand);
     console.log('🏆 [WinnerConfirm] Validation:', result.validation);
 
-    setNextHandData(result.nextHand);
+    // Add breakdown to each player
+    const nextHandWithBreakdown = result.nextHand.map(player => ({
+      ...player,
+      breakdown: calculatePlayerBreakdown(player, selections, pots, contributionsMap)
+    }));
+
+    setNextHandData(nextHandWithBreakdown);
     setValidationResult(result.validation);
     const handNumber = parseInt(stackData.handNumber?.replace(/[^0-9]/g, '') || '1') + 1;
 
@@ -701,30 +753,114 @@ export const PotCalculationDisplay: React.FC<PotCalculationDisplayProps> = ({
 
       {nextHandData && (
         <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-300 rounded-xl p-6 mt-8">
-          <h3 className="text-2xl font-bold text-purple-900 mb-4">🔄 Next Hand Generated</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {nextHandData.map(player => (
-              <div key={player.name} className={`p-4 rounded-lg ${player.stack > 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'} border-2`}>
-                <div className="font-bold text-lg">{player.name}</div>
-                <div className="text-sm text-gray-600">{player.position}</div>
+          <div
+            className="flex justify-between items-center cursor-pointer mb-4"
+            onClick={() => setIsNextHandExpanded(!isNextHandExpanded)}
+          >
+            <h3 className="text-2xl font-bold text-purple-900">🔄 Next Hand Generated</h3>
+            <svg
+              className={`w-6 h-6 text-purple-900 transition-transform duration-300 ${
+                isNextHandExpanded ? 'rotate-180' : ''
+              }`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={3}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
 
-                {/* Previous Stack */}
-                <div className="text-xs text-gray-500 mt-2">Previous:</div>
-                <div className="text-sm font-mono text-gray-700">{player.previousStack.toLocaleString()}</div>
+          {/* Formatted Hand Display (Always Visible) */}
+          <div className="mb-6 bg-white rounded-lg border-2 border-gray-300 p-4">
+            <h4 className="text-lg font-bold mb-2 text-gray-700">📋 Formatted Next Hand:</h4>
+            <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap text-gray-900">
+              {nextHandFormatted}
+            </pre>
+          </div>
 
-                {/* Net Change */}
-                <div className={`text-sm font-semibold mt-1 ${player.netChange > 0 ? 'text-green-700' : player.netChange < 0 ? 'text-red-700' : 'text-gray-600'}`}>
-                  {player.netChange > 0 ? '+' : ''}{player.netChange.toLocaleString()}
-                </div>
+          {/* Collapsible Player Details */}
+          <div
+            className={`overflow-hidden transition-all duration-400 ease-in-out ${
+              isNextHandExpanded ? 'max-h-[5000px]' : 'max-h-0'
+            }`}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {nextHandData.map(player => {
+                const breakdown = player.breakdown;
+                if (!breakdown) return null;
 
-                {/* Divider */}
-                <div className="border-t-2 border-gray-300 my-2"></div>
+                return (
+                  <div key={player.name} className={`p-4 rounded-lg ${player.stack > 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'} border-2`}>
+                    <div className="font-bold text-lg">{player.name}</div>
+                    <div className="text-sm text-gray-600 mb-3">{player.position}</div>
 
-                {/* New Stack */}
-                <div className="text-xs text-gray-500">New Stack:</div>
-                <div className="text-2xl font-mono font-bold">{player.stack.toLocaleString()}</div>
-              </div>
-            ))}
+                    {/* Detailed Calculation */}
+                    <div className="bg-white rounded-lg p-3 mb-2 text-xs font-mono">
+                      <div className="font-bold text-gray-700 mb-2">Stack Calculation:</div>
+
+                      {/* Starting Stack */}
+                      <div className="text-gray-900">
+                        Starting: <span className="font-bold">{player.previousStack.toLocaleString()}</span>
+                      </div>
+
+                      {/* Ante */}
+                      {breakdown.anteContribution > 0 && (
+                        <div className="text-red-600">
+                          - {breakdown.anteContribution.toLocaleString()} (Ante)
+                        </div>
+                      )}
+
+                      {/* Blind */}
+                      {breakdown.blindContribution > 0 && (
+                        <div className="text-red-600">
+                          - {breakdown.blindContribution.toLocaleString()} ({breakdown.blindType})
+                        </div>
+                      )}
+
+                      {/* Action */}
+                      {breakdown.actionContribution > 0 && (
+                        <div className="text-red-600">
+                          - {breakdown.actionContribution.toLocaleString()} (Action)
+                        </div>
+                      )}
+
+                      {/* After Contributions */}
+                      <div className="border-t border-gray-300 mt-1 pt-1 text-gray-700">
+                        = {(player.previousStack - breakdown.anteContribution - breakdown.totalContribution).toLocaleString()}
+                      </div>
+
+                      {/* Winnings */}
+                      {breakdown.potWinnings > 0 && (
+                        <>
+                          <div className="text-green-600 font-bold mt-1">
+                            + {breakdown.potWinnings.toLocaleString()} (Won)
+                          </div>
+                          <div className="border-t-2 border-gray-400 mt-1 pt-1 text-gray-900 font-bold">
+                            = {player.stack.toLocaleString()}
+                          </div>
+                        </>
+                      )}
+
+                      {breakdown.potWinnings === 0 && (
+                        <div className="border-t-2 border-gray-400 mt-1 pt-1 text-gray-900 font-bold">
+                          Final: {player.stack.toLocaleString()}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Net Change Summary */}
+                    <div className={`text-center text-sm font-semibold ${player.netChange > 0 ? 'text-green-700' : player.netChange < 0 ? 'text-red-700' : 'text-gray-600'}`}>
+                      Net: {player.netChange > 0 ? '+' : ''}{player.netChange.toLocaleString()}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {validationResult && (

@@ -1,0 +1,300 @@
+[11/13/2025, 6:48:23 AM] LOG   🔍 [Turn Check] Davies (BB) checking prev player Kenney (UTG): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   🔍 [Turn Check] Davies (BB) checking prev player Boivin (UTG+1): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   🔍 [Turn Check] Davies (BB) checking prev player Kabrhel (UTG+2): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   🔍 [Turn Check] Davies (BB) checking prev player Brewer (MP): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   🔍 [Turn Check] Davies (BB) checking prev player Peters (CO): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   🔍 [Turn Check] Davies (BB) checking prev player Tollerene (Dealer): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   🔍 [Turn Check] Davies (BB) checking prev player Foxen (SB): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   ✅ [Turn Check] Davies (BB) - all previous players have acted, buttons ENABLED
+[11/13/2025, 6:48:23 AM] LOG      🔍 [Contribution Calc] Tollerene (Dealer): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG      → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG      🔍 [Contribution Calc] Foxen (SB): action="fold", amount=undefined, blind=200000
+[11/13/2025, 6:48:23 AM] LOG      → Using blind: 200000
+[11/13/2025, 6:48:23 AM] LOG      🔍 [Contribution Calc] Davies (BB): action="fold", amount=undefined, blind=400000
+[11/13/2025, 6:48:23 AM] LOG      → Using blind: 400000
+[11/13/2025, 6:48:23 AM] LOG      🔍 [Contribution Calc] Kenney (UTG): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG      → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG      🔍 [Contribution Calc] Boivin (UTG+1): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG      → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG      🔍 [Contribution Calc] Kabrhel (UTG+2): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG      → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG      🔍 [Contribution Calc] Brewer (MP): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG      → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG      🔍 [Contribution Calc] Peters (CO): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG      → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   🎯 [getAvailableActionsForPlayer] Davies contribution: 400000, max contribution: 400000
+[11/13/2025, 6:48:23 AM] LOG   ✅ [getAvailableActionsForPlayer] Davies can CHECK (400000 >= 400000)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [PreFlopView] Player 4 base: {
+  "sectionKey": "preflop_base",
+  "hasProcessedStack": true,
+  "sectionStacksValue": 11150000,
+  "currentStack": 11150000
+}
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Called for playerId=4, suffix="", actionLevel="base"
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Total players at table: 8
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Player 4 is Kenney (UTG)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Action order for 8 players: UTG → UTG+1 → UTG+2 → LJ → MP → MP+1 → MP+2 → HJ → CO → Dealer → SB → BB
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Kenney (UTG) is at index 0 in action order
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [Turn Check] Kenney (UTG) - all previous players have acted, buttons ENABLED
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Tollerene (Dealer): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Foxen (SB): action="fold", amount=undefined, blind=200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Davies (BB): action="fold", amount=undefined, blind=400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kenney (UTG): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Boivin (UTG+1): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kabrhel (UTG+2): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Brewer (MP): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Peters (CO): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Kenney contribution: 400, max contribution: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [getAvailableActionsForPlayer] Kenney can CALL (400 < 400000)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [PreFlopView] Player 5 base: {
+  "sectionKey": "preflop_base",
+  "hasProcessedStack": true,
+  "sectionStacksValue": 34300000,
+  "currentStack": 34300000
+}
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Called for playerId=5, suffix="", actionLevel="base"
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Total players at table: 8
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Player 5 is Boivin (UTG+1)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Action order for 8 players: UTG → UTG+1 → UTG+2 → LJ → MP → MP+1 → MP+2 → HJ → CO → Dealer → SB → BB
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Boivin (UTG+1) is at index 1 in action order
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Boivin (UTG+1) checking prev player Kenney (UTG): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [Turn Check] Boivin (UTG+1) - all previous players have acted, buttons ENABLED
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Tollerene (Dealer): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Foxen (SB): action="fold", amount=undefined, blind=200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Davies (BB): action="fold", amount=undefined, blind=400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kenney (UTG): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Boivin (UTG+1): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kabrhel (UTG+2): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Brewer (MP): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Peters (CO): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Boivin contribution: 400, max contribution: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [getAvailableActionsForPlayer] Boivin can CALL (400 < 400000)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [PreFlopView] Player 6 base: {
+  "sectionKey": "preflop_base",
+  "hasProcessedStack": true,
+  "sectionStacksValue": 2250000,
+  "currentStack": 2250000
+}
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Called for playerId=6, suffix="", actionLevel="base"
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Total players at table: 8
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Player 6 is Kabrhel (UTG+2)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Action order for 8 players: UTG → UTG+1 → UTG+2 → LJ → MP → MP+1 → MP+2 → HJ → CO → Dealer → SB → BB
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Kabrhel (UTG+2) is at index 2 in action order
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Kabrhel (UTG+2) checking prev player Kenney (UTG): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Kabrhel (UTG+2) checking prev player Boivin (UTG+1): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [Turn Check] Kabrhel (UTG+2) - all previous players have acted, buttons ENABLED
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Tollerene (Dealer): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Foxen (SB): action="fold", amount=undefined, blind=200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Davies (BB): action="fold", amount=undefined, blind=400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kenney (UTG): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Boivin (UTG+1): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kabrhel (UTG+2): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Brewer (MP): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Peters (CO): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Kabrhel contribution: 0, max contribution: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [getAvailableActionsForPlayer] Kabrhel can CALL (0 < 400000)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [PreFlopView] Player 7 base: {
+  "sectionKey": "preflop_base",
+  "hasProcessedStack": true,
+  "sectionStacksValue": 4675000,
+  "currentStack": 4675000
+}
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Called for playerId=7, suffix="", actionLevel="base"
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Total players at table: 8
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Player 7 is Brewer (MP)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Action order for 8 players: UTG → UTG+1 → UTG+2 → LJ → MP → MP+1 → MP+2 → HJ → CO → Dealer → SB → BB
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Brewer (MP) is at index 4 in action order
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Brewer (MP) checking prev player Kenney (UTG): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Brewer (MP) checking prev player Boivin (UTG+1): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Brewer (MP) checking prev player Kabrhel (UTG+2): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [Turn Check] Brewer (MP) - all previous players have acted, buttons ENABLED
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Tollerene (Dealer): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Foxen (SB): action="fold", amount=undefined, blind=200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Davies (BB): action="fold", amount=undefined, blind=400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kenney (UTG): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Boivin (UTG+1): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kabrhel (UTG+2): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Brewer (MP): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Peters (CO): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Brewer contribution: 0, max contribution: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [getAvailableActionsForPlayer] Brewer can CALL (0 < 400000)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [PreFlopView] Player 8 base: {
+  "sectionKey": "preflop_base",
+  "hasProcessedStack": true,
+  "sectionStacksValue": 5650000,
+  "currentStack": 5650000
+}
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Called for playerId=8, suffix="", actionLevel="base"
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Total players at table: 8
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Player 8 is Peters (CO)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Action order for 8 players: UTG → UTG+1 → UTG+2 → LJ → MP → MP+1 → MP+2 → HJ → CO → Dealer → SB → BB
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Peters (CO) is at index 8 in action order
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Peters (CO) checking prev player Kenney (UTG): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Peters (CO) checking prev player Boivin (UTG+1): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Peters (CO) checking prev player Kabrhel (UTG+2): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Peters (CO) checking prev player Brewer (MP): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [Turn Check] Peters (CO) - all previous players have acted, buttons ENABLED
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Tollerene (Dealer): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Foxen (SB): action="fold", amount=undefined, blind=200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Davies (BB): action="fold", amount=undefined, blind=400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kenney (UTG): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Boivin (UTG+1): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kabrhel (UTG+2): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Brewer (MP): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Peters (CO): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Peters contribution: 0, max contribution: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [getAvailableActionsForPlayer] Peters can CALL (0 < 400000)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [PreFlopView] Player 1 base: {
+  "sectionKey": "preflop_base",
+  "hasProcessedStack": true,
+  "sectionStacksValue": 7800000,
+  "currentStack": 7800000
+}
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Called for playerId=1, suffix="", actionLevel="base"
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Total players at table: 8
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Player 1 is Tollerene (Dealer)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Action order for 8 players: UTG → UTG+1 → UTG+2 → LJ → MP → MP+1 → MP+2 → HJ → CO → Dealer → SB → BB
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Tollerene (Dealer) is at index 9 in action order
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Tollerene (Dealer) checking prev player Kenney (UTG): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Tollerene (Dealer) checking prev player Boivin (UTG+1): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Tollerene (Dealer) checking prev player Kabrhel (UTG+2): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Tollerene (Dealer) checking prev player Brewer (MP): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Tollerene (Dealer) checking prev player Peters (CO): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [Turn Check] Tollerene (Dealer) - all previous players have acted, buttons ENABLED
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Tollerene (Dealer): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Foxen (SB): action="fold", amount=undefined, blind=200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Davies (BB): action="fold", amount=undefined, blind=400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kenney (UTG): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Boivin (UTG+1): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kabrhel (UTG+2): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Brewer (MP): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Peters (CO): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Tollerene contribution: 0, max contribution: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [getAvailableActionsForPlayer] Tollerene can CALL (0 < 400000)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [PreFlopView] Player 2 base: {
+  "sectionKey": "preflop_base",
+  "hasProcessedStack": true,
+  "sectionStacksValue": 17100000,
+  "currentStack": 17100000
+}
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Called for playerId=2, suffix="", actionLevel="base"
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Total players at table: 8
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Player 2 is Foxen (SB)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Action order for 8 players: UTG → UTG+1 → UTG+2 → LJ → MP → MP+1 → MP+2 → HJ → CO → Dealer → SB → BB
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Foxen (SB) is at index 10 in action order
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Foxen (SB) checking prev player Kenney (UTG): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Foxen (SB) checking prev player Boivin (UTG+1): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Foxen (SB) checking prev player Kabrhel (UTG+2): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Foxen (SB) checking prev player Brewer (MP): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Foxen (SB) checking prev player Peters (CO): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Foxen (SB) checking prev player Tollerene (Dealer): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [Turn Check] Foxen (SB) - all previous players have acted, buttons ENABLED
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Tollerene (Dealer): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Foxen (SB): action="fold", amount=undefined, blind=200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Davies (BB): action="fold", amount=undefined, blind=400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kenney (UTG): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Boivin (UTG+1): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kabrhel (UTG+2): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Brewer (MP): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Peters (CO): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Foxen contribution: 200000, max contribution: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [getAvailableActionsForPlayer] Foxen can CALL (200000 < 400000)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [PreFlopView] Player 3 base: {
+  "sectionKey": "preflop_base",
+  "hasProcessedStack": true,
+  "sectionStacksValue": 11925000,
+  "currentStack": 11925000
+}
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Called for playerId=3, suffix="", actionLevel="base"
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Total players at table: 8
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Player 3 is Davies (BB)
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Action order for 8 players: UTG → UTG+1 → UTG+2 → LJ → MP → MP+1 → MP+2 → HJ → CO → Dealer → SB → BB
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Davies (BB) is at index 11 in action order
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Davies (BB) checking prev player Kenney (UTG): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Davies (BB) checking prev player Boivin (UTG+1): action="call", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Davies (BB) checking prev player Kabrhel (UTG+2): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Davies (BB) checking prev player Brewer (MP): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Davies (BB) checking prev player Peters (CO): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Davies (BB) checking prev player Tollerene (Dealer): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🔍 [Turn Check] Davies (BB) checking prev player Foxen (SB): action="fold", isAllIn=false
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [Turn Check] Davies (BB) - all previous players have acted, buttons ENABLED
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Tollerene (Dealer): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Foxen (SB): action="fold", amount=undefined, blind=200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 200000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Davies (BB): action="fold", amount=undefined, blind=400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kenney (UTG): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Boivin (UTG+1): action="call", amount=400, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using action amount: 400
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Kabrhel (UTG+2): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Brewer (MP): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    🔍 [Contribution Calc] Peters (CO): action="fold", amount=undefined, blind=0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m    → Using blind: 0
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m 🎯 [getAvailableActionsForPlayer] Davies contribution: 400000, max contribution: 400000
+[11/13/2025, 6:48:23 AM] LOG   [2;38;2;124;124;124m%s[0m ✅ [getAvailableActionsForPlayer] Davies can CHECK (400000 >= 400000)
+[11/13/2025, 6:49:05 AM] LOG   [vite] server connection lost. Polling for restart...
+[11/13/2025, 6:49:11 AM] ERROR [LogSync] Failed to sync logs: {
+  "name": "TypeError",
+  "message": "Failed to fetch",
+  "stack": "TypeError: Failed to fetch\n    at LogSync.sync (http://127.0.0.1:3001/src/utils/logSync.ts:44:30)\n    at http://127.0.0.1:3001/src/utils/logSync.ts:22:12"
+}

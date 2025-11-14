@@ -125,9 +125,11 @@ export const RiverView: React.FC<RiverViewProps> = ({
 
     console.log(`🔄 [RiverView useEffect] Current level: ${currentLevel}, Round complete: ${isRoundComplete.isComplete}, Reason: ${isRoundComplete.reason}, Processed: ${hasProcessedCurrentState}`);
 
-    // "Add More Action" is disabled only when round is complete
+    // "Add More Action" is disabled when:
+    // 1. Round is complete, OR
+    // 2. State hasn't been processed yet (initial load or after reset)
     // Note: River doesn't have "Create Next Street" button since it's the last street
-    setIsAddMoreActionDisabled(isRoundComplete.isComplete);
+    setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
   }, [playerData, visibleActionLevels.river, players, hasProcessedCurrentState]);
 
   // Refs for card selectors

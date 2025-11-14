@@ -775,16 +775,8 @@ export function StackSetupView({
           {/* Action Buttons */}
           <div className="flex gap-2">
             <button
-              onClick={loadNextHandFromClipboard}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-              title="Load next hand data from clipboard"
-            >
-              <span>📋</span>
-              <span>Load Next Hand</span>
-            </button>
-            <button
               onClick={setupPlayers}
-              className="flex-1 px-4 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
+              className="w-full px-4 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
             >
               Setup Players
             </button>

@@ -71,7 +71,8 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
   const [popupPositions, setPopupPositions] = React.useState<Record<string, 'above' | 'below' | 'center' | 'left' | 'right' | number>>({});
 
   // State for disabling "Add More Action" button when betting round is complete
-  const [isAddMoreActionDisabled, setIsAddMoreActionDisabled] = React.useState(false);
+  // Initially disabled until Process Stack is clicked and betting round is incomplete
+  const [isAddMoreActionDisabled, setIsAddMoreActionDisabled] = React.useState(true);
 
   // State for disabling "Create Next Street" button when betting round is incomplete
   const [isCreateNextStreetDisabled, setIsCreateNextStreetDisabled] = React.useState(true);
@@ -126,9 +127,10 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
     console.log(`🔄 [PreFlopView useEffect] Current level: ${currentLevel}, Round complete: ${isRoundComplete.isComplete}, Reason: ${isRoundComplete.reason}, Processed: ${hasProcessedCurrentState}`);
 
-    // "Add More Action" is disabled only when round is complete
-    // Note: We check hasProcessedCurrentState for "Create Next Street" button, but not for "Add More Action"
-    setIsAddMoreActionDisabled(isRoundComplete.isComplete);
+    // "Add More Action" is disabled when:
+    // 1. Round is complete, OR
+    // 2. State hasn't been processed yet (initial load or after reset)
+    setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
 
     // "Create Next Street" is disabled when round is incomplete OR when state hasn't been processed
     setIsCreateNextStreetDisabled(!isRoundComplete.isComplete || !hasProcessedCurrentState);

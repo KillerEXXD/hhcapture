@@ -24,15 +24,44 @@ export const WinnerSelectionModal: React.FC<WinnerSelectionModalProps> = ({
   const [errors, setErrors] = useState<string[]>([]);
 
   /**
-   * Handle winner selection for a pot
+   * Handle winner selection/toggle for a pot (supports multiple winners)
    */
-  const handleSelectWinner = (potName: string, potType: string, winnerName: string) => {
+  const handleToggleWinner = (potName: string, potType: string, winnerName: string) => {
     setSelections(prev => {
-      // Remove any existing selection for this pot
-      const filtered = prev.filter(s => s.potName !== potName);
+      // Find existing selection for this pot
+      const existingSelection = prev.find(s => s.potName === potName);
 
-      // Add new selection
-      return [...filtered, { potName, potType, winnerName }];
+      if (existingSelection) {
+        // Toggle winner in the existing selection
+        const isAlreadySelected = existingSelection.winnerNames.includes(winnerName);
+
+        if (isAlreadySelected) {
+          // Remove this winner
+          const updatedWinners = existingSelection.winnerNames.filter(w => w !== winnerName);
+
+          if (updatedWinners.length === 0) {
+            // If no winners left, remove the selection entirely
+            return prev.filter(s => s.potName !== potName);
+          } else {
+            // Update with remaining winners
+            return prev.map(s =>
+              s.potName === potName
+                ? { ...s, winnerNames: updatedWinners }
+                : s
+            );
+          }
+        } else {
+          // Add this winner
+          return prev.map(s =>
+            s.potName === potName
+              ? { ...s, winnerNames: [...s.winnerNames, winnerName] }
+              : s
+          );
+        }
+      } else {
+        // No existing selection, create new one
+        return [...prev, { potName, potType, winnerNames: [winnerName] }];
+      }
     });
 
     // Clear errors when user makes a selection
@@ -63,10 +92,17 @@ export const WinnerSelectionModal: React.FC<WinnerSelectionModalProps> = ({
   };
 
   /**
-   * Get selected winner for a pot
+   * Get selected winners for a pot
    */
-  const getSelectedWinner = (potName: string): string | undefined => {
-    return selections.find(s => s.potName === potName)?.winnerName;
+  const getSelectedWinners = (potName: string): string[] => {
+    return selections.find(s => s.potName === potName)?.winnerNames || [];
+  };
+
+  /**
+   * Check if a player is selected as winner for a pot
+   */
+  const isWinnerSelected = (potName: string, playerName: string): boolean => {
+    return getSelectedWinners(potName).includes(playerName);
   };
 
   return (
@@ -78,7 +114,7 @@ export const WinnerSelectionModal: React.FC<WinnerSelectionModalProps> = ({
             🏆 Select Winners
           </h2>
           <p className="text-gray-600">
-            Select the winner for each pot. Only eligible players can be selected.
+            Select winner(s) for each pot. Click multiple players to split the pot equally. Only eligible players can be selected.
           </p>
         </div>
 
@@ -97,7 +133,8 @@ export const WinnerSelectionModal: React.FC<WinnerSelectionModalProps> = ({
         {/* Pot Selection Cards */}
         <div className="space-y-6 mb-6">
           {pots.map((pot) => {
-            const selectedWinner = getSelectedWinner(pot.name);
+            const selectedWinners = getSelectedWinners(pot.name);
+            const splitAmount = selectedWinners.length > 0 ? pot.amount / selectedWinners.length : 0;
 
             return (
               <div
@@ -111,29 +148,50 @@ export const WinnerSelectionModal: React.FC<WinnerSelectionModalProps> = ({
                       {pot.name}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      Amount: <span className="font-mono font-semibold">{pot.amount.toLocaleString()}</span>
+                      Total: <span className="font-mono font-semibold">{pot.amount.toLocaleString()}</span>
                       {' '}({pot.percentage.toFixed(1)}%)
                     </p>
+                    {selectedWinners.length > 1 && (
+                      <p className="text-sm text-blue-600 font-semibold mt-1">
+                        Split {selectedWinners.length} ways: {splitAmount.toLocaleString()} each
+                      </p>
+                    )}
                   </div>
-                  {selectedWinner && (
+                  {selectedWinners.length > 0 && (
                     <div className="text-green-600 font-semibold flex items-center">
                       <span className="mr-2">✓</span>
-                      {selectedWinner}
+                      {selectedWinners.length} winner{selectedWinners.length > 1 ? 's' : ''}
                     </div>
                   )}
                 </div>
 
+                {/* Selected Winners Display */}
+                {selectedWinners.length > 0 && (
+                  <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800 font-semibold mb-1">Selected:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedWinners.map(winner => (
+                        <span key={winner} className="px-2 py-1 bg-green-600 text-white text-sm rounded-md">
+                          {winner}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Eligible Players */}
                 <div>
-                  <p className="text-sm text-gray-600 mb-2">Select winner (eligible players only):</p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {selectedWinners.length === 0 ? 'Select winner(s):' : 'Click to add/remove winners:'}
+                  </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                     {pot.eligible.map((playerName) => {
-                      const isSelected = selectedWinner === playerName;
+                      const isSelected = isWinnerSelected(pot.name, playerName);
 
                       return (
                         <button
                           key={playerName}
-                          onClick={() => handleSelectWinner(pot.name, pot.type, playerName)}
+                          onClick={() => handleToggleWinner(pot.name, pot.type, playerName)}
                           className={`
                             px-4 py-2 rounded-lg font-medium transition-all
                             ${isSelected
@@ -156,14 +214,34 @@ export const WinnerSelectionModal: React.FC<WinnerSelectionModalProps> = ({
         {/* Summary */}
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <h3 className="text-blue-900 font-semibold mb-2">📊 Selection Summary</h3>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {pots.map(pot => {
               const selection = selections.find(s => s.potName === pot.name);
+              const splitAmount = selection && selection.winnerNames.length > 0
+                ? pot.amount / selection.winnerNames.length
+                : 0;
+
               return (
                 <div key={pot.name} className="text-sm">
                   <span className="text-blue-800 font-medium">{pot.name}:</span>{' '}
-                  {selection ? (
-                    <span className="text-blue-900 font-semibold">{selection.winnerName}</span>
+                  {selection && selection.winnerNames.length > 0 ? (
+                    <div className="ml-4 mt-1">
+                      {selection.winnerNames.map((winner, idx) => (
+                        <div key={winner} className="text-blue-900">
+                          <span className="font-semibold">{winner}</span>
+                          {selection.winnerNames.length > 1 && (
+                            <span className="text-blue-700 ml-2">
+                              ({splitAmount.toLocaleString()})
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                      {selection.winnerNames.length > 1 && (
+                        <div className="text-blue-600 text-xs italic mt-1">
+                          Split {selection.winnerNames.length} ways
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <span className="text-blue-600 italic">Not selected</span>
                   )}

@@ -134,9 +134,10 @@ export const FlopView: React.FC<FlopViewProps> = ({
 
     console.log(`🔄 [FlopView useEffect] Current level: ${currentLevel}, Round complete: ${isRoundComplete.isComplete}, Reason: ${isRoundComplete.reason}, Processed: ${hasProcessedCurrentState}`);
 
-    // "Add More Action" is disabled only when round is complete
-    // Note: We check hasProcessedCurrentState for "Create Next Street" button, but not for "Add More Action"
-    setIsAddMoreActionDisabled(isRoundComplete.isComplete);
+    // "Add More Action" is disabled when:
+    // 1. Round is complete, OR
+    // 2. State hasn't been processed yet (initial load or after reset)
+    setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
 
     // "Create Next Street" is disabled when round is incomplete OR when state hasn't been processed
     setIsCreateNextStreetDisabled(!isRoundComplete.isComplete || !hasProcessedCurrentState);

@@ -21,7 +21,7 @@ export interface Pot {
 export interface WinnerSelection {
   potName: string;
   potType: string;
-  winnerName: string;
+  winnerNames: string[]; // Changed from winnerName to support multiple winners
 }
 
 export interface NextHandPlayer {
@@ -30,6 +30,16 @@ export interface NextHandPlayer {
   stack: number;
   previousStack: number;  // Stack before this hand
   netChange: number;      // + for winnings, - for losses
+  // Detailed breakdown for transparency
+  breakdown?: {
+    anteContribution: number;      // Ante paid
+    blindContribution: number;     // SB/BB paid (if applicable)
+    actionContribution: number;    // Additional bets/raises beyond blind
+    totalContribution: number;     // Total put into pot
+    potWinnings: number;          // Amount won from pot(s)
+    isBlindPosition: boolean;     // Was SB or BB
+    blindType?: 'SB' | 'BB';      // Which blind
+  };
 }
 
 export interface ValidationResult {
@@ -71,7 +81,7 @@ export function calculateNewStacks(
     console.log(`[calculateNewStacks] ${player.name}: ${startingStack} - ${totalContribution} = ${newStacks[player.name]}`);
   });
 
-  // Award each pot to its winner
+  // Award each pot to its winner(s)
   winnerSelections.forEach(selection => {
     const pot = pots.find(p => p.name === selection.potName);
     if (!pot) {
@@ -79,15 +89,27 @@ export function calculateNewStacks(
       return;
     }
 
-    // Validate winner is eligible for this pot
-    if (!pot.eligible.includes(selection.winnerName)) {
-      console.error(`${selection.winnerName} is not eligible for ${pot.name}`);
+    const winners = selection.winnerNames;
+    if (!winners || winners.length === 0) {
+      console.error(`No winners selected for ${pot.name}`);
       return;
     }
 
-    // Add pot amount to winner's new stack
-    newStacks[selection.winnerName] += pot.amount;
-    console.log(`[calculateNewStacks] ${selection.winnerName} wins ${pot.name} (${pot.amount}), new stack: ${newStacks[selection.winnerName]}`);
+    // Validate all winners are eligible for this pot
+    const ineligibleWinners = winners.filter(w => !pot.eligible.includes(w));
+    if (ineligibleWinners.length > 0) {
+      console.error(`Ineligible winners for ${pot.name}: ${ineligibleWinners.join(', ')}`);
+      return;
+    }
+
+    // Split pot equally among winners
+    const splitAmount = pot.amount / winners.length;
+    console.log(`[calculateNewStacks] Splitting ${pot.name} (${pot.amount}) among ${winners.length} winner(s): ${splitAmount.toFixed(2)} each`);
+
+    winners.forEach(winnerName => {
+      newStacks[winnerName] += splitAmount;
+      console.log(`[calculateNewStacks] ${winnerName} receives ${splitAmount.toFixed(2)} from ${pot.name}, new stack: ${newStacks[winnerName].toFixed(2)}`);
+    });
   });
 
   return newStacks;
@@ -246,10 +268,13 @@ export function validateWinnerSelections(
     const selection = winnerSelections.find(s => s.potName === pot.name);
     if (!selection) {
       errors.push(`No winner selected for ${pot.name}`);
+    } else if (!selection.winnerNames || selection.winnerNames.length === 0) {
+      errors.push(`No winners selected for ${pot.name}`);
     } else {
-      // Check winner is eligible
-      if (!pot.eligible.includes(selection.winnerName)) {
-        errors.push(`${selection.winnerName} is not eligible for ${pot.name}. Eligible: ${pot.eligible.join(', ')}`);
+      // Check all winners are eligible
+      const ineligibleWinners = selection.winnerNames.filter(w => !pot.eligible.includes(w));
+      if (ineligibleWinners.length > 0) {
+        errors.push(`Ineligible winners for ${pot.name}: ${ineligibleWinners.join(', ')}. Eligible: ${pot.eligible.join(', ')}`);
       }
     }
   });
