@@ -174,22 +174,46 @@ export function StackSetupView({
       let anteValue = state.stackData.ante;
       let anteOrderValue = state.stackData.anteOrder;
 
+      console.log('🔍 [setupPlayers] Initial blind values from state.stackData:', {
+        smallBlind: smallBlindValue,
+        bigBlind: bigBlindValue,
+        ante: anteValue,
+        anteOrder: anteOrderValue
+      });
+
       if (handFormatData) {
         console.log('✅ Parsed 4-line header format');
         console.log('  Hand Number:', handFormatData.header.handNumber);
         console.log('  Started At:', handFormatData.header.startedAt);
         console.log('  SB:', handFormatData.header.sb, 'BB:', handFormatData.header.bb, 'Ante:', handFormatData.header.ante);
 
-        // Capture parsed values for immediate use
-        smallBlindValue = handFormatData.header.sb;
-        bigBlindValue = handFormatData.header.bb;
-        anteValue = handFormatData.header.ante;
+        // IMPORTANT: Use manually entered blind values if they differ from parsed values
+        // This allows users to override the text values with the input fields
+        // Only update blind values from text if the current state is the default (500/1000/1000)
+        const isDefaultBlinds = (
+          state.stackData.smallBlind === 500 &&
+          state.stackData.bigBlind === 1000 &&
+          state.stackData.ante === 1000
+        );
 
-        console.log('📝 Setting stackData with parsed blind values:', {
-          smallBlind: smallBlindValue,
-          bigBlind: bigBlindValue,
-          ante: anteValue
-        });
+        if (isDefaultBlinds) {
+          // Use parsed values (first time setup)
+          smallBlindValue = handFormatData.header.sb;
+          bigBlindValue = handFormatData.header.bb;
+          anteValue = handFormatData.header.ante;
+          console.log('📝 Using parsed blind values (defaults detected):', {
+            smallBlind: smallBlindValue,
+            bigBlind: bigBlindValue,
+            ante: anteValue
+          });
+        } else {
+          // Use manually entered values (user has changed them)
+          console.log('📝 Using manually entered blind values (overriding parsed text):', {
+            smallBlind: smallBlindValue,
+            bigBlind: bigBlindValue,
+            ante: anteValue
+          });
+        }
 
         // Auto-fill hand number, started time, blinds, ante
         actions.setStackData({
@@ -303,6 +327,11 @@ export function StackSetupView({
 
         // SB player (with chips)
         if (normalizedPosition === 'sb') {
+          console.log(`🔍 [setupPlayers] SB player ${player.name} posting SB:`, {
+            smallBlindValue,
+            playerStack: player.stack,
+            willPost: Math.min(smallBlindValue, player.stack)
+          });
           postedSB = Math.min(smallBlindValue, player.stack);
           if (player.stack <= smallBlindValue) {
             isForcedAllIn = true;
