@@ -293,23 +293,40 @@ function buildStreetBreakdown(
 
     // Add blinds and antes for preflop (they are posted before action but not in contributedAmounts)
     // Include ALL players who posted blinds/antes, even if they folded (dead money goes into pot)
+    // IMPORTANT: Use Math.min(blind, stack) to handle players with insufficient chips
     if (street === 'preflop' && blindAnte && players) {
       console.log('🔍 [calculateStreetPot] Preflop blind check:', {
         street,
         blindAnte,
-        players: players.map(p => ({ name: p.name, position: p.position }))
+        players: players.map(p => ({ name: p.name, position: p.position, stack: p.stack }))
       });
       players.forEach(player => {
         if (player.position === 'SB' && blindAnte.sb > 0) {
-          console.log(`✅ [calculateStreetPot] Adding SB ${blindAnte.sb} from ${player.name}`);
-          amount += blindAnte.sb;
-          playersWhoContributed.add(player.id);
+          // Use Math.min to handle players with less chips than the blind
+          const actualSBPosted = Math.min(blindAnte.sb, player.stack);
+          console.log(`🔍 [calculateStreetPot] SB player ${player.name}: blind=${blindAnte.sb}, stack=${player.stack}, posting=${actualSBPosted}`);
+          if (actualSBPosted > 0) {
+            console.log(`✅ [calculateStreetPot] Adding SB ${actualSBPosted} from ${player.name}`);
+            amount += actualSBPosted;
+            playersWhoContributed.add(player.id);
+          } else {
+            console.log(`❌ [calculateStreetPot] NOT adding SB from ${player.name} (actualSBPosted = 0)`);
+          }
         } else if (player.position === 'SB' && blindAnte.sb === 0) {
           console.log(`❌ [calculateStreetPot] NOT adding SB from ${player.name} because SB is 0`);
         } else if (player.position === 'BB') {
-          console.log(`✅ [calculateStreetPot] Adding BB ${blindAnte.bb} + Ante ${blindAnte.ante} from ${player.name}`);
-          amount += blindAnte.bb + blindAnte.ante;
-          playersWhoContributed.add(player.id);
+          // For BB: they post BB first, then Ante (or vice versa depending on order)
+          // Use Math.min to handle players with insufficient chips
+          const totalBBRequired = blindAnte.bb + blindAnte.ante;
+          const actualBBPosted = Math.min(totalBBRequired, player.stack);
+          console.log(`🔍 [calculateStreetPot] BB player ${player.name}: required=${totalBBRequired}, stack=${player.stack}, posting=${actualBBPosted}`);
+          if (actualBBPosted > 0) {
+            console.log(`✅ [calculateStreetPot] Adding BB+Ante ${actualBBPosted} from ${player.name}`);
+            amount += actualBBPosted;
+            playersWhoContributed.add(player.id);
+          } else {
+            console.log(`❌ [calculateStreetPot] NOT adding BB+Ante from ${player.name} (actualBBPosted = 0)`);
+          }
         }
       });
     }
