@@ -270,7 +270,7 @@ export function StackSetupView({
 
       // Calculate posted blinds/ante for each player
       playersWithInferredPositions.forEach(player => {
-        if (!player.name || player.stack === 0) return;
+        if (!player.name) return;
 
         const normalizedPosition = normalizePosition(player.position);
         let postedSB = 0;
@@ -279,7 +279,28 @@ export function StackSetupView({
         let isForcedAllIn = false;
         let forcedAllInAmount = 0;
 
-        // SB player
+        // Handle players with 0 chips - they post nothing and are marked as folded
+        if (player.stack === 0) {
+          // 0-chip players: posted amounts = 0, marked as folded
+          postedAmountsMap[player.id] = {
+            postedSB: 0,
+            postedBB: 0,
+            postedAnte: 0,
+            isForcedAllIn: false,
+            forcedAllInAmount: 0
+          };
+
+          // Mark as folded in preflop
+          actions.updatePlayerData(player.id, 'preflopAction', 'fold', '');
+          actions.updatePlayerData(player.id, 'postedSB', 0, '');
+          actions.updatePlayerData(player.id, 'postedBB', 0, '');
+          actions.updatePlayerData(player.id, 'postedAnte', 0, '');
+
+          console.log(`   🚫 Player ${player.id} (${player.name}) has 0 chips - marked as folded, posted=0`);
+          return; // Skip further processing for 0-chip players
+        }
+
+        // SB player (with chips)
         if (normalizedPosition === 'sb') {
           postedSB = Math.min(smallBlindValue, player.stack);
           if (player.stack <= smallBlindValue) {
@@ -288,7 +309,7 @@ export function StackSetupView({
           }
         }
 
-        // Heads up: Dealer posts SB
+        // Heads up: Dealer posts SB (with chips)
         if (playersWithInferredPositions.filter(p => p.name).length === 2 && normalizedPosition === 'dealer') {
           postedSB = Math.min(smallBlindValue, player.stack);
           if (player.stack <= smallBlindValue) {
@@ -366,7 +387,7 @@ export function StackSetupView({
 
       playersWithInferredPositions.forEach(player => {
         console.log('🔍 [StackSetupView] Player:', player.id, player.name, 'stack:', player.stack);
-        if (player.name && player.stack > 0) {
+        if (player.name) {
           const posted = postedAmountsMap[player.id] || { postedSB: 0, postedBB: 0, postedAnte: 0, isForcedAllIn: false, forcedAllInAmount: 0 };
           const totalPosted = posted.postedSB + posted.postedBB + posted.postedAnte;
 
@@ -378,7 +399,11 @@ export function StackSetupView({
           initialSectionStacks['preflop_base'].current[player.id] = nowStack;
           initialSectionStacks['preflop_base'].updated[player.id] = nowStack;
 
-          console.log(`   ✅ Player ${player.id} (${player.name}): starting=${player.stack}, posted=${totalPosted} (SB:${posted.postedSB}, BB:${posted.postedBB}, Ante:${posted.postedAnte}), now=${nowStack}, forcedAllIn=${posted.isForcedAllIn}`);
+          if (player.stack === 0) {
+            console.log(`   🚫 Player ${player.id} (${player.name}): starting=0, posted=0, now=0, FOLDED (0 chips)`);
+          } else {
+            console.log(`   ✅ Player ${player.id} (${player.name}): starting=${player.stack}, posted=${totalPosted} (SB:${posted.postedSB}, BB:${posted.postedBB}, Ante:${posted.postedAnte}), now=${nowStack}, forcedAllIn=${posted.isForcedAllIn}`);
+          }
         }
       });
 
@@ -407,7 +432,7 @@ export function StackSetupView({
           [fullDeck[i], fullDeck[j]] = [fullDeck[j], fullDeck[i]];
         }
 
-        // Assign cards to each player
+        // Assign cards to each player (skip 0-chip players)
         let cardIndex = 0;
         playersWithInferredPositions.forEach(player => {
           if (player.name && player.stack > 0) {
@@ -424,6 +449,8 @@ export function StackSetupView({
               cardManagement.updatePlayerCard(player.id, 2, card2);
               console.log(`  Player ${player.id} (${player.name}) Card 2: ${card2.rank}${card2.suit}`);
             }
+          } else if (player.name && player.stack === 0) {
+            console.log(`  Player ${player.id} (${player.name}) - No cards (0 chips, folded)`);
           }
         });
 
