@@ -571,12 +571,9 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         return ['fold']; // Only fold button available and enabled for 0-chip players
       }
 
-      // Check if player has already folded (only disable buttons for players WITH chips who folded)
-      const currentAction = playerData[playerId]?.preflopAction;
-      if (currentAction === 'fold' && startingStack > 0) {
-        console.log(`🚫 [getAvailableActionsForPlayer] Player ${currentPlayer.name} has already folded - returning [] (no actions available)`);
-        return []; // No actions available for already-folded players with chips
-      }
+      // NOTE: In BASE level, we DON'T check for 'fold' action because 'fold' is the default
+      // All players start with fold action, so we can't use it to determine if they've actually folded
+      // Only in MORE ACTION rounds do we check for fold to exclude players
 
       // Check if player is already all-in from previous street
       const isAllInFromPrevious = playerData[playerId]?.allInFromPrevious === true;
