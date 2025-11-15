@@ -79,16 +79,16 @@
  *     Jane (was SB) → BB
  *
  * Next Hand (2 players - Heads-up):
- *   [0] Bob (SB) - 10,000 chips ← Dealer/SB in heads-up (posts SB)
+ *   [0] Bob (Dealer) - 10,000 chips ← Dealer in heads-up (posts SB)
  *   [1] Jane (BB) - 500 chips
  *   (Alice removed - was 0 chips as Dealer in 3-player game)
  *
  * ═══════════════════════════════════════════════════════════════════════════
- * SCENARIO 3: 2 PLAYERS (Heads-up) → Remove 0-chip Dealer/SB
+ * SCENARIO 3: 2 PLAYERS (Heads-up) → Remove 0-chip Dealer
  * ═══════════════════════════════════════════════════════════════════════════
  *
  * Current Hand (2 players):
- *   [0] John (SB) - 0 chips ← Started with 0, Dealer in heads-up
+ *   [0] John (Dealer) - 0 chips ← Started with 0, posts SB in heads-up
  *   [1] Bob (BB) - 10,000 chips
  *
  * Process:
@@ -212,9 +212,11 @@ export function calculateNewStacks(
 
 /**
  * Position mappings for different player counts
+ * NOTE: In heads-up (2 players), we use 'Dealer' instead of 'SB'
+ *       The Dealer posts SB, other player posts BB
  */
 const POSITIONS: Record<number, string[]> = {
-  2: ['SB', 'BB'],
+  2: ['Dealer', 'BB'],  // Heads-up: Dealer posts SB
   3: ['Dealer', 'SB', 'BB'],
   4: ['Dealer', 'SB', 'BB', 'UTG'],
   5: ['Dealer', 'SB', 'BB', 'UTG', 'CO'],
@@ -240,9 +242,8 @@ export function generateNextHand(
   }
 
   // Find current dealer index
-  const dealerIdx = players.findIndex(p =>
-    p.position === 'Dealer' || (numPlayers === 2 && p.position === 'SB')
-  );
+  // In heads-up, dealer is always 'Dealer' position (posts SB)
+  const dealerIdx = players.findIndex(p => p.position === 'Dealer');
 
   if (dealerIdx === -1) {
     throw new Error('Dealer not found in current hand');
@@ -288,16 +289,16 @@ export function generateNextHand(
 
       // In heads-up: Dealer posts SB, other player is BB
       // After removing dealer, we need to reassign positions for heads-up
-      const headsUpPositions = POSITIONS[2]; // ['SB', 'BB']
+      const headsUpPositions = POSITIONS[2]; // ['Dealer', 'BB']
 
-      // Previous BB becomes new Dealer/SB (posts SB in heads-up)
+      // Previous BB becomes new Dealer (posts SB in heads-up)
       // Previous SB becomes new BB
       const prevBB = filteredNextHand.find(p => p.position === 'BB');
       const prevSB = filteredNextHand.find(p => p.position === 'SB');
 
       if (prevBB && prevSB) {
         console.log(`🔄 [generateNextHand] Heads-up rotation: ${prevBB.name} (BB) → Dealer, ${prevSB.name} (SB) → BB`);
-        prevBB.position = 'SB';  // In heads-up, SB is also the Dealer
+        prevBB.position = 'Dealer';  // In heads-up, Dealer posts SB
         prevSB.position = 'BB';
       }
     } else if (numPlayers >= 4) {
@@ -348,21 +349,21 @@ export function validateButtonRotation(
   const prevDealer = currentPlayers.find(p => p.position === 'Dealer');
 
   if (numPlayers === 2) {
-    // 2-player: SB/Dealer alternates, BB alternates
-    const nextSB = nextPlayers.find(p => p.position === 'SB');
+    // 2-player heads-up: Dealer alternates with BB
+    const nextDealer = nextPlayers.find(p => p.position === 'Dealer');
     const nextBB = nextPlayers.find(p => p.position === 'BB');
 
-    if (!nextSB || !nextBB) {
-      errors.push('SB or BB not found in next hand');
+    if (!nextDealer || !nextBB) {
+      errors.push('Dealer or BB not found in next hand');
     } else {
-      // In 2P, previous BB becomes new SB
-      if (prevBB && nextSB.name !== prevBB.name) {
-        errors.push(`Button rotation wrong: ${prevBB.name} (prev BB) should be new SB, got ${nextSB.name}`);
+      // In heads-up, previous BB becomes new Dealer
+      if (prevBB && nextDealer.name !== prevBB.name) {
+        errors.push(`Button rotation wrong: ${prevBB.name} (prev BB) should be new Dealer, got ${nextDealer.name}`);
       }
 
-      // In 2P, previous SB becomes new BB
-      if (prevSB && nextBB.name !== prevSB.name) {
-        errors.push(`Button rotation wrong: ${prevSB.name} (prev SB) should be new BB, got ${nextBB.name}`);
+      // In heads-up, previous Dealer becomes new BB
+      if (prevDealer && nextBB.name !== prevDealer.name) {
+        errors.push(`Button rotation wrong: ${prevDealer.name} (prev Dealer) should be new BB, got ${nextBB.name}`);
       }
     }
   } else {
@@ -393,7 +394,8 @@ export function validateAllPlayersPresent(
   const errors: string[] = [];
 
   // Check if dealer started with 0 chips (eligible for removal)
-  const dealer = currentPlayers.find(p => p.position === 'Dealer' || (currentPlayers.length === 2 && p.position === 'SB'));
+  // In all player counts (including heads-up), dealer is always 'Dealer' position
+  const dealer = currentPlayers.find(p => p.position === 'Dealer');
   const dealerStartedWith0 = dealer && dealer.stack === 0;
 
   // Allow player count to decrease by 1 if 0-chip dealer was removed
