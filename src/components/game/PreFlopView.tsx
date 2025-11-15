@@ -564,6 +564,13 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
       console.log(`🎯 [getAvailableActionsForPlayer] Player ${playerId} is ${currentPlayer.name} (${currentPlayer.position})`);
 
+      // Check if player has already folded (0-chip players are auto-folded in setup)
+      const currentAction = playerData[playerId]?.preflopAction;
+      if (currentAction === 'fold') {
+        console.log(`🚫 [getAvailableActionsForPlayer] Player ${currentPlayer.name} has already folded - returning [] (no actions available)`);
+        return []; // No actions available for folded players
+      }
+
       // Check if player is already all-in from previous street
       const isAllInFromPrevious = playerData[playerId]?.allInFromPrevious === true;
       if (isAllInFromPrevious) {
