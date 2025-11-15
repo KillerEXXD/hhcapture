@@ -716,6 +716,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
       // No action: Always available
       actions.push('no action');
 
+      console.log(`🎯 [getAvailableActionsForPlayer] Returning actions for ${currentPlayer.name}:`, actions);
       return actions;
     }
 
