@@ -256,6 +256,9 @@ export function generateNextHand(
   console.log(`🎯 [generateNextHand] Current dealer: ${currentDealer.name} (${currentDealer.position}), started with ${currentDealer.stack} chips`);
   console.log(`🎯 [generateNextHand] Dealer started with 0? ${dealerStartedWith0}`);
 
+  // Store original positions BEFORE rotation (needed for 3→2 transition)
+  const originalPositions = new Map(players.map(p => [p.name, p.position]));
+
   // Rotate button: next player becomes dealer
   const nextHand: NextHandPlayer[] = [];
 
@@ -288,18 +291,18 @@ export function generateNextHand(
       console.log(`🎯 [generateNextHand] Transitioning from 3-player to 2-player (heads-up)`);
 
       // In heads-up: Dealer posts SB, other player is BB
-      // After removing dealer, we need to reassign positions for heads-up
-      const headsUpPositions = POSITIONS[2]; // ['Dealer', 'BB']
+      // Rule: Original SB → New BB, Original BB → New Dealer (posts SB)
 
-      // Previous BB becomes new Dealer (posts SB in heads-up)
-      // Previous SB becomes new BB
-      const prevBB = filteredNextHand.find(p => p.position === 'BB');
-      const prevSB = filteredNextHand.find(p => p.position === 'SB');
+      // Find players by their ORIGINAL positions (before rotation)
+      const originalBB = filteredNextHand.find(p => originalPositions.get(p.name) === 'BB');
+      const originalSB = filteredNextHand.find(p => originalPositions.get(p.name) === 'SB');
 
-      if (prevBB && prevSB) {
-        console.log(`🔄 [generateNextHand] Heads-up rotation: ${prevBB.name} (BB) → Dealer, ${prevSB.name} (SB) → BB`);
-        prevBB.position = 'Dealer';  // In heads-up, Dealer posts SB
-        prevSB.position = 'BB';
+      if (originalBB && originalSB) {
+        console.log(`🔄 [generateNextHand] Heads-up transition: ${originalBB.name} (was BB) → Dealer, ${originalSB.name} (was SB) → BB`);
+        originalBB.position = 'Dealer';  // Original BB becomes Dealer (posts SB in heads-up)
+        originalSB.position = 'BB';      // Original SB becomes BB
+      } else {
+        console.error(`⚠️ [generateNextHand] Could not find original BB/SB for heads-up transition`);
       }
     } else if (numPlayers >= 4) {
       // For 4+ players transitioning to 3+ players, reassign positions

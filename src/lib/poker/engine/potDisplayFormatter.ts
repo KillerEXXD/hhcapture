@@ -194,12 +194,12 @@ function getExclusionReason(player: Player, cappedAt: number): string {
 function getPlayerTotalContribution(
   playerId: number,
   contributedAmounts: ContributedAmounts,
-  currentStreet: Stage
+  currentStreet?: Stage
 ): number {
   let total = 0;
 
   const streets: Stage[] = ['preflop', 'flop', 'turn', 'river'];
-  const currentIndex = streets.indexOf(currentStreet);
+  const currentIndex = currentStreet ? streets.indexOf(currentStreet) : streets.length - 1;
 
   // Loop through all section keys and find ones that match streets up to current street
   for (const sectionKey in contributedAmounts) {

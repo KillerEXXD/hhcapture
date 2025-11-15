@@ -49,7 +49,9 @@
       "Bash(timeout:*)",
       "Bash(npm run kill-ports:*)",
       "Bash(start http://127.0.0.1:3002)",
-      "Bash(cmd //c dir //B //O-D \"C:\\Users\\ravee\\Downloads\\*.json\")"
+      "Bash(cmd //c dir //B //O-D \"C:\\Users\\ravee\\Downloads\\*.json\")",
+      "SlashCommand(/cs)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []
