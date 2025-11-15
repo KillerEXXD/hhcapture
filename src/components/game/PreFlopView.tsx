@@ -564,11 +564,18 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
       console.log(`🎯 [getAvailableActionsForPlayer] Player ${playerId} is ${currentPlayer.name} (${currentPlayer.position})`);
 
-      // Check if player has already folded (0-chip players are auto-folded in setup)
+      // Check if player has 0 starting stack - only enable fold button (keep it enabled even when selected)
+      const startingStack = sectionStacks?.['preflop_base']?.initial?.[playerId] || currentPlayer.stack;
+      if (startingStack === 0) {
+        console.log(`🚫 [getAvailableActionsForPlayer] Player ${currentPlayer.name} has 0 chips - returning ['fold'] only (highlighted but not disabled)`);
+        return ['fold']; // Only fold button available and enabled for 0-chip players
+      }
+
+      // Check if player has already folded (only disable buttons for players WITH chips who folded)
       const currentAction = playerData[playerId]?.preflopAction;
-      if (currentAction === 'fold') {
+      if (currentAction === 'fold' && startingStack > 0) {
         console.log(`🚫 [getAvailableActionsForPlayer] Player ${currentPlayer.name} has already folded - returning [] (no actions available)`);
-        return []; // No actions available for folded players
+        return []; // No actions available for already-folded players with chips
       }
 
       // Check if player is already all-in from previous street
@@ -602,14 +609,22 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         return []; // Position not in action order
       }
 
-      // Check if all previous players have acted (or are all-in/folded)
+      // Check if all previous players have acted (or are all-in/folded/0-chip)
       // Note: In BASE level, undefined is treated as fold (default action), so it counts as having acted
       // Note: 'fold' is considered a valid action (counts as having acted)
+      // Note: Players with 0 starting chips are skipped (they auto-fold)
       for (let i = 0; i < currentPlayerIndex; i++) {
         const prevPosition = actionOrder[i];
         const prevPlayer = players.find(p => p.position === prevPosition && p.name);
 
         if (prevPlayer) {
+          // Skip 0-chip players - they don't block action progression
+          const prevStartingStack = sectionStacks?.['preflop_base']?.initial?.[prevPlayer.id] || prevPlayer.stack;
+          if (prevStartingStack === 0) {
+            console.log(`🔍 [Turn Check] ${currentPlayer.name} (${currentPlayer.position}) skipping 0-chip player ${prevPlayer.name} (${prevPosition})`);
+            continue; // Skip to next player
+          }
+
           const prevAction = playerData[prevPlayer.id]?.preflopAction as ActionType | undefined;
           const prevIsAllIn = playerData[prevPlayer.id]?.allInFromPrevious === true;
 

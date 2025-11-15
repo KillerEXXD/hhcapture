@@ -279,9 +279,9 @@ export function StackSetupView({
         let isForcedAllIn = false;
         let forcedAllInAmount = 0;
 
-        // Handle players with 0 chips - they post nothing and are marked as folded
+        // Handle players with 0 chips - they post nothing, fold button pre-selected and highlighted
         if (player.stack === 0) {
-          // 0-chip players: posted amounts = 0, marked as folded
+          // 0-chip players: posted amounts = 0, fold button pre-selected (highlighted)
           postedAmountsMap[player.id] = {
             postedSB: 0,
             postedBB: 0,
@@ -290,13 +290,14 @@ export function StackSetupView({
             forcedAllInAmount: 0
           };
 
-          // Mark as folded in preflop
+          // Pre-select fold action (this highlights the fold button in red)
+          // User can still see the highlighted fold button, only fold is enabled
           actions.updatePlayerData(player.id, 'preflopAction', 'fold', '');
           actions.updatePlayerData(player.id, 'postedSB', 0, '');
           actions.updatePlayerData(player.id, 'postedBB', 0, '');
           actions.updatePlayerData(player.id, 'postedAnte', 0, '');
 
-          console.log(`   🚫 Player ${player.id} (${player.name}) has 0 chips - marked as folded, posted=0`);
+          console.log(`   🚫 Player ${player.id} (${player.name}) has 0 chips - posted=0, fold button highlighted`);
           return; // Skip further processing for 0-chip players
         }
 
