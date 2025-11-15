@@ -352,16 +352,26 @@ function generateCalculation(
   const formulaLines: string[] = [];
 
   // Guard: If currentStreet is 'stack', skip Posted money check (only applies to betting streets)
-  // For main pot on preflop, show Posted money and player contributions
-  if (potType === 'main' && currentStreet === 'preflop') {
+  // For main pot, show player contributions
+  if (potType === 'main') {
     const contributionLines = generateContributionLines(
       allPlayers,
       eligiblePlayers,
       contributedAmounts,
       deadMoneyBreakdown,
-      blindAnte
+      blindAnte,
+      currentStreet
     );
     formulaLines.push(...contributionLines);
+  } else {
+    // For side pots, show eligible players and their contribution
+    eligiblePlayers.forEach(player => {
+      const contribution = getPlayerTotalContribution(player.id, contributedAmounts, currentStreet);
+      if (contribution > 0) {
+        const label = `${player.name}${player.position ? ` (${player.position})` : ''}:`;
+        formulaLines.push(label.padEnd(25) + `$${contribution.toLocaleString()}`.padEnd(20));
+      }
+    });
   }
 
   const formula = formulaLines.join('\n');
