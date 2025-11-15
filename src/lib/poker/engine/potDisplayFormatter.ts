@@ -392,15 +392,19 @@ function generateContributionLines(
   eligiblePlayers: Player[],
   contributedAmounts: ContributedAmounts,
   deadMoneyBreakdown: { total: number; ante: number; foldedBlinds: number; foldedBets: number },
-  blindAnte?: { sb: number; bb: number; ante: number }
+  blindAnte?: { sb: number; bb: number; ante: number },
+  currentStreet?: Stage
 ): string[] {
   console.log('📊 [generateContributionLines] Called with:', {
     allPlayers: allPlayers.map(p => `${p.name} (${p.position})`),
     eligiblePlayers: eligiblePlayers.map(p => `${p.name} (${p.position})`),
-    blindAnte
+    blindAnte,
+    currentStreet
   });
 
   const lines: string[] = [];
+  const streets: Stage[] = ['preflop', 'flop', 'turn', 'river'];
+  const currentIndex = currentStreet ? streets.indexOf(currentStreet) : 0;
 
   // Find SB and BB players
   const sbPlayer = allPlayers.find(p => p.position === 'SB');
@@ -435,11 +439,16 @@ function generateContributionLines(
   allPlayers.forEach(player => {
     let totalContribution = 0;
 
-    // Sum all contributions from this player in preflop
+    // Sum all contributions from this player up to current street
     for (const sectionKey in contributedAmounts) {
-      if (sectionKey.startsWith('preflop')) {
-        const sectionContributions = contributedAmounts[sectionKey] || {};
-        totalContribution += sectionContributions[player.id] || 0;
+      // Check if this section belongs to any street up to current street
+      for (let i = 0; i <= currentIndex; i++) {
+        const street = streets[i];
+        if (sectionKey.startsWith(street)) {
+          const sectionContributions = contributedAmounts[sectionKey] || {};
+          totalContribution += sectionContributions[player.id] || 0;
+          break;
+        }
       }
     }
 
