@@ -295,7 +295,7 @@ function buildStreetBreakdown(
     // Include ALL players who posted blinds/antes, even if they folded (dead money goes into pot)
     if (street === 'preflop' && blindAnte && players) {
       players.forEach(player => {
-        if (player.position === 'SB') {
+        if (player.position === 'SB' && blindAnte.sb > 0) {
           amount += blindAnte.sb;
           playersWhoContributed.add(player.id);
         } else if (player.position === 'BB') {
@@ -430,8 +430,8 @@ function generateContributionLines(
     lines.push(`Posted (Ante):`.padEnd(25) + `$${blindAnte.ante.toLocaleString()}`.padEnd(20));
   }
 
-  // Show Posted (SB) if SB folded
-  if (sbPlayer && !sbInPot && blindAnte) {
+  // Show Posted (SB) if SB folded (and SB > 0)
+  if (sbPlayer && !sbInPot && blindAnte && blindAnte.sb > 0) {
     lines.push(`Posted (SB):`.padEnd(25) + `$${blindAnte.sb.toLocaleString()}`.padEnd(20));
   }
 

@@ -1,0 +1,3 @@
+There are situations when SB won't exist. This happens in 3 player or 4+ players game. in that scenario, the orde of positions changes.
+in 3 Player game: the order of positions Pre-flop is BB->UTG->Dealer. UTG acts first pre-flop. in the flop, BB acts first. BB posts BB and ante and nobody posts anything. SB is called "Dead small". There won't be SB posted to main pot. The main pot will be BB posted and ANte posted pre-flop.
+The next hand will go normal. Next hand generation for 3 player will be, BB becomes SB, UTG becomes BB and Dealer becomes UTG+1 and button is now dead because button moved to "Dead small". This is called "Dead button".
