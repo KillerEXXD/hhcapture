@@ -18,7 +18,7 @@ export default defineConfig({
     port: 3001,
     host: '127.0.0.1',
     strictPort: false,
-    open: true
+    open: false  // Disable auto-open, we'll handle it in the script
   },
   build: {
     outDir: 'dist',

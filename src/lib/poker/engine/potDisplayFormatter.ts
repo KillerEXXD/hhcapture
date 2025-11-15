@@ -294,11 +294,20 @@ function buildStreetBreakdown(
     // Add blinds and antes for preflop (they are posted before action but not in contributedAmounts)
     // Include ALL players who posted blinds/antes, even if they folded (dead money goes into pot)
     if (street === 'preflop' && blindAnte && players) {
+      console.log('🔍 [calculateStreetPot] Preflop blind check:', {
+        street,
+        blindAnte,
+        players: players.map(p => ({ name: p.name, position: p.position }))
+      });
       players.forEach(player => {
         if (player.position === 'SB' && blindAnte.sb > 0) {
+          console.log(`✅ [calculateStreetPot] Adding SB ${blindAnte.sb} from ${player.name}`);
           amount += blindAnte.sb;
           playersWhoContributed.add(player.id);
+        } else if (player.position === 'SB' && blindAnte.sb === 0) {
+          console.log(`❌ [calculateStreetPot] NOT adding SB from ${player.name} because SB is 0`);
         } else if (player.position === 'BB') {
+          console.log(`✅ [calculateStreetPot] Adding BB ${blindAnte.bb} + Ante ${blindAnte.ante} from ${player.name}`);
           amount += blindAnte.bb + blindAnte.ante;
           playersWhoContributed.add(player.id);
         }
@@ -431,8 +440,18 @@ function generateContributionLines(
   }
 
   // Show Posted (SB) if SB folded (and SB > 0)
+  console.log('🔍 [generateContributionLines] SB Check:', {
+    sbPlayer: sbPlayer?.name,
+    sbInPot,
+    blindAnte,
+    sbAmount: blindAnte?.sb,
+    shouldShow: sbPlayer && !sbInPot && blindAnte && blindAnte.sb > 0
+  });
   if (sbPlayer && !sbInPot && blindAnte && blindAnte.sb > 0) {
+    console.log('✅ [generateContributionLines] Adding Posted (SB) line');
     lines.push(`Posted (SB):`.padEnd(25) + `$${blindAnte.sb.toLocaleString()}`.padEnd(20));
+  } else {
+    console.log('❌ [generateContributionLines] NOT adding Posted (SB) line');
   }
 
   // Show each player's contribution (ALL players who contributed, not just eligible)

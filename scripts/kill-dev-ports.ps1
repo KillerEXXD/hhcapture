@@ -6,9 +6,9 @@ Write-Host "Checking for processes on ports 3001 and 3002..." -ForegroundColor C
 $port3001 = Get-NetTCPConnection -LocalPort 3001 -State Listen -ErrorAction SilentlyContinue
 if ($port3001) {
     $port3001 | ForEach-Object {
-        $pid = $_.OwningProcess
-        Write-Host "Killing process $pid on port 3001..." -ForegroundColor Yellow
-        Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
+        $processId = $_.OwningProcess
+        Write-Host "Killing process $processId on port 3001..." -ForegroundColor Yellow
+        Stop-Process -Id $processId -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -16,9 +16,9 @@ if ($port3001) {
 $port3002 = Get-NetTCPConnection -LocalPort 3002 -State Listen -ErrorAction SilentlyContinue
 if ($port3002) {
     $port3002 | ForEach-Object {
-        $pid = $_.OwningProcess
-        Write-Host "Killing process $pid on port 3002..." -ForegroundColor Yellow
-        Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
+        $processId = $_.OwningProcess
+        Write-Host "Killing process $processId on port 3002..." -ForegroundColor Yellow
+        Stop-Process -Id $processId -Force -ErrorAction SilentlyContinue
     }
 }
 
