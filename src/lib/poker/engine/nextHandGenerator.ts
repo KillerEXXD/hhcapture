@@ -6,6 +6,100 @@
  * - Stack calculations
  * - Button rotation
  * - Full validations
+ * - Special handling for 0-chip dealer elimination
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CRITICAL RULE: 0-CHIP DEALER REMOVAL
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * If a player starts a hand as Dealer with 0 chips, they must be REMOVED from
+ * the next hand generation. This simulates tournament elimination.
+ *
+ * IMPORTANT NOTES:
+ * - This rule applies ONLY to the Dealer position
+ * - SB/BB with 0 chips are handled differently (they stay, post 0, auto-fold)
+ * - The dealer's starting stack (player.stack) is checked, NOT their ending stack
+ * - Different logic applies based on player count after removal
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ * SCENARIO 1: 4+ PLAYERS → Remove 0-chip Dealer
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Current Hand (4 players):
+ *   [0] Alice (UTG) - 8,500 chips
+ *   [1] John (Dealer) - 0 chips ← Started with 0
+ *   [2] Jane (SB) - 500 chips
+ *   [3] Bob (BB) - 10,000 chips
+ *
+ * Process:
+ *   Step 1: Normal rotation (all 4 players)
+ *     Jane (was SB) → Dealer
+ *     Bob (was BB) → SB
+ *     Alice (was UTG) → BB
+ *     John (was Dealer) → UTG
+ *
+ *   Step 2: Remove John (was Dealer with 0 chips)
+ *
+ *   Step 3: Reassign positions for 3 players
+ *     positions[3] = ['Dealer', 'SB', 'BB']
+ *     Jane → Dealer
+ *     Bob → SB
+ *     Alice → BB
+ *
+ * Next Hand (3 players):
+ *   [0] Jane (Dealer) - 500 chips
+ *   [1] Bob (SB) - 10,000 chips
+ *   [2] Alice (BB) - 8,500 chips
+ *   (John removed - was 0 chips as Dealer)
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ * SCENARIO 2: 3 PLAYERS → Remove 0-chip Dealer → HEADS-UP TRANSITION
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Current Hand (3 players):
+ *   [0] Alice (Dealer) - 0 chips ← Started with 0
+ *   [1] Jane (SB) - 500 chips
+ *   [2] Bob (BB) - 10,000 chips
+ *
+ * Process:
+ *   Step 1: Normal rotation (all 3 players)
+ *     Jane (was SB) → Dealer
+ *     Bob (was BB) → SB
+ *     Alice (was Dealer) → BB
+ *
+ *   Step 2: Remove Alice (was Dealer with 0 chips)
+ *     Remaining: Jane (Dealer), Bob (SB)
+ *
+ *   Step 3: Apply HEADS-UP rules (2 players remaining)
+ *     In heads-up: Dealer posts SB, other player posts BB
+ *     Previous BB → Dealer/SB (posts SB)
+ *     Previous SB → BB (posts BB)
+ *
+ *     Bob (was BB) → SB (Dealer in heads-up)
+ *     Jane (was SB) → BB
+ *
+ * Next Hand (2 players - Heads-up):
+ *   [0] Bob (SB) - 10,000 chips ← Dealer/SB in heads-up (posts SB)
+ *   [1] Jane (BB) - 500 chips
+ *   (Alice removed - was 0 chips as Dealer in 3-player game)
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ * SCENARIO 3: 2 PLAYERS (Heads-up) → Remove 0-chip Dealer/SB
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Current Hand (2 players):
+ *   [0] John (SB) - 0 chips ← Started with 0, Dealer in heads-up
+ *   [1] Bob (BB) - 10,000 chips
+ *
+ * Process:
+ *   Step 1: Detect 0-chip dealer
+ *   Step 2: Remove John
+ *   Step 3: Only 1 player left → Game ends
+ *
+ * Next Hand:
+ *   (Game over - only 1 player remains)
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
 import type { Player } from '../../../types/poker/player.types';
@@ -132,6 +226,7 @@ const POSITIONS: Record<number, string[]> = {
 
 /**
  * Rotate button clockwise and generate next hand
+ * Handles special case: Remove players who started current hand as Dealer with 0 chips
  */
 export function generateNextHand(
   players: Player[],
@@ -153,6 +248,13 @@ export function generateNextHand(
     throw new Error('Dealer not found in current hand');
   }
 
+  // Check if current dealer started with 0 chips
+  const currentDealer = players[dealerIdx];
+  const dealerStartedWith0 = currentDealer.stack === 0;
+
+  console.log(`🎯 [generateNextHand] Current dealer: ${currentDealer.name} (${currentDealer.position}), started with ${currentDealer.stack} chips`);
+  console.log(`🎯 [generateNextHand] Dealer started with 0? ${dealerStartedWith0}`);
+
   // Rotate button: next player becomes dealer
   const nextHand: NextHandPlayer[] = [];
 
@@ -173,11 +275,55 @@ export function generateNextHand(
     });
   }
 
+  // Special handling: Remove dealer if they started with 0 chips
+  if (dealerStartedWith0 && numPlayers >= 3) {
+    console.log(`🚫 [generateNextHand] Removing ${currentDealer.name} (was Dealer with 0 chips)`);
+
+    // Remove the player who was dealer with 0 chips
+    const filteredNextHand = nextHand.filter(p => p.name !== currentDealer.name);
+
+    // Handle transition from 3 players to 2 players (heads-up)
+    if (numPlayers === 3 && filteredNextHand.length === 2) {
+      console.log(`🎯 [generateNextHand] Transitioning from 3-player to 2-player (heads-up)`);
+
+      // In heads-up: Dealer posts SB, other player is BB
+      // After removing dealer, we need to reassign positions for heads-up
+      const headsUpPositions = POSITIONS[2]; // ['SB', 'BB']
+
+      // Previous BB becomes new Dealer/SB (posts SB in heads-up)
+      // Previous SB becomes new BB
+      const prevBB = filteredNextHand.find(p => p.position === 'BB');
+      const prevSB = filteredNextHand.find(p => p.position === 'SB');
+
+      if (prevBB && prevSB) {
+        console.log(`🔄 [generateNextHand] Heads-up rotation: ${prevBB.name} (BB) → Dealer, ${prevSB.name} (SB) → BB`);
+        prevBB.position = 'SB';  // In heads-up, SB is also the Dealer
+        prevSB.position = 'BB';
+      }
+    } else if (numPlayers >= 4) {
+      // For 4+ players transitioning to 3+ players, reassign positions
+      const newPlayerCount = filteredNextHand.length;
+      const newPositions = POSITIONS[newPlayerCount];
+
+      if (newPositions) {
+        console.log(`🔄 [generateNextHand] Reassigning positions for ${newPlayerCount} players`);
+        filteredNextHand.forEach((player, idx) => {
+          player.position = newPositions[idx];
+          console.log(`   ${player.name}: ${newPositions[idx]}`);
+        });
+      }
+    }
+
+    console.log(`✅ [generateNextHand] Next hand has ${filteredNextHand.length} players (removed ${currentDealer.name})`);
+    return filteredNextHand;
+  }
+
   return nextHand;
 }
 
 /**
  * Validate button rotation
+ * NOTE: Skip validation if player count changed (0-chip dealer was removed)
  */
 export function validateButtonRotation(
   currentPlayers: Player[],
@@ -185,6 +331,16 @@ export function validateButtonRotation(
 ): ValidationResult {
   const errors: string[] = [];
   const numPlayers = currentPlayers.length;
+  const nextNumPlayers = nextPlayers.length;
+
+  // Check if a player was removed (0-chip dealer elimination)
+  if (numPlayers !== nextNumPlayers) {
+    console.log(`⚠️ [validateButtonRotation] Player count changed from ${numPlayers} to ${nextNumPlayers}, skipping rotation validation (0-chip dealer removed)`);
+    return {
+      isValid: true,
+      errors: []
+    };
+  }
 
   // Find previous positions
   const prevSB = currentPlayers.find(p => p.position === 'SB');
@@ -228,6 +384,7 @@ export function validateButtonRotation(
 
 /**
  * Validate all players are present in next hand (including busted players)
+ * NOTE: Allows player count to decrease by 1 if a 0-chip dealer was removed
  */
 export function validateAllPlayersPresent(
   currentPlayers: Player[],
@@ -235,8 +392,31 @@ export function validateAllPlayersPresent(
 ): ValidationResult {
   const errors: string[] = [];
 
+  // Check if dealer started with 0 chips (eligible for removal)
+  const dealer = currentPlayers.find(p => p.position === 'Dealer' || (currentPlayers.length === 2 && p.position === 'SB'));
+  const dealerStartedWith0 = dealer && dealer.stack === 0;
+
+  // Allow player count to decrease by 1 if 0-chip dealer was removed
   if (currentPlayers.length !== nextPlayers.length) {
-    errors.push(`Player count mismatch: ${currentPlayers.length} current, ${nextPlayers.length} next`);
+    if (dealerStartedWith0 && currentPlayers.length === nextPlayers.length + 1) {
+      console.log(`✅ [validateAllPlayersPresent] Player count decreased by 1 (${currentPlayers.length} → ${nextPlayers.length}), 0-chip dealer removed: ${dealer?.name}`);
+
+      // Verify the removed player is the 0-chip dealer
+      const currentNames = new Set(currentPlayers.map(p => p.name));
+      const nextNames = new Set(nextPlayers.map(p => p.name));
+      const missing = Array.from(currentNames).filter(name => !nextNames.has(name));
+
+      if (missing.length === 1 && missing[0] === dealer?.name) {
+        return {
+          isValid: true,
+          errors: []
+        };
+      } else {
+        errors.push(`Expected only ${dealer?.name} to be removed, but missing: ${missing.join(', ')}`);
+      }
+    } else {
+      errors.push(`Player count mismatch: ${currentPlayers.length} current, ${nextPlayers.length} next`);
+    }
   }
 
   const currentNames = new Set(currentPlayers.map(p => p.name));
@@ -246,6 +426,13 @@ export function validateAllPlayersPresent(
   const extra = Array.from(nextNames).filter(name => !currentNames.has(name));
 
   if (missing.length > 0 || extra.length > 0) {
+    // If dealer with 0 was removed, this is expected
+    if (dealerStartedWith0 && missing.length === 1 && missing[0] === dealer?.name && extra.length === 0) {
+      return {
+        isValid: true,
+        errors: []
+      };
+    }
     errors.push(`Players mismatch. Missing: ${missing.join(', ')}, Extra: ${extra.join(', ')}`);
   }
 
