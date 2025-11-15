@@ -470,13 +470,14 @@ function generateContributionLines(
     }
   }
 
-  // Show Posted (Ante) if BB is in pot (use ACTUAL posted amount from contributedAmounts)
-  if (bbPlayer && bbInPot) {
-    const actualBBPosted = getPlayerTotalContribution(bbPlayer.id, contributedAmounts, currentStreet);
-    // For BB in pot, the ante portion is included in their contribution
-    // We need to show just the ante portion if there's a blind structure
-    if (blindAnte && blindAnte.ante > 0 && actualBBPosted > 0) {
-      lines.push(`Posted (Ante):`.padEnd(25) + `$${blindAnte.ante.toLocaleString()}`.padEnd(20));
+  // Show Posted (Ante) if BB is in pot (use ACTUAL posted amount)
+  if (bbPlayer && bbInPot && blindAnte && blindAnte.ante > 0) {
+    // Calculate actual ante posted by BB (after posting BB)
+    const remainingAfterBB = Math.max(0, bbPlayer.stack - blindAnte.bb);
+    const actualAntePosted = Math.min(blindAnte.ante, remainingAfterBB);
+    if (actualAntePosted > 0) {
+      lines.push(`Posted (Ante):`.padEnd(25) + `$${actualAntePosted.toLocaleString()}`.padEnd(20));
+      console.log(`📊 [generateContributionLines] Posted (Ante): $${actualAntePosted} (BB in pot)`);
     }
   }
 
@@ -519,18 +520,23 @@ function generateContributionLines(
 
     // Add blind if this player is SB or BB (and hasn't folded, since folded blinds are shown as "Posted")
     // Use Math.min to handle players with insufficient chips
+    // Blinds are ALWAYS included (for all streets) because they were posted in preflop
     const isInPot = eligiblePlayers.some(ep => ep.id === player.id);
     let anteAmount = 0;
-    if (blindAnte && isInPot && currentStreet === 'preflop') {
+    if (blindAnte && isInPot) {
       if (player.position === 'SB') {
-        totalContribution += Math.min(blindAnte.sb, player.stack);
+        const sbAmount = Math.min(blindAnte.sb, player.stack);
+        totalContribution += sbAmount;
+        console.log(`📊 [generateContributionLines] Adding SB ${sbAmount} for ${player.name} (in pot)`);
       } else if (player.position === 'BB') {
         // For BB: add just the BB amount to totalContribution
         // Ante will be shown separately
-        totalContribution += Math.min(blindAnte.bb, player.stack);
+        const bbAmount = Math.min(blindAnte.bb, player.stack);
+        totalContribution += bbAmount;
         // Calculate ante (after posting BB)
         const remainingAfterBB = Math.max(0, player.stack - blindAnte.bb);
         anteAmount = Math.min(blindAnte.ante, remainingAfterBB);
+        console.log(`📊 [generateContributionLines] Adding BB ${bbAmount} + tracking Ante ${anteAmount} for ${player.name} (in pot)`);
       }
     }
 
@@ -542,7 +548,7 @@ function generateContributionLines(
     }
 
     // Show BB's ante separately (if BB is in pot and ante > 0)
-    if (player.position === 'BB' && isInPot && anteAmount > 0 && currentStreet === 'preflop') {
+    if (player.position === 'BB' && isInPot && anteAmount > 0) {
       const anteLabel = `Ante (BB):`;
       lines.push(anteLabel.padEnd(25) + `$${anteAmount.toLocaleString()}`.padEnd(20));
       console.log(`📊 [generateContributionLines] Added ante line: "${anteLabel.padEnd(25)}$${anteAmount.toLocaleString()}"`);
