@@ -428,30 +428,42 @@ function generateContributionLines(
 
   console.log('📊 [generateContributionLines] SB in pot:', sbInPot, 'BB in pot:', bbInPot);
 
-  // Show Posted (BB + Ante) if BB folded
-  if (bbPlayer && !bbInPot && blindAnte) {
-    const postedAmount = blindAnte.bb + blindAnte.ante;
-    lines.push(`Posted (BB + Ante):`.padEnd(25) + `$${postedAmount.toLocaleString()}`.padEnd(20));
+  // Show Posted (BB + Ante) if BB folded (use ACTUAL posted amount)
+  if (bbPlayer && !bbInPot) {
+    const actualBBPosted = getPlayerTotalContribution(bbPlayer.id, contributedAmounts, currentStreet);
+    if (actualBBPosted > 0) {
+      lines.push(`Posted (BB + Ante):`.padEnd(25) + `$${actualBBPosted.toLocaleString()}`.padEnd(20));
+    }
   }
 
-  // Show Posted (Ante) if BB is in pot
-  if (bbPlayer && bbInPot && blindAnte && blindAnte.ante > 0) {
-    lines.push(`Posted (Ante):`.padEnd(25) + `$${blindAnte.ante.toLocaleString()}`.padEnd(20));
+  // Show Posted (Ante) if BB is in pot (use ACTUAL posted amount from contributedAmounts)
+  if (bbPlayer && bbInPot) {
+    const actualBBPosted = getPlayerTotalContribution(bbPlayer.id, contributedAmounts, currentStreet);
+    // For BB in pot, the ante portion is included in their contribution
+    // We need to show just the ante portion if there's a blind structure
+    if (blindAnte && blindAnte.ante > 0 && actualBBPosted > 0) {
+      lines.push(`Posted (Ante):`.padEnd(25) + `$${blindAnte.ante.toLocaleString()}`.padEnd(20));
+    }
   }
 
-  // Show Posted (SB) if SB folded (and SB > 0)
-  console.log('🔍 [generateContributionLines] SB Check:', {
-    sbPlayer: sbPlayer?.name,
-    sbInPot,
-    blindAnte,
-    sbAmount: blindAnte?.sb,
-    shouldShow: sbPlayer && !sbInPot && blindAnte && blindAnte.sb > 0
-  });
-  if (sbPlayer && !sbInPot && blindAnte && blindAnte.sb > 0) {
-    console.log('✅ [generateContributionLines] Adding Posted (SB) line');
-    lines.push(`Posted (SB):`.padEnd(25) + `$${blindAnte.sb.toLocaleString()}`.padEnd(20));
-  } else {
-    console.log('❌ [generateContributionLines] NOT adding Posted (SB) line');
+  // Show Posted (SB) if SB folded (use ACTUAL posted amount, not blindAnte.sb)
+  if (sbPlayer && !sbInPot) {
+    const actualSBPosted = getPlayerTotalContribution(sbPlayer.id, contributedAmounts, currentStreet);
+    console.log('🔍 [generateContributionLines] SB Check:', {
+      sbPlayer: sbPlayer?.name,
+      sbInPot,
+      blindAnte,
+      blindAnteSB: blindAnte?.sb,
+      actualSBPosted,
+      shouldShow: actualSBPosted > 0
+    });
+
+    if (actualSBPosted > 0) {
+      console.log('✅ [generateContributionLines] Adding Posted (SB) line with actual amount:', actualSBPosted);
+      lines.push(`Posted (SB):`.padEnd(25) + `$${actualSBPosted.toLocaleString()}`.padEnd(20));
+    } else {
+      console.log('❌ [generateContributionLines] NOT adding Posted (SB) line (actualSBPosted = 0)');
+    }
   }
 
   // Show each player's contribution (ALL players who contributed, not just eligible)
