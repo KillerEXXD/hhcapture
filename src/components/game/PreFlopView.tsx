@@ -662,7 +662,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         // Use stackData unit as fallback if player unit is not set
         const effectiveUnit = (unit && unit !== 'undefined') ? unit : stackData.unit;
 
-        console.log(`   🔍 [Contribution Calc] ${player.name} (${player.position}): action="${action}", amount=${amount}, unit="${unit}", effectiveUnit="${effectiveUnit}", blind=${contribution}`);
+        console.log(`   🔍 [Contribution Calc] ${player.name} (${player.position}): action="${action}", amount=${amount}, postedSB=${postedSB}, postedBB=${postedBB}, contribution=${contribution}`);
 
         // If player has acted (and it's not fold or no action), use the action amount
         // Note: "none" and "no action" are treated the same - player hasn't voluntarily acted yet
@@ -687,6 +687,10 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
       const maxContribution = Math.max(...contributions.values());
 
       console.log(`🎯 [getAvailableActionsForPlayer] ${currentPlayer.name} contribution: ${playerContribution}, max contribution: ${maxContribution}`);
+      console.log(`🎯 [getAvailableActionsForPlayer] All contributions:`, Array.from(contributions.entries()).map(([id, amt]) => {
+        const p = players.find(pl => pl.id === id);
+        return `${p?.name}=${amt}`;
+      }).join(', '));
 
       // Available actions based on contribution
       const actions: ActionType[] = [];
