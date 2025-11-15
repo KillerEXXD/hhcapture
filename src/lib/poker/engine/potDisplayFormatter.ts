@@ -265,6 +265,7 @@ function buildStreetBreakdown(
   return streets.slice(0, currentIndex + 1).map(street => {
     let amount = 0;
     const playersWhoContributed = new Set<number>();
+    const playerContributions = new Map<number, number>(); // Track each player's contribution for THIS street
 
     // Loop through all section keys (e.g., "preflop_base", "preflop_more", "flop_base")
     for (const sectionKey in contributedAmounts) {
@@ -286,6 +287,8 @@ function buildStreetBreakdown(
           if (contribution > 0) {
             amount += contribution;
             playersWhoContributed.add(playerId);
+            // Track this player's contribution
+            playerContributions.set(playerId, (playerContributions.get(playerId) || 0) + contribution);
           }
         }
       }
@@ -309,6 +312,7 @@ function buildStreetBreakdown(
             console.log(`✅ [calculateStreetPot] Adding SB ${actualSBPosted} from ${player.name}`);
             amount += actualSBPosted;
             playersWhoContributed.add(player.id);
+            playerContributions.set(player.id, (playerContributions.get(player.id) || 0) + actualSBPosted);
           } else {
             console.log(`❌ [calculateStreetPot] NOT adding SB from ${player.name} (actualSBPosted = 0)`);
           }
@@ -324,6 +328,7 @@ function buildStreetBreakdown(
             console.log(`✅ [calculateStreetPot] Adding BB+Ante ${actualBBPosted} from ${player.name}`);
             amount += actualBBPosted;
             playersWhoContributed.add(player.id);
+            playerContributions.set(player.id, (playerContributions.get(player.id) || 0) + actualBBPosted);
           } else {
             console.log(`❌ [calculateStreetPot] NOT adding BB+Ante from ${player.name} (actualBBPosted = 0)`);
           }
@@ -333,10 +338,22 @@ function buildStreetBreakdown(
 
     const contributingPlayers = playersWhoContributed.size;
 
+    // Generate detailed breakdown for this street
+    const detailLines: string[] = [];
+    if (players) {
+      players.forEach(player => {
+        const contribution = playerContributions.get(player.id) || 0;
+        if (contribution > 0) {
+          const label = `${player.name}${player.position ? ` (${player.position})` : ''}:`;
+          detailLines.push(label.padEnd(25) + `$${contribution.toLocaleString()}`);
+        }
+      });
+    }
+
     return {
       street,
       amount,
-      detail: generateStreetDetail(contributingPlayers, amount),
+      detail: detailLines.length > 0 ? detailLines.join('\n') : generateStreetDetail(contributingPlayers, amount),
     };
   });
 }
