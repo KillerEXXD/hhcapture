@@ -434,6 +434,11 @@ export const LogRocketControl: React.FC<LogRocketControlProps> = ({ state, actio
                 type="text"
                 value={testerName}
                 onChange={(e) => setTesterName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isStarting) {
+                    handleQuickStartRecording();
+                  }
+                }}
                 list="tester-names"
                 placeholder="Enter your name"
                 className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
@@ -455,6 +460,11 @@ export const LogRocketControl: React.FC<LogRocketControlProps> = ({ state, actio
                 type="text"
                 value={bugName}
                 onChange={(e) => setBugName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isStarting) {
+                    handleQuickStartRecording();
+                  }
+                }}
                 list="session-names"
                 placeholder="e.g., Pot calculation error on flop"
                 className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
