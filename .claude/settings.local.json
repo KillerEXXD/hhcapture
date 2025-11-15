@@ -41,7 +41,15 @@
       "Bash(findstr:*)",
       "Bash(taskkill //F //PID 53160)",
       "Bash(taskkill:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm install:*)",
+      "Bash(tree:*)",
+      "Bash(tasklist:*)",
+      "Bash(npm run dev:full:*)",
+      "Bash(timeout:*)",
+      "Bash(npm run kill-ports:*)",
+      "Bash(start http://127.0.0.1:3002)",
+      "Bash(cmd //c dir //B //O-D \"C:\\Users\\ravee\\Downloads\\*.json\")"
     ],
     "deny": [],
     "ask": []

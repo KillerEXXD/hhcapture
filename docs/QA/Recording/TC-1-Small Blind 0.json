@@ -1,0 +1,168 @@
+{
+    "title": "Small Blind 0",
+    "steps": [
+        {
+            "type": "setViewport",
+            "width": 576,
+            "height": 631,
+            "deviceScaleFactor": 1,
+            "isMobile": false,
+            "hasTouch": false,
+            "isLandscape": false
+        },
+        {
+            "type": "navigate",
+            "url": "https://tournament-pro.vercel.app/",
+            "assertedEvents": [
+                {
+                    "type": "navigation",
+                    "url": "https://tournament-pro.vercel.app/",
+                    "title": "HHTool - Poker Hand Collector"
+                }
+            ]
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "aria/Setup Players"
+                ],
+                [
+                    "div.space-y-3 button"
+                ],
+                [
+                    "xpath///*[@id=\"root\"]/div/div/div[3]/div[4]/button"
+                ],
+                [
+                    "pierce/div.space-y-3 button"
+                ]
+            ],
+            "offsetY": 22.90625,
+            "offsetX": 490
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "tr:nth-of-type(1) div:nth-of-type(2) > button:nth-of-type(2) > div"
+                ],
+                [
+                    "xpath///*[@id=\"root\"]/div/div/div[4]/div/table/tbody/tr[1]/td[5]/div/div/div[2]/button[2]/div"
+                ],
+                [
+                    "pierce/tr:nth-of-type(1) div:nth-of-type(2) > button:nth-of-type(2) > div"
+                ]
+            ],
+            "offsetY": 18.666656494140625,
+            "offsetX": 3
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "tr:nth-of-type(2) div:nth-of-type(2) > button:nth-of-type(2) div.text-\\[10px\\]"
+                ],
+                [
+                    "xpath///*[@id=\"root\"]/div/div/div[4]/div/table/tbody/tr[2]/td[5]/div/div/div[2]/button[2]/div/div[2]"
+                ],
+                [
+                    "pierce/tr:nth-of-type(2) div:nth-of-type(2) > button:nth-of-type(2) div.text-\\[10px\\]"
+                ]
+            ],
+            "offsetY": 0,
+            "offsetX": 3.27081298828125
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "aria/⚡ Process Stack - Preflop"
+                ],
+                [
+                    "button.bg-yellow-500"
+                ],
+                [
+                    "xpath///*[@id=\"root\"]/div/div/div[5]/button[1]"
+                ],
+                [
+                    "pierce/button.bg-yellow-500"
+                ],
+                [
+                    "text/⚡Process Stack"
+                ]
+            ],
+            "offsetY": 22,
+            "offsetX": 100.36457824707031
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "aria/🏆 Select Winners"
+                ],
+                [
+                    "div.mt-8 > div.bg-gray-100 button"
+                ],
+                [
+                    "xpath///*[@id=\"root\"]/div/div/div[6]/div[2]/div/div[4]/button"
+                ],
+                [
+                    "pierce/div.mt-8 > div.bg-gray-100 button"
+                ],
+                [
+                    "text/🏆 Select Winners"
+                ]
+            ],
+            "offsetY": 46,
+            "offsetX": 389
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "aria/Charlie"
+                ],
+                [
+                    "div.space-y-6 button:nth-of-type(2)"
+                ],
+                [
+                    "xpath///*[@id=\"root\"]/div/div/div[6]/div[2]/div/div[5]/div/div[2]/div/div[2]/div/button[2]"
+                ],
+                [
+                    "pierce/div.space-y-6 button:nth-of-type(2)"
+                ]
+            ],
+            "offsetY": 12.666656494140625,
+            "offsetX": 85.66665649414062
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "aria/Confirm Winners & Generate Next Hand"
+                ],
+                [
+                    "div.mt-8 button.bg-blue-600"
+                ],
+                [
+                    "xpath///*[@id=\"root\"]/div/div/div[6]/div[2]/div/div[5]/div/div[4]/button[2]"
+                ],
+                [
+                    "pierce/div.mt-8 button.bg-blue-600"
+                ],
+                [
+                    "text/Confirm Winners"
+                ]
+            ],
+            "offsetY": 16.77081298828125,
+            "offsetX": 139.73956298828125
+        }
+    ]
+}

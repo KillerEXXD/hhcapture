@@ -10,6 +10,7 @@ import { FlopView } from './components/game/FlopView';
 import { TurnView } from './components/game/TurnView';
 import { RiverView } from './components/game/RiverView';
 import PotCalculationDemo from './pages/PotCalculationDemo';
+import { LogRocketControl } from './components/LogRocketControl';
 
 function App() {
   // Initialize game state
@@ -76,97 +77,120 @@ function App() {
 
   // Render Pot Calculation Demo
   if (state.currentView === 'pot-demo') {
-    return <PotCalculationDemo />;
+    return (
+      <>
+        <PotCalculationDemo />
+        <LogRocketControl state={state} actions={actions} />
+      </>
+    );
   }
 
   // Render current view
   if (state.currentView === 'stack') {
     return (
-      <StackSetupView
-        state={state}
-        actions={actions}
-        cardManagement={cardManagement}
-        onClearAll={handleClearAll}
-        onExport={handleExport}
-        formatStack={formatStack}
-      />
+      <>
+        <StackSetupView
+          state={state}
+          actions={actions}
+          cardManagement={cardManagement}
+          onClearAll={handleClearAll}
+          onExport={handleExport}
+          formatStack={formatStack}
+        />
+        <LogRocketControl state={state} actions={actions} />
+      </>
     );
   }
 
   // Render PreFlop view
   if (state.currentView === 'preflop' || state.currentView === 'preflop-more' || state.currentView === 'preflop-more2') {
     return (
-      <PreFlopView
-        state={state}
-        actions={actions}
-        cardManagement={cardManagement}
-        potCalculation={potCalculation}
-        onClearAll={handleClearAll}
-        onExport={handleExport}
-        formatStack={formatStack}
-      />
+      <>
+        <PreFlopView
+          state={state}
+          actions={actions}
+          cardManagement={cardManagement}
+          potCalculation={potCalculation}
+          onClearAll={handleClearAll}
+          onExport={handleExport}
+          formatStack={formatStack}
+        />
+        <LogRocketControl state={state} actions={actions} />
+      </>
     );
   }
 
   // Render Flop view
   if (state.currentView === 'flop' || state.currentView === 'flop-more' || state.currentView === 'flop-more2') {
     return (
-      <FlopView
-        state={state}
-        actions={actions}
-        cardManagement={cardManagement}
-        potCalculation={potCalculation}
-        onClearAll={handleClearAll}
-        onExport={handleExport}
-        formatStack={formatStack}
-      />
+      <>
+        <FlopView
+          state={state}
+          actions={actions}
+          cardManagement={cardManagement}
+          potCalculation={potCalculation}
+          onClearAll={handleClearAll}
+          onExport={handleExport}
+          formatStack={formatStack}
+        />
+        <LogRocketControl state={state} actions={actions} />
+      </>
     );
   }
 
   // Render Turn view
   if (state.currentView === 'turn' || state.currentView === 'turn-more' || state.currentView === 'turn-more2') {
     return (
-      <TurnView
-        state={state}
-        actions={actions}
-        cardManagement={cardManagement}
-        potCalculation={potCalculation}
-        onClearAll={handleClearAll}
-        onExport={handleExport}
-        formatStack={formatStack}
-      />
+      <>
+        <TurnView
+          state={state}
+          actions={actions}
+          cardManagement={cardManagement}
+          potCalculation={potCalculation}
+          onClearAll={handleClearAll}
+          onExport={handleExport}
+          formatStack={formatStack}
+        />
+        <LogRocketControl state={state} actions={actions} />
+      </>
     );
   }
 
   // Render River view
   if (state.currentView === 'river' || state.currentView === 'river-more' || state.currentView === 'river-more2') {
     return (
-      <RiverView
-        state={state}
-        actions={actions}
-        cardManagement={cardManagement}
-        potCalculation={potCalculation}
-        onClearAll={handleClearAll}
-        onExport={handleExport}
-        formatStack={formatStack}
-      />
+      <>
+        <RiverView
+          state={state}
+          actions={actions}
+          cardManagement={cardManagement}
+          potCalculation={potCalculation}
+          onClearAll={handleClearAll}
+          onExport={handleExport}
+          formatStack={formatStack}
+        />
+        <LogRocketControl state={state} actions={actions} />
+      </>
     );
   }
 
   // Placeholder for unknown views
   return (
-    <div className="p-2 max-w-full mx-auto bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-lg shadow-lg p-3">
-        <h1 className="text-lg font-bold text-gray-800">Game View</h1>
-        <p className="text-sm text-gray-600">Current view: {state.currentView}</p>
-        <button
-          onClick={() => actions.setCurrentView('stack')}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Back to Stack Setup
-        </button>
+    <>
+      <div className="p-2 max-w-full mx-auto bg-gray-50 min-h-screen">
+        <div className="bg-white rounded-lg shadow-lg p-3">
+          <h1 className="text-lg font-bold text-gray-800">Game View</h1>
+          <p className="text-sm text-gray-600">Current view: {state.currentView}</p>
+          <button
+            onClick={() => actions.setCurrentView('stack')}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Back to Stack Setup
+          </button>
+        </div>
       </div>
-    </div>
+      <LogRocketControl state={state} actions={actions} />
+    </>
   );
 }
 

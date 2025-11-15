@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LogRocket Test</title>
+  <script src="https://cdn.lr-in-prod.com/LogRocket.min.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 5px;
+      background: #f0f0f0;
+    }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <h1>LogRocket Connection Test</h1>
+
+  <div>
+    <button onclick="testLogRocket()">Test LogRocket</button>
+    <button onclick="copySessionURL()">Copy Session URL</button>
+  </div>
+
+  <div id="status"></div>
+
+  <script>
+    let sessionURL = '';
+
+    function log(message, isError = false) {
+      const status = document.getElementById('status');
+      status.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+      status.className = isError ? 'error' : 'success';
+      console.log(message);
+    }
+
+    function testLogRocket() {
+      try {
+        log('🚀 Testing LogRocket initialization...');
+
+        // Initialize LogRocket
+        window.LogRocket.init('zrgal7/tpro');
+        log('✅ LogRocket.init() called successfully');
+
+        // Identify user
+        const testerName = 'Test User ' + Date.now();
+        window.LogRocket.identify(testerName, {
+          name: testerName,
+          role: 'QA Tester',
+          email: 'test@tester.local',
+          sessionName: 'Test Session'
+        });
+        log(`✅ User identified: ${testerName}`);
+
+        // Track event
+        window.LogRocket.track('Test Event', {
+          timestamp: new Date().toISOString(),
+          testData: 'This is a test'
+        });
+        log('✅ Event tracked');
+
+        // Get session URL
+        window.LogRocket.getSessionURL(function(url) {
+          sessionURL = url;
+          log(`✅ Session URL: ${url}`);
+          log('🎉 Test completed successfully!');
+          log('📋 Check your LogRocket dashboard at: https://app.logrocket.com');
+        });
+
+      } catch (error) {
+        log(`❌ Error: ${error.message}`, true);
+        console.error('Full error:', error);
+      }
+    }
+
+    function copySessionURL() {
+      if (sessionURL) {
+        navigator.clipboard.writeText(sessionURL);
+        log('📋 Session URL copied to clipboard');
+      } else {
+        log('⚠️ No session URL available yet. Run test first.', true);
+      }
+    }
+
+    // Auto-run test on page load
+    window.addEventListener('load', () => {
+      setTimeout(testLogRocket, 1000);
+    });
+  </script>
+</body>
+</html>
