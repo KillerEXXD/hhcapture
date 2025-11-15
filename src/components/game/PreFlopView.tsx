@@ -951,17 +951,32 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
       const suffix = actionLevel === 'base' ? '' : actionLevel === 'more' ? '_moreAction' : '_moreAction2';
 
-      players.forEach((player) => {
+      // CRITICAL: Validate players in ACTION ORDER, not player ID order
+      // This ensures we validate raises chronologically (UTG → SB → BB)
+      // and don't compare early raises against later re-raises
+      const totalPlayers = players.filter(p => p.name).length;
+      let actionOrder: string[];
+      if (totalPlayers === 2) {
+        actionOrder = ['SB', 'Dealer', 'BB'];
+      } else if (totalPlayers === 3) {
+        actionOrder = ['Dealer', 'SB', 'BB'];
+      } else {
+        actionOrder = ['UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer', 'SB', 'BB'];
+      }
+
+      const playersInActionOrder = actionOrder.map(pos => players.find(p => p.position === pos)).filter((p): p is Player => p !== undefined);
+
+      // CRITICAL FIX: Validate in action order, calculating max bet only from players who acted BEFORE current player
+      // This ensures we validate raises chronologically and don't compare early raises against later re-raises
+      playersInActionOrder.forEach((player, currentIndex) => {
         if (!player.name) return;
 
         const data = playerData[player.id] || {};
         const actionKey = `preflop${suffix}Action` as keyof typeof data;
         const amountKey = `preflop${suffix}Amount` as keyof typeof data;
-        const unitKey = `preflop${suffix}Unit` as keyof typeof data;
 
         const action = data[actionKey] as string;
         const amount = data[amountKey] as string;
-        const unit = data[unitKey] as ChipUnit;
 
         // Only validate if action is bet or raise
         if (action === 'bet' || action === 'raise') {
@@ -970,27 +985,69 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
           // Basic validation: check if amount is a valid number > 0
           if (!amount || amount.trim() === '' || isNaN(raiseToAmount) || raiseToAmount <= 0) {
             validationErrors.push(`${player.name} (PreFlop ${actionLevel.toUpperCase()}): Missing or invalid raise amount`);
-            return; // Skip FR-12 validation if basic validation fails
+            return;
           }
 
-          // Run FR-12 validation
-          // NOTE: During Process Stack, all actions are complete, so we don't filter by action order
-          // The validation logic will see ALL raises, which is correct for final validation
-          const validationResult = validateRaiseAmount(
-            player.id,
-            raiseToAmount,
-            'preflop',
-            actionLevel,
-            players,
-            playerData,
-            sectionStacks,
-            unit || defaultUnit
-            // No maxPlayerIdToConsider parameter - consider all players for Process Stack validation
-          );
+          // FR-12 validation: Calculate max bet from players who acted BEFORE this player
+          // For MORE ACTION: Need to check cumulative totals (including BASE), not just MORE ACTION amounts
+          const playersWhoActedBefore = playersInActionOrder.slice(0, currentIndex);
+          let maxBetBeforeThisPlayer = 0;
 
-          if (!validationResult.isValid) {
+          if (actionLevel === 'base') {
+            // BASE: Compare against previous raises in BASE
+            playersWhoActedBefore.forEach(previousPlayer => {
+              if (!previousPlayer.name) return;
+              const prevData = playerData[previousPlayer.id] || {};
+              const prevAction = prevData[actionKey] as string;
+              const prevAmount = prevData[amountKey] as string;
+
+              if (prevAction === 'bet' || prevAction === 'raise') {
+                const prevRaiseAmount = parseFloat(prevAmount);
+                if (!isNaN(prevRaiseAmount)) {
+                  maxBetBeforeThisPlayer = Math.max(maxBetBeforeThisPlayer, prevRaiseAmount * 1000);
+                }
+              }
+            });
+          } else {
+            // MORE ACTION: Must check cumulative totals (BASE + MORE ACTION)
+            // Also need to check all players in BASE (not just those who acted before in MORE ACTION)
+            playersInActionOrder.forEach(otherPlayer => {
+              if (!otherPlayer.name || otherPlayer.id === player.id) return;
+              const otherData = playerData[otherPlayer.id] || {};
+
+              // Get BASE amount
+              const baseAction = otherData.preflopAction as string;
+              const baseAmount = otherData.preflopAmount as string;
+              let baseBet = 0;
+              if (baseAction === 'bet' || baseAction === 'raise') {
+                const baseRaiseAmount = parseFloat(baseAmount);
+                if (!isNaN(baseRaiseAmount)) {
+                  baseBet = baseRaiseAmount * 1000;
+                }
+              }
+
+              // Get MORE ACTION amount (cumulative total)
+              const moreAction = otherData[actionKey] as string;
+              const moreAmount = otherData[amountKey] as string;
+              let cumulativeTotal = baseBet;
+
+              if (moreAction === 'bet' || moreAction === 'raise') {
+                const moreRaiseAmount = parseFloat(moreAmount);
+                if (!isNaN(moreRaiseAmount)) {
+                  // MORE ACTION amount is the cumulative total, not incremental
+                  cumulativeTotal = moreRaiseAmount * 1000;
+                }
+              }
+
+              maxBetBeforeThisPlayer = Math.max(maxBetBeforeThisPlayer, cumulativeTotal);
+            });
+          }
+
+          // Validate: current raise must be > max bet from previous players
+          const currentRaiseInChips = raiseToAmount * 1000;
+          if (maxBetBeforeThisPlayer > 0 && currentRaiseInChips <= maxBetBeforeThisPlayer) {
             validationErrors.push(
-              `${player.name} (PreFlop ${actionLevel.toUpperCase()}): ${validationResult.errorMessage}`
+              `${player.name} (PreFlop ${actionLevel.toUpperCase()}): Raise amount (${raiseToAmount}) must be greater than current max bet (${maxBetBeforeThisPlayer / 1000})`
             );
           }
         }

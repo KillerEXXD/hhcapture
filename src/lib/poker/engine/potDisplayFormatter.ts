@@ -421,8 +421,8 @@ function generateContributionLines(
     lines.push(`Posted (SB):`.padEnd(25) + `$${blindAnte.sb.toLocaleString()}`.padEnd(20));
   }
 
-  // Show each eligible player's contribution
-  eligiblePlayers.forEach(player => {
+  // Show each player's contribution (ALL players who contributed, not just eligible)
+  allPlayers.forEach(player => {
     let totalContribution = 0;
 
     // Sum all contributions from this player in preflop
@@ -433,8 +433,9 @@ function generateContributionLines(
       }
     }
 
-    // Add blind if this player is SB or BB
-    if (blindAnte) {
+    // Add blind if this player is SB or BB (and hasn't folded, since folded blinds are shown as "Posted")
+    const isInPot = eligiblePlayers.some(ep => ep.id === player.id);
+    if (blindAnte && isInPot) {
       if (player.position === 'SB') {
         totalContribution += blindAnte.sb;
       } else if (player.position === 'BB') {

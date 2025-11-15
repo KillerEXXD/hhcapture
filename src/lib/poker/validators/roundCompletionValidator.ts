@@ -188,9 +188,11 @@ function checkPreflopRoundComplete(
         } else {
           // For More Action 1, fall back to BASE round
           const baseAction = getPreflopAction(p, '', playerData);
+          console.log(`      [DEBUG] ${p.name} More Action 1 - Falling back to BASE:`, baseAction);
           if (baseAction && baseAction.amount && parseFloat(baseAction.amount) > 0) {
             const amount = parseFloat(baseAction.amount);
             const unit = baseAction.unit;
+            console.log(`      [DEBUG] ${p.name} BASE amount=${amount}, unit=${unit}`);
 
             // Convert based on unit
             if (unit === 'K') {
@@ -203,8 +205,10 @@ function checkPreflopRoundComplete(
               // No unit - infer based on magnitude
               contribution = amount < 1000 ? amount * 1000 : amount;
             }
+            console.log(`      [DEBUG] ${p.name} BASE contribution=${contribution}`);
           } else {
             contribution = blindsOnly;
+            console.log(`      [DEBUG] ${p.name} No BASE action, using blinds only=${blindsOnly}`);
           }
         }
       }

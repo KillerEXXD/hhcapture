@@ -611,6 +611,76 @@ export function checkPlayerNeedsToAct(
     maxBet = calculateMaxContributionInActionLevel(stage, actionLevel, players, playerData);
     console.log(`   Player ${playerId} contribution in ${actionLevel}: ${playerContribution}`);
     console.log(`   Max contribution in ${actionLevel}: ${maxBet}`);
+
+    // SPECIAL CASE: If player has 0 contribution in MORE ACTION but maxBet > 0,
+    // check if others are calling/matching the player's BASE raise (not re-raising)
+    //
+    // This handles the scenario where:
+    // - Player A raises/bets in BASE
+    // - Player B calls that bet in MORE ACTION 1
+    // - Player A has 0 MA1 contribution (their bet was in BASE)
+    // - We need to check if Player B is just calling (cumulative = Player A's cumulative)
+    //   or re-raising (cumulative > Player A's cumulative)
+    //
+    // Works for all streets:
+    // - Preflop: Cumulative includes blinds/antes
+    // - Flop/Turn/River: Cumulative starts at 0 for the street
+    if (playerContribution === 0 && maxBet > 0) {
+      // Get player's cumulative total from previous rounds (includes BASE)
+      const playerCumulativeTotal = calculateCumulativeContribution(playerId, stage, actionLevel, playerData);
+      console.log(`   🔍 [MORE ACTION Call vs Re-raise Check] Stage: ${stage}, Player ${playerId} has 0 in ${actionLevel}`);
+      console.log(`      Player ${playerId} cumulative total (from BASE): ${playerCumulativeTotal}`);
+
+      // Check if anyone has a HIGHER cumulative total OR made a bet/raise in THIS action level
+      // (indicating a re-raise or new action that requires response)
+      let someoneRaisedAbove = false;
+      for (const p of players) {
+        if (!p.name || p.id === playerId) continue;
+        const otherData = playerData[p.id];
+        if (!otherData) continue;
+
+        // Skip folded players
+        if (otherData[baseActionKey] === 'fold') continue;
+        if (otherData[moreAction1ActionKey] === 'fold') continue;
+        if (actionLevel === 'more2' && otherData[moreAction2ActionKey] === 'fold') continue;
+
+        // Get the other player's cumulative total
+        const otherCumulativeTotal = calculateMaxContribution(stage, actionLevel, [p], playerData);
+        console.log(`      Player ${p.id} (${p.name}) cumulative total: ${otherCumulativeTotal}`);
+
+        // CRITICAL: Also check if the other player made a bet/raise in THIS action level
+        // This handles cases where cumulative totals are equal but someone raised in MORE ACTION
+        const otherContributionInLevel = calculateContributionInActionLevel(p.id, stage, actionLevel, playerData);
+        console.log(`      Player ${p.id} (${p.name}) contribution in ${actionLevel}: ${otherContributionInLevel}`);
+
+        if (otherCumulativeTotal > playerCumulativeTotal) {
+          console.log(`      ✅ RE-RAISE detected: ${p.name} (${otherCumulativeTotal}) > Player ${playerId} (${playerCumulativeTotal})`);
+          someoneRaisedAbove = true;
+          break;
+        }
+
+        // If cumulative totals are equal BUT the other player contributed in THIS level,
+        // it means they raised to match/exceed this player's BASE bet
+        if (otherCumulativeTotal === playerCumulativeTotal && otherContributionInLevel > 0) {
+          console.log(`      ✅ RAISE in ${actionLevel} detected: ${p.name} contributed ${otherContributionInLevel} in this level`);
+          someoneRaisedAbove = true;
+          break;
+        }
+      }
+
+      if (!someoneRaisedAbove) {
+        console.log(`   → ✅ CALL detected (no re-raise). Player ${playerId} does NOT need to act.`);
+        return {
+          needsToAct: false,
+          alreadyMatchedMaxBet: true,
+          alreadyAllIn: false,
+          cumulativeContribution: playerCumulativeTotal,
+          maxContribution: playerCumulativeTotal,
+        };
+      } else {
+        console.log(`   → ⚠️ RE-RAISE detected. Player ${playerId} NEEDS to act.`);
+      }
+    }
   } else {
     console.log(`   🎯 [BASE] Comparing cumulative contributions`);
     playerContribution = calculateCumulativeContribution(playerId, stage, actionLevel, playerData);

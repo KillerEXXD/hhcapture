@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
  * Or with UI: npx playwright test --ui
  */
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: './e2e',
 
   // Maximum time one test can run for
   timeout: 30 * 1000,
