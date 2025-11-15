@@ -187,35 +187,18 @@ export function StackSetupView({
         console.log('  Started At:', handFormatData.header.startedAt);
         console.log('  SB:', handFormatData.header.sb, 'BB:', handFormatData.header.bb, 'Ante:', handFormatData.header.ante);
 
-        // IMPORTANT: Use manually entered blind values if they differ from parsed values
-        // This allows users to override the text values with the input fields
-        // Only update blind values from text if the current state is the default (500/1000/1000)
-        const isDefaultBlinds = (
-          state.stackData.smallBlind === 500 &&
-          state.stackData.bigBlind === 1000 &&
-          state.stackData.ante === 1000
-        );
+        // ALWAYS use values from textarea (parsed values are the source of truth)
+        smallBlindValue = handFormatData.header.sb;
+        bigBlindValue = handFormatData.header.bb;
+        anteValue = handFormatData.header.ante;
 
-        if (isDefaultBlinds) {
-          // Use parsed values (first time setup)
-          smallBlindValue = handFormatData.header.sb;
-          bigBlindValue = handFormatData.header.bb;
-          anteValue = handFormatData.header.ante;
-          console.log('📝 Using parsed blind values (defaults detected):', {
-            smallBlind: smallBlindValue,
-            bigBlind: bigBlindValue,
-            ante: anteValue
-          });
-        } else {
-          // Use manually entered values (user has changed them)
-          console.log('📝 Using manually entered blind values (overriding parsed text):', {
-            smallBlind: smallBlindValue,
-            bigBlind: bigBlindValue,
-            ante: anteValue
-          });
-        }
+        console.log('📝 Using parsed blind values from textarea:', {
+          smallBlind: smallBlindValue,
+          bigBlind: bigBlindValue,
+          ante: anteValue
+        });
 
-        // Auto-fill hand number, started time, blinds, ante
+        // Auto-populate input fields AND update the values used for calculation
         actions.setStackData({
           ...state.stackData,
           handNumber: handFormatData.header.handNumber,
@@ -225,7 +208,7 @@ export function StackSetupView({
           ante: anteValue
         });
 
-        console.log('✅ stackData updated, blind input fields should now show the values');
+        console.log('✅ stackData updated, blind input fields auto-populated with parsed values');
 
         // Use parsed players
         parsedPlayers = handFormatData.players;
