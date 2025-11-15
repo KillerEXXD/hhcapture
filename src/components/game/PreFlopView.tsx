@@ -649,9 +649,11 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         if (!player.name) continue;
         let contribution = 0;
 
-        // Start with blind contributions (use actual blind values from stackData)
-        if (player.position === 'SB') contribution = stackData.smallBlind;
-        if (player.position === 'BB') contribution = stackData.bigBlind;
+        // Start with blind contributions (use POSTED amounts, not stackData blinds)
+        // This handles 0-chip players who posted 0
+        const postedSB = playerData[player.id]?.postedSB || 0;
+        const postedBB = playerData[player.id]?.postedBB || 0;
+        contribution = postedSB + postedBB;
 
         // Add action contribution
         const action = playerData[player.id]?.preflopAction as ActionType | undefined;
