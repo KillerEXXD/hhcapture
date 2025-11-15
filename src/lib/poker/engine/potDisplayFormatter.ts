@@ -501,19 +501,34 @@ function generateContributionLines(
     }
 
     // Add blind if this player is SB or BB (and hasn't folded, since folded blinds are shown as "Posted")
+    // Use Math.min to handle players with insufficient chips
     const isInPot = eligiblePlayers.some(ep => ep.id === player.id);
-    if (blindAnte && isInPot) {
+    let anteAmount = 0;
+    if (blindAnte && isInPot && currentStreet === 'preflop') {
       if (player.position === 'SB') {
-        totalContribution += blindAnte.sb;
+        totalContribution += Math.min(blindAnte.sb, player.stack);
       } else if (player.position === 'BB') {
-        totalContribution += blindAnte.bb;
+        // For BB: add just the BB amount to totalContribution
+        // Ante will be shown separately
+        totalContribution += Math.min(blindAnte.bb, player.stack);
+        // Calculate ante (after posting BB)
+        const remainingAfterBB = Math.max(0, player.stack - blindAnte.bb);
+        anteAmount = Math.min(blindAnte.ante, remainingAfterBB);
       }
     }
 
+    // Show player's contribution (action + blind, but NOT ante for BB)
     if (totalContribution > 0) {
       const label = `${player.name}${player.position ? ` (${player.position})` : ''}:`;
       lines.push(label.padEnd(25) + `$${totalContribution.toLocaleString()}`.padEnd(20));
       console.log(`📊 [generateContributionLines] Added player line: "${label.padEnd(25)}$${totalContribution.toLocaleString()}"`);
+    }
+
+    // Show BB's ante separately (if BB is in pot and ante > 0)
+    if (player.position === 'BB' && isInPot && anteAmount > 0 && currentStreet === 'preflop') {
+      const anteLabel = `Ante (BB):`;
+      lines.push(anteLabel.padEnd(25) + `$${anteAmount.toLocaleString()}`.padEnd(20));
+      console.log(`📊 [generateContributionLines] Added ante line: "${anteLabel.padEnd(25)}$${anteAmount.toLocaleString()}"`);
     }
   });
 
