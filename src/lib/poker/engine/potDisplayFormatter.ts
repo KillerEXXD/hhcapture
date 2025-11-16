@@ -2,6 +2,7 @@
  * Pot Display Formatter
  *
  * Converts pot calculation results into format expected by PotCalculationDisplay component
+ * Updated: Includes blinds for all streets (not just preflop)
  */
 
 import type { Player, Stage } from '../../../types/poker';
