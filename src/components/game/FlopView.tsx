@@ -20,7 +20,9 @@ import { checkBettingRoundComplete } from '../../lib/poker/validators/roundCompl
 import { checkPlayerNeedsToAct } from '../../lib/poker/validators/playerActionStatus';
 import { returnFocusAfterProcessStack } from '../../lib/poker/utils/focusManagement';
 import { validateRaiseAmount } from '../../lib/poker/validators/raiseValidator';
-import { formatPotsForDisplay, type DisplayPotData } from '../../lib/poker/engine/potDisplayFormatter';
+import { formatPotsForDisplay, type DisplayPotData, POT_FORMATTER_VERSION } from '../../lib/poker/engine/potDisplayFormatter';
+// Force re-render when formatter updates: v2.1
+console.log('[FlopView] Using pot formatter version:', POT_FORMATTER_VERSION);
 
 interface FlopViewProps {
   state: GameState;

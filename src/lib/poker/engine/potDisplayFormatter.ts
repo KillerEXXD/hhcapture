@@ -5,6 +5,10 @@
  * Updated: Includes blinds for all streets (not just preflop)
  */
 
+// Version bump to force HMR reload
+export const POT_FORMATTER_VERSION = '2.1';
+console.log('[POT FORMATTER] Module loaded - v' + POT_FORMATTER_VERSION);
+
 import type { Player, Stage } from '../../../types/poker';
 import type { PotInfo as EnginePotInfo } from './potCalculationEngine';
 import type { ContributedAmounts } from '../../../types/poker/pot.types';

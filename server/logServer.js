@@ -85,8 +85,11 @@ app.delete('/api/logs', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '127.0.0.1', () => {
   console.log(`\n✅ Log Server Running on port ${PORT}`);
   console.log(`📝 Logs will be written to: ${LOG_FILE}`);
   console.log(`🤖 Ready to receive browser logs for Claude Code\n`);
+}).on('error', (err) => {
+  console.error(`❌ Failed to start log server: ${err.message}`);
+  process.exit(1);
 });
