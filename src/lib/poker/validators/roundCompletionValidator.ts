@@ -302,6 +302,25 @@ function checkPreflopRoundComplete(
 /**
  * Check if postflop betting round is complete
  */
+/**
+ * Convert display amount to actual value based on unit
+ */
+function convertDisplayToActual(amount: string | number, unit: string | undefined): number {
+  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  if (isNaN(numAmount)) return 0;
+
+  if (unit === 'K') {
+    return numAmount * 1000;
+  } else if (unit === 'Mil') {
+    return numAmount * 1000000;
+  } else if (unit === 'actual') {
+    return numAmount;
+  } else {
+    // No unit - infer based on magnitude
+    return numAmount < 1000 ? numAmount * 1000 : numAmount;
+  }
+}
+
 function checkPostflopRoundComplete(
   stage: Stage,
   actionLevel: ActionLevel,
@@ -325,21 +344,27 @@ function checkPostflopRoundComplete(
     // Base action
     const baseActionKey = `${stage}Action`;
     const baseAmountKey = `${stage}Amount`;
+    const baseUnitKey = `${stage}Unit`;
     const baseAction = data[baseActionKey] as string | undefined;
 
     if (baseAction === 'bet' || baseAction === 'raise' || baseAction === 'call' || baseAction === 'all-in') {
-      contribution = parseFloat((data[baseAmountKey] as string) || '0');
+      const amount = parseFloat((data[baseAmountKey] as string) || '0');
+      const unit = data[baseUnitKey] as string | undefined;
+      contribution = convertDisplayToActual(amount, unit);
     }
 
     // If checking MORE action levels, check if player acted in MORE
     if (actionLevel === 'more') {
       const moreActionKey = `${stage}_moreActionAction`;
       const moreAmountKey = `${stage}_moreActionAmount`;
+      const moreUnitKey = `${stage}_moreActionUnit`;
       const moreAction = data[moreActionKey] as string | undefined;
 
       if (moreAction === 'bet' || moreAction === 'raise' || moreAction === 'call' || moreAction === 'all-in') {
         // Player acted in MORE - use their MORE amount (which is TOTAL including BASE)
-        contribution = parseFloat((data[moreAmountKey] as string) || '0');
+        const amount = parseFloat((data[moreAmountKey] as string) || '0');
+        const unit = data[moreUnitKey] as string | undefined;
+        contribution = convertDisplayToActual(amount, unit);
         currentLevelAction = moreAction;
       } else {
         // Player didn't act in MORE - use their BASE contribution
@@ -349,19 +374,25 @@ function checkPostflopRoundComplete(
       // Check MORE2 first, then fall back to MORE, then BASE
       const more2ActionKey = `${stage}_moreAction2Action`;
       const more2AmountKey = `${stage}_moreAction2Amount`;
+      const more2UnitKey = `${stage}_moreAction2Unit`;
       const more2Action = data[more2ActionKey] as string | undefined;
 
       if (more2Action === 'bet' || more2Action === 'raise' || more2Action === 'call' || more2Action === 'all-in') {
-        contribution = parseFloat((data[more2AmountKey] as string) || '0');
+        const amount = parseFloat((data[more2AmountKey] as string) || '0');
+        const unit = data[more2UnitKey] as string | undefined;
+        contribution = convertDisplayToActual(amount, unit);
         currentLevelAction = more2Action;
       } else {
         // Fall back to MORE
         const moreActionKey = `${stage}_moreActionAction`;
         const moreAmountKey = `${stage}_moreActionAmount`;
+        const moreUnitKey = `${stage}_moreActionUnit`;
         const moreAction = data[moreActionKey] as string | undefined;
 
         if (moreAction === 'bet' || moreAction === 'raise' || moreAction === 'call' || moreAction === 'all-in') {
-          contribution = parseFloat((data[moreAmountKey] as string) || '0');
+          const amount = parseFloat((data[moreAmountKey] as string) || '0');
+          const unit = data[moreUnitKey] as string | undefined;
+          contribution = convertDisplayToActual(amount, unit);
         }
         currentLevelAction = 'none';
       }
