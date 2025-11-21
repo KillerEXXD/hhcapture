@@ -107,9 +107,21 @@ function checkPreflopRoundComplete(
       const preflopAction = getPreflopAction(p, suffix, playerData);
       if (preflopAction && preflopAction.amount && parseFloat(preflopAction.amount) > 0) {
         // After processStack, the amount already includes blinds!
-        // Convert from display format (e.g., 2, 3, 4) to actual value (2000, 3000, 4000)
+        // Convert from display format based on unit
         const amount = parseFloat(preflopAction.amount);
-        contribution = amount < 1000 ? amount * 1000 : amount;
+        const unit = preflopAction.unit;
+
+        // Convert based on unit
+        if (unit === 'K') {
+          contribution = amount * 1000;
+        } else if (unit === 'Mil') {
+          contribution = amount * 1000000;
+        } else if (unit === 'actual') {
+          contribution = amount;
+        } else {
+          // No unit - infer based on magnitude
+          contribution = amount < 1000 ? amount * 1000 : amount;
+        }
       } else {
         // No action, just blinds (ante is NOT part of live contribution for matching)
         contribution = blindsOnly;

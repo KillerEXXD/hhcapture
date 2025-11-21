@@ -130,13 +130,15 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
 
     console.log(`🔄 [PreFlopView useEffect] Current level: ${currentLevel}, Round complete: ${isRoundComplete.isComplete}, Reason: ${isRoundComplete.reason}, Processed: ${hasProcessedCurrentState}`);
 
-    // "Add More Action" is disabled when:
-    // 1. Round is complete, OR
-    // 2. State hasn't been processed yet (initial load or after reset)
-    setIsAddMoreActionDisabled(isRoundComplete.isComplete || !hasProcessedCurrentState);
+    // "Add More Action" is enabled when:
+    // 1. State has been processed, AND
+    // 2. Round is NOT complete (players still need to act)
+    setIsAddMoreActionDisabled(!hasProcessedCurrentState || isRoundComplete.isComplete);
 
-    // "Create Next Street" is disabled when round is incomplete OR when state hasn't been processed
-    setIsCreateNextStreetDisabled(!isRoundComplete.isComplete || !hasProcessedCurrentState);
+    // "Create Next Street" is enabled when:
+    // 1. State has been processed, AND
+    // 2. Round IS complete (all players have acted and matched bets)
+    setIsCreateNextStreetDisabled(!hasProcessedCurrentState || !isRoundComplete.isComplete);
   }, [playerData, visibleActionLevels.preflop, players, hasProcessedCurrentState]);
 
   // Utility function for suit colors
@@ -594,7 +596,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
         actionOrder = ['Dealer', 'SB', 'BB'];
       } else {
         // 4+ Preflop: UTG → ... → Dealer → SB → BB
-        actionOrder = ['UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer', 'SB', 'BB'];
+        actionOrder = ['UTG', 'UTG+1', 'UTG+2', 'MP', 'MP+1', 'MP+2', 'LJ', 'HJ', 'CO', 'Dealer', 'SB', 'BB'];
       }
 
       console.log(`🎯 [getAvailableActionsForPlayer] Action order for ${playerCount} players: ${actionOrder.join(' → ')}`);
@@ -871,7 +873,7 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
           } else if (totalPlayers === 3) {
             actionOrder = ['Dealer', 'SB', 'BB'];
           } else {
-            actionOrder = ['UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer', 'SB', 'BB'];
+            actionOrder = ['UTG', 'UTG+1', 'UTG+2', 'MP', 'MP+1', 'MP+2', 'LJ', 'HJ', 'CO', 'Dealer', 'SB', 'BB'];
           }
 
           // Find current player's position in action order
@@ -1241,13 +1243,16 @@ export const PreFlopView: React.FC<PreFlopViewProps> = ({
       console.log('✅ [PreFlopView] Set hasProcessedCurrentState to true');
 
       // Check if betting round is complete after processing
+      console.log('🔥🔥🔥 CACHE BUSTER V3 - PROCESS STACK CLICKED 🔥🔥🔥');
       const currentLevel = currentLevels[currentLevels.length - 1]; // Last processed level
+      console.log(`🎯 [PreFlop processStack] About to check round completion for level: ${currentLevel}`);
       const isRoundComplete = checkBettingRoundComplete(
         'preflop',
         currentLevel,
         players,
         latestPlayerData
       );
+      console.log(`🎯 [PreFlop processStack] Round complete result: ${isRoundComplete.isComplete}, Reason: ${isRoundComplete.reason}`);
 
       // Format and display pot breakdown if round is complete
       if (isRoundComplete.isComplete && finalPotInfo) {

@@ -379,7 +379,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
         actionOrder = ['SB', 'BB', 'Dealer'];
       } else {
         // 4+ Postflop: SB → BB → UTG → ... → Dealer
-        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer'];
+        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'MP', 'MP+1', 'MP+2', 'LJ', 'HJ', 'CO', 'Dealer'];
       }
 
       const playersInActionOrder = actionOrder.map(pos => players.find(p => p.position === pos)).filter((p): p is Player => p !== undefined);
@@ -842,7 +842,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
         actionOrder = ['SB', 'BB', 'Dealer'];
       } else {
         // 4+ Postflop: SB → BB → UTG → ... → Dealer
-        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer'];
+        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'MP', 'MP+1', 'MP+2', 'LJ', 'HJ', 'CO', 'Dealer'];
       }
 
       // Find current player's position in action order

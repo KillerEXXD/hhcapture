@@ -452,7 +452,8 @@ export function processStackSynchronous(
 
       updatedPlayerData[player.id] = {
         ...updatedPlayerData[player.id],
-        [amountKey]: displayAmountFormatted
+        [amountKey]: displayAmountFormatted,
+        [unitKey]: unit
       };
 
       console.log(`      💾 Display amount: ${displayAmountFormatted} ${unit}`);

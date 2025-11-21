@@ -7,6 +7,8 @@
  * - If incomplete → Focus "Add More Action" button (user needs to add more action to complete round)
  */
 
+console.log('🔥🔥🔥 FOCUS MANAGEMENT MODULE LOADED - VERSION 2.0 - CACHE BUSTER 🔥🔥🔥');
+
 import type { Player, PlayerData, Stage, ActionLevel } from '../../../types/poker';
 import { checkBettingRoundComplete } from '../validators/roundCompletionValidator';
 
@@ -41,18 +43,18 @@ export function returnFocusAfterProcessStack(options: FocusReturnOptions): void 
   console.log(`🎯 [FocusReturn] Stage: ${stage}, Level: ${actionLevel}`);
 
   // Check if the betting round is complete
-  const isRoundComplete = checkBettingRoundComplete(
+  const roundCompleteResult = checkBettingRoundComplete(
     stage,
     actionLevel,
     players,
     playerData
   );
 
-  console.log(`🎯 [FocusReturn] Betting round complete: ${isRoundComplete}`);
+  console.log(`🎯 [FocusReturn] Betting round complete: ${roundCompleteResult.isComplete}, Reason: ${roundCompleteResult.reason}`);
 
   setTimeout(() => {
     // If round is COMPLETE → Focus "Create Next Street"
-    if (isRoundComplete) {
+    if (roundCompleteResult.isComplete) {
       if (hasCreateNextStreetButton) {
         // Try street-specific button names first
         const streetButtons = [

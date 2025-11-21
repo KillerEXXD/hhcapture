@@ -375,7 +375,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
         actionOrder = ['SB', 'BB', 'Dealer'];
       } else {
         // 4+ Postflop: SB → BB → UTG → ... → Dealer
-        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer'];
+        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'MP', 'MP+1', 'MP+2', 'LJ', 'HJ', 'CO', 'Dealer'];
       }
 
       const playersInActionOrder = actionOrder.map(pos => players.find(p => p.position === pos)).filter((p): p is Player => p !== undefined);
@@ -868,7 +868,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
         actionOrder = ['SB', 'BB', 'Dealer'];
       } else {
         // 4+ Postflop: SB → BB → UTG → ... → Dealer
-        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer'];
+        actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'MP', 'MP+1', 'MP+2', 'LJ', 'HJ', 'CO', 'Dealer'];
       }
 
       console.log(`🎯 [FlopView] Action order for ${playerCount} players: ${actionOrder.join(' → ')}`);
@@ -1103,7 +1103,7 @@ export const FlopView: React.FC<FlopViewProps> = ({
           } else if (originalPlayerCount === 3) {
             actionOrder = ['SB', 'BB', 'Dealer'];
           } else {
-            actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'LJ', 'MP', 'MP+1', 'MP+2', 'HJ', 'CO', 'Dealer'];
+            actionOrder = ['SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'MP', 'MP+1', 'MP+2', 'LJ', 'HJ', 'CO', 'Dealer'];
           }
 
           // Find current player's position in action order
