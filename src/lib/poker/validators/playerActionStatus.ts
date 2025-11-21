@@ -694,6 +694,29 @@ export function checkPlayerNeedsToAct(
   console.log(`   Player ${playerId} matched max bet: ${alreadyMatchedMaxBet} (${playerContribution} >= ${maxBet})`);
 
   if (alreadyMatchedMaxBet) {
+    // SPECIAL CASE for More Action: If maxBet is 0 and player contribution is 0,
+    // check if this is because no one has acted yet (needs to act) vs everyone checked (doesn't need to act)
+    if ((actionLevel === 'more' || actionLevel === 'more2') && maxBet === 0 && playerContribution === 0) {
+      // Check if THIS player has taken any action in this More Action round
+      const moreActionKey = actionLevel === 'more' ? moreAction1ActionKey : moreAction2ActionKey;
+      const playerAction = data[moreActionKey];
+
+      if (!playerAction || playerAction === 'no action') {
+        // Player hasn't acted yet, so they NEED to act (can check, bet, fold)
+        console.log(`   → ⚠️ EDGE CASE: maxBet=0, player contribution=0, but player hasn't acted in ${actionLevel} yet. Player ${playerId} NEEDS to act.`);
+        return {
+          needsToAct: true,
+          alreadyMatchedMaxBet: false,
+          alreadyAllIn: false,
+          cumulativeContribution: playerContribution,
+          maxContribution: maxBet,
+        };
+      } else {
+        // Player has acted (check or fold), so they don't need to act again
+        console.log(`   → Player ${playerId} already acted (${playerAction}) with 0 contribution, does NOT need to act`);
+      }
+    }
+
     console.log(`   → Player ${playerId} already matched max bet, does NOT need to act`);
     return {
       needsToAct: false,
