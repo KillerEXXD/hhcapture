@@ -1095,8 +1095,11 @@ function switchTab(tabName) {
     document.getElementById(tabName).classList.add('active');
 
     // Handle nav-item highlighting - works with both click events and programmatic calls
-    if (typeof event !== 'undefined' && event && event.target) {
-        event.target.closest('.nav-item').classList.add('active');
+    if (typeof event !== 'undefined' && event && event.target && typeof event.target.closest === 'function') {
+        const navItem = event.target.closest('.nav-item');
+        if (navItem) {
+            navItem.classList.add('active');
+        }
     } else {
         // Programmatic call - find nav item by data attribute or text
         document.querySelectorAll('.nav-item').forEach(item => {
