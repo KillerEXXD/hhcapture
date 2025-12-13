@@ -8,7 +8,7 @@
  * - Auto-select cards toggle for testing
  */
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 import type { Player, ChipUnit, Position, Rank, Suit } from '../types/poker';
 import type { GameState, GameStateActions } from '../hooks/useGameState';
 import type { UseCardManagementReturn } from '../hooks/useCardManagement';
@@ -526,38 +526,6 @@ export function StackSetupView({
   }, [actions]);
 
   /**
-   * Track if URL params have been processed (to prevent double-loading)
-   */
-  const urlParamsProcessed = useRef(false);
-
-  /**
-   * Load hand data from URL params
-   * Used for prototyping integration with tpro.html
-   */
-  useEffect(() => {
-    // Only run once
-    if (urlParamsProcessed.current) return;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const handData = urlParams.get('handData');
-
-    if (handData) {
-      console.log('🔗 [URL Params] Found handData in URL');
-      urlParamsProcessed.current = true;
-
-      // Decode and set the hand data
-      const decodedData = decodeURIComponent(handData);
-      console.log('🔗 [URL Params] Decoded hand data:', decodedData);
-
-      // Set the raw input (user will manually click Setup Players)
-      actions.setStackData({ ...state.stackData, rawInput: decodedData });
-
-      // Clear URL params to prevent re-loading on refresh
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [actions, state.stackData]);
-
-  /**
    * Navigation buttons
    */
   // Determine which streets are available based on potsByStage
@@ -874,7 +842,6 @@ export function StackSetupView({
           <div className="flex gap-2">
             <button
               onClick={setupPlayers}
-              data-testid="setup-players-btn"
               className="w-full px-4 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
             >
               Setup Players

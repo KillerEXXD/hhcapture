@@ -1397,60 +1397,8 @@ function changeHandPage(direction) {
 // ============================================================================
 
 function viewActionsInApp(handId) {
-    const hand = sampleHands.find(h => h.id === handId);
-    if (!hand) return;
-
-    // Generate sample player data that matches the app's expected format
-    // Format: 4-line header + player lines
-    const playerNames = ["Phil Ivey", "Daniel Negreanu", "Vanessa Selbst", "Justin Bonomo", "Maria Ho", "Erik Seidel", "Bryn Kenney", "Stephen Chidwick"];
-    const positions = ["Dealer", "SB", "BB", "UTG", "UTG+1", "MP", "MP+1", "HJ", "CO"];
-
-    // Generate players based on hand.players count
-    const numPlayers = hand.players;
-    let handData = '';
-
-    // Line 1: Hand number and timestamp
-    handData += `Hand #${hand.handNo} - ${new Date().toLocaleString()}\n`;
-
-    // Line 2: Blinds info (sample values)
-    const sb = 500;
-    const bb = 1000;
-    const ante = 100;
-    handData += `SB: ${sb} BB: ${bb} Ante: ${ante}\n`;
-
-    // Line 3: Empty or additional info
-    handData += `Tournament: Sample Tournament\n`;
-
-    // Line 4: Separator
-    handData += `---\n`;
-
-    // Player lines: Name Position Stack
-    const usedPositions = [];
-    if (numPlayers === 2) {
-        usedPositions.push("Dealer", "BB");
-    } else if (numPlayers === 3) {
-        usedPositions.push("Dealer", "SB", "BB");
-    } else {
-        // For 4+ players, use appropriate positions
-        const allPositions = ["Dealer", "SB", "BB", "UTG", "UTG+1", "MP", "MP+1", "HJ", "CO"];
-        for (let i = 0; i < numPlayers && i < allPositions.length; i++) {
-            usedPositions.push(allPositions[i]);
-        }
-    }
-
-    for (let i = 0; i < numPlayers; i++) {
-        const name = playerNames[i % playerNames.length];
-        const position = usedPositions[i] || "";
-        const stack = Math.floor(Math.random() * 100000) + 10000; // Random stack between 10k-110k
-        handData += `${name} ${position} ${stack}\n`;
-    }
-
-    // Encode the hand data for URL
-    const encodedData = encodeURIComponent(handData);
-
-    // Open the app with the hand data (user will manually click Setup Players)
-    const appUrl = `http://127.0.0.1:3001?handData=${encodedData}`;
-    window.open(appUrl, '_blank');
+    // Simply open the app - user will use existing data in setup
+    window.open('http://127.0.0.1:3001', '_blank');
 }
 
 // ============================================================================
