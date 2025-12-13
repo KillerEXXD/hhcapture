@@ -1170,7 +1170,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
         {/* BACK TO HAND HISTORY */}
         <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-100">
           <button
-            onClick={() => window.open('/tpro.html', '_blank')}
+            onClick={() => window.open('/tpro.html?view=handHistory', '_blank')}
             className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

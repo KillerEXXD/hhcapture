@@ -1559,6 +1559,21 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDashboardStats();
     renderTournamentTable();
     renderPlayerTable();
+
+    // Check URL params to auto-navigate to hand history
+    const urlParams = new URLSearchParams(window.location.search);
+    const showHandHistory = urlParams.get('view');
+    const tournamentId = urlParams.get('tournamentId');
+
+    if (showHandHistory === 'handHistory') {
+        // Switch to Tournaments tab and show hand history
+        switchTab('tournaments');
+        // Use tournament ID if provided, otherwise default to first tournament
+        const tid = tournamentId ? parseInt(tournamentId) : 1;
+        viewHandHistory(tid);
+        // Clear URL params
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 });
 
     
