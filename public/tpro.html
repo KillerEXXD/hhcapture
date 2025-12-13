@@ -1306,19 +1306,35 @@ function changePage(direction) {
 // ============================================================================
 
 function viewHandHistory(tournamentId) {
+    console.log('🟢 [viewHandHistory] Called with tournamentId:', tournamentId);
     currentTournamentId = tournamentId;
     const tournament = sampleTournaments.find(t => t.id === tournamentId);
-    
-    document.getElementById('tournamentListView').style.display = 'none';
-    document.getElementById('handHistoryView').style.display = 'block';
-    document.getElementById('tournamentBreadcrumb').style.display = 'flex';
+    console.log('🟢 [viewHandHistory] Found tournament:', tournament);
+
+    if (!tournament) {
+        console.error('🔴 [viewHandHistory] Tournament not found!');
+        return;
+    }
+
+    const listView = document.getElementById('tournamentListView');
+    const historyView = document.getElementById('handHistoryView');
+    const breadcrumb = document.getElementById('tournamentBreadcrumb');
+
+    console.log('🟢 [viewHandHistory] DOM elements:', { listView, historyView, breadcrumb });
+
+    listView.style.display = 'none';
+    historyView.style.display = 'block';
+    breadcrumb.style.display = 'flex';
     document.getElementById('currentTournamentName').textContent = tournament.name;
     document.getElementById('handHistoryTitle').textContent = `${tournament.name} - Hand History`;
     document.getElementById('handCount').textContent = tournament.hands;
-    
+
+    console.log('🟢 [viewHandHistory] Set display styles - listView: none, historyView: block');
+
     currentHandPage = 1;
     filteredHands = [...sampleHands];
     renderHandHistory();
+    console.log('🟢 [viewHandHistory] renderHandHistory() called');
 }
 
 function showTournamentList() {
@@ -1568,6 +1584,7 @@ function sortPlayers(column) {
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔵 [tpro.html] DOMContentLoaded fired');
     updateDashboardStats();
     renderTournamentTable();
     renderPlayerTable();
@@ -1577,14 +1594,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const showHandHistory = urlParams.get('view');
     const tournamentId = urlParams.get('tournamentId');
 
+    console.log('🔵 [tpro.html] URL params:', { view: showHandHistory, tournamentId });
+
     if (showHandHistory === 'handHistory') {
+        console.log('🔵 [tpro.html] handHistory view requested');
         // Switch to Tournaments tab and show hand history
+        console.log('🔵 [tpro.html] Calling switchTab("tournaments")');
         switchTab('tournaments');
         // Use tournament ID if provided, otherwise default to first tournament
         const tid = tournamentId ? parseInt(tournamentId) : 1;
+        console.log('🔵 [tpro.html] Tournament ID:', tid);
         // Small delay to ensure DOM is ready
         setTimeout(() => {
+            console.log('🔵 [tpro.html] Calling viewHandHistory(' + tid + ')');
             viewHandHistory(tid);
+            console.log('🔵 [tpro.html] viewHandHistory completed');
         }, 100);
         // Clear URL params
         window.history.replaceState({}, document.title, window.location.pathname);
