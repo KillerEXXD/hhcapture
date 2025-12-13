@@ -1429,7 +1429,8 @@ function changeHandPage(direction) {
 
 function viewActionsInApp(handId) {
     // Simply open the app - user will use existing data in setup
-    window.open('http://127.0.0.1:3001', '_blank');
+    // Use relative path so it works on any domain (localhost, vercel, etc.)
+    window.open('/', '_blank');
 }
 
 // ============================================================================
