@@ -1570,7 +1570,10 @@ document.addEventListener('DOMContentLoaded', function() {
         switchTab('tournaments');
         // Use tournament ID if provided, otherwise default to first tournament
         const tid = tournamentId ? parseInt(tournamentId) : 1;
-        viewHandHistory(tid);
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+            viewHandHistory(tid);
+        }, 100);
         // Clear URL params
         window.history.replaceState({}, document.title, window.location.pathname);
     }
