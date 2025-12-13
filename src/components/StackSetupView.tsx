@@ -8,7 +8,7 @@
  * - Auto-select cards toggle for testing
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import type { Player, ChipUnit, Position, Rank, Suit } from '../types/poker';
 import type { GameState, GameStateActions } from '../hooks/useGameState';
 import type { UseCardManagementReturn } from '../hooks/useCardManagement';
@@ -526,6 +526,54 @@ export function StackSetupView({
   }, [actions]);
 
   /**
+   * Track if URL params have been processed (to prevent double-loading)
+   */
+  const urlParamsProcessed = useRef(false);
+
+  /**
+   * Auto-load hand data from URL params
+   * Used for prototyping integration with tpro.html
+   */
+  useEffect(() => {
+    // Only run once
+    if (urlParamsProcessed.current) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const handData = urlParams.get('handData');
+    const autoSetup = urlParams.get('autoSetup');
+
+    if (handData) {
+      console.log('🔗 [URL Params] Found handData in URL');
+      urlParamsProcessed.current = true;
+
+      // Decode and set the hand data
+      const decodedData = decodeURIComponent(handData);
+      console.log('🔗 [URL Params] Decoded hand data:', decodedData);
+
+      // Set the raw input
+      actions.setStackData({ ...state.stackData, rawInput: decodedData });
+
+      // If autoSetup is true, trigger setup after a short delay to allow state to update
+      if (autoSetup === 'true') {
+        console.log('🔗 [URL Params] Auto-setup enabled, will trigger Setup Players');
+        setTimeout(() => {
+          // Find and click the Setup Players button
+          const setupButton = document.querySelector('[data-testid="setup-players-btn"]') as HTMLButtonElement;
+          if (setupButton) {
+            console.log('🔗 [URL Params] Clicking Setup Players button');
+            setupButton.click();
+          } else {
+            console.warn('🔗 [URL Params] Setup Players button not found');
+          }
+        }, 500);
+      }
+
+      // Clear URL params to prevent re-loading on refresh
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [actions, state.stackData]);
+
+  /**
    * Navigation buttons
    */
   // Determine which streets are available based on potsByStage
@@ -842,6 +890,7 @@ export function StackSetupView({
           <div className="flex gap-2">
             <button
               onClick={setupPlayers}
+              data-testid="setup-players-btn"
               className="w-full px-4 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
             >
               Setup Players
