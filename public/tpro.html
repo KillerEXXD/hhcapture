@@ -1428,9 +1428,10 @@ function changeHandPage(direction) {
 // ============================================================================
 
 function viewActionsInApp(handId) {
-    // Simply open the app - user will use existing data in setup
+    // Pass the current tournament ID so user can return to the same tournament
     // Use relative path so it works on any domain (localhost, vercel, etc.)
-    window.open('/', '_blank');
+    const tournamentId = currentTournamentId || 1;
+    window.open(`/?fromTournament=${tournamentId}`, '_blank');
 }
 
 // ============================================================================

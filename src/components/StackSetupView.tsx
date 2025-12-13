@@ -8,7 +8,7 @@
  * - Auto-select cards toggle for testing
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import type { Player, ChipUnit, Position, Rank, Suit } from '../types/poker';
 import type { GameState, GameStateActions } from '../hooks/useGameState';
 import type { UseCardManagementReturn } from '../hooks/useCardManagement';
@@ -104,6 +104,29 @@ export function StackSetupView({
   onExport,
   formatStack
 }: StackSetupViewProps): React.ReactElement {
+
+  /**
+   * Store tournament ID from URL params in localStorage
+   * This allows the "Back to Hand History" button to return to the correct tournament
+   */
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromTournament = urlParams.get('fromTournament');
+
+    if (fromTournament) {
+      localStorage.setItem('lastTournamentId', fromTournament);
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  /**
+   * Get the tournament ID to return to
+   */
+  const getBackToHandHistoryUrl = useCallback(() => {
+    const tournamentId = localStorage.getItem('lastTournamentId') || '1';
+    return `/tpro.html?view=handHistory&tournamentId=${tournamentId}`;
+  }, []);
 
   /**
    * Setup players from raw input
@@ -580,7 +603,7 @@ export function StackSetupView({
         {/* BACK TO HAND HISTORY */}
         <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-100">
           <button
-            onClick={() => window.open('/tpro.html?view=handHistory', '_blank')}
+            onClick={() => window.open(getBackToHandHistoryUrl(), '_blank')}
             className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
