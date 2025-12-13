@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Tournament Pro - Enhanced UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; animation: modalFadeIn 0.3s; }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content { animation: modalSlideUp 0.3s; max-height: 90vh; overflow-y: auto; }
+        @keyframes modalSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #667eea 0%, #4299e1 100%); }
+        .gradient-green { background: linear-gradient(135deg, #48bb78 0%, #38b2ac 100%); }
+        .gradient-orange { background: linear-gradient(135deg, #f6ad55 0%, #fc8181 100%); }
+        .gradient-purple { background: linear-gradient(135deg, #9f7aea 0%, #ed64a6 100%); }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .nav-item { position: relative; transition: all 0.3s; }
+        .nav-item.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px 2px 0 0; }
+        
+        /* Table Styles */
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .data-table thead th { position: sticky; top: 0; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); z-index: 10; padding: 16px; text-align: left; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb; cursor: pointer; user-select: none; }
+        .data-table thead th:hover { background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%); }
+        .data-table tbody tr { transition: all 0.2s; }
+        .data-table tbody tr:hover { background: linear-gradient(to right, #f0f4ff, #e0e7ff); transform: scale(1.01); box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15); }
+        .data-table tbody td { padding: 16px; border-bottom: 1px solid #f3f4f6; }
+        
+        /* View Toggle */
+        .view-toggle { background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 4px; display: inline-flex; gap: 4px; }
+        .view-toggle button { padding: 8px 16px; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
+        .view-toggle button.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); }
+        
+        /* Search & Filter Bar */
+        .filter-bar { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
+        
+        /* Pagination */
+        .pagination { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 24px; }
+        .pagination button { padding: 8px 16px; border-radius: 8px; font-weight: 600; transition: all 0.2s; background: white; border: 2px solid #e5e7eb; }
+        .pagination button:hover:not(:disabled) { background: #f3f4f6; border-color: #9ca3af; }
+        .pagination button.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: transparent; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Status Badges */
+        .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+        .badge-in-progress { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; border: 1px solid #fbbf24; }
+        .badge-completed { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #065f46; border: 1px solid #10b981; }
+        .badge-pending { background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%); color: #5b21b6; border: 1px solid #8b5cf6; }
+        
+        /* Hand History Styles */
+        .hand-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 2px solid #e5e7eb; transition: all 0.2s; cursor: pointer; }
+        .hand-card:hover { border-color: #667eea; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15); transform: translateX(4px); }
+        .card-suit { font-size: 14px; font-weight: 700; }
+        .card-suit.spades, .card-suit.clubs { color: #1f2937; }
+        .card-suit.hearts, .card-suit.diamonds { color: #dc2626; }
+        
+        /* Breadcrumb */
+        .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; padding: 12px 0; }
+        .breadcrumb-item { color: #6b7280; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .breadcrumb-item.active { color: #1f2937; font-weight: 600; }
+        .breadcrumb-separator { color: #d1d5db; }
+        
+        /* Dashboard Stat Cards */
+        .stat-card { background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85)); border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        .stat-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+        .chart-bar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 4px; transition: all 0.3s; }
+        .chart-bar:hover { transform: scaleY(1.05); opacity: 0.9; }
+        
+        /* Activity Feed */
+        .activity-item { padding: 16px; border-radius: 12px; margin-bottom: 12px; background: white; border: 1px solid #e5e7eb; transition: all 0.2s; }
+        .activity-item:hover { border-color: #667eea; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15); }
+        .activity-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+        
+        /* ========== ENHANCED BREADCRUMB STYLES (NEW) ========== */
+        .breadcrumb-container { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 16px 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+            margin-bottom: 24px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .breadcrumb-enhanced { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 12px;
+            animation: slideInLeft 0.4s ease-out;
+        }
+        
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0; 
+                transform: translateX(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        .breadcrumb-item-enhanced { 
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px; 
+            font-weight: 600;
+            transition: all 0.3s;
+            background: #f3f4f6;
+        }
+        
+        .breadcrumb-item-enhanced:not(.active) {
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .breadcrumb-item-enhanced:not(.active):hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .breadcrumb-item-enhanced.active { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+        }
+        
+        .breadcrumb-separator-enhanced { 
+            color: #9ca3af;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        /* User Avatar Styles */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 min-h-screen">
+    
+    <!-- Top Navigation -->
+    <nav class="glass border-b border-white/20 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center shadow-lg">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Poker Tournament Pro</h1>
+                        <p class="text-xs text-gray-500">Professional Hand Analysis</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center space-x-3 pl-4 border-l border-gray-200">
+                        <div class="text-right">
+                            <p class="text-sm font-semibold text-gray-800">Ravee Kumar</p>
+                            <p class="text-xs text-gray-500">Administrator</p>
+                        </div>
+                        <div class="w-11 h-11 gradient-bg rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg cursor-pointer hover:scale-105 transition-transform">
+                            R
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="flex space-x-1 -mb-px">
+                <button onclick="switchTab('dashboard')" class="nav-item active px-6 py-3 text-sm font-semibold text-gray-700 hover:text-purple-600 transition-all rounded-t-xl">
+                    <span class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        <span>Dashboard</span>
+                    </span>
+                </button>
+                <button onclick="switchTab('tournaments')" class="nav-item px-6 py-3 text-sm font-semibold text-gray-700 hover:text-purple-600 transition-all rounded-t-xl">
+                    <span class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        <span>Tournaments</span>
+                    </span>
+                </button>
+                <button onclick="switchTab('players')" class="nav-item px-6 py-3 text-sm font-semibold text-gray-700 hover:text-purple-600 transition-all rounded-t-xl">
+                    <span class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <span>Players</span>
+                    </span>
+                </button>
+                <button onclick="switchTab('analysts')" class="nav-item px-6 py-3 text-sm font-semibold text-gray-700 hover:text-purple-600 transition-all rounded-t-xl">
+                    <span class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                        <span>Analysts</span>
+                    </span>
+                </button>
+                <button onclick="switchTab('administrators')" class="nav-item px-6 py-3 text-sm font-semibold text-gray-700 hover:text-purple-600 transition-all rounded-t-xl">
+                    <span class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span>Administrators</span>
+                    </span>
+                </button>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        
+        <!-- DASHBOARD TAB -->
+        <div id="dashboard" class="tab-content active">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Dashboard</h2>
+                <p class="text-gray-600">Overview of your poker tournament data and analytics</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Tournaments -->
+                <div class="stat-card">
+                    <div class="stat-icon gradient-bg">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-500 mb-1">Total Tournaments</p>
+                    <p class="text-3xl font-bold text-gray-900" id="totalTournaments">500</p>
+                    <p class="text-xs text-green-600 font-semibold mt-2">↑ 12% from last month</p>
+                </div>
+
+                <!-- Total Players -->
+                <div class="stat-card">
+                    <div class="stat-icon gradient-blue">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-500 mb-1">Tracked Players</p>
+                    <p class="text-3xl font-bold text-gray-900" id="totalPlayers">3,000</p>
+                    <p class="text-xs text-green-600 font-semibold mt-2">↑ 8% from last month</p>
+                </div>
+
+                <!-- Total Hands -->
+                <div class="stat-card">
+                    <div class="stat-icon gradient-green">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-500 mb-1">Total Hands</p>
+                    <p class="text-3xl font-bold text-gray-900" id="totalHands">173,500</p>
+                    <p class="text-xs text-gray-500 font-semibold mt-2">Avg 347 per tournament</p>
+                </div>
+
+                <!-- Active Tournaments -->
+                <div class="stat-card">
+                    <div class="stat-icon gradient-orange">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-500 mb-1">In Progress</p>
+                    <p class="text-3xl font-bold text-gray-900" id="activeTournaments">--</p>
+                    <p class="text-xs text-orange-600 font-semibold mt-2">Currently active</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column - Charts & Stats -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Tournament Status Distribution -->
+                    <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Tournament Status Distribution</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold text-gray-700">In Progress</span>
+                                    <span class="text-sm font-bold text-orange-600" id="inProgressCount">--</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="chart-bar h-3" id="inProgressBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold text-gray-700">Completed</span>
+                                    <span class="text-sm font-bold text-green-600" id="completedCount">--</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="chart-bar bg-gradient-to-r from-green-500 to-teal-500 h-3" id="completedBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold text-gray-700">Pending</span>
+                                    <span class="text-sm font-bold text-purple-600" id="pendingCount">--</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="chart-bar bg-gradient-to-r from-purple-500 to-pink-500 h-3" id="pendingBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tournaments by Year -->
+                    <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Tournaments by Year</h3>
+                        <div class="flex items-end justify-between h-48 gap-4">
+                            <div class="flex-1 flex flex-col items-center justify-end h-full">
+                                <div class="chart-bar w-full" id="year2022Bar" style="height: 0%"></div>
+                                <p class="text-xs font-semibold text-gray-600 mt-2">2022</p>
+                                <p class="text-sm font-bold text-gray-900" id="year2022Count">--</p>
+                            </div>
+                            <div class="flex-1 flex flex-col items-center justify-end h-full">
+                                <div class="chart-bar w-full" id="year2023Bar" style="height: 0%"></div>
+                                <p class="text-xs font-semibold text-gray-600 mt-2">2023</p>
+                                <p class="text-sm font-bold text-gray-900" id="year2023Count">--</p>
+                            </div>
+                            <div class="flex-1 flex flex-col items-center justify-end h-full">
+                                <div class="chart-bar w-full" id="year2024Bar" style="height: 0%"></div>
+                                <p class="text-xs font-semibold text-gray-600 mt-2">2024</p>
+                                <p class="text-sm font-bold text-gray-900" id="year2024Count">--</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Tournaments by Hands -->
+                    <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Top Tournaments by Hand Count</h3>
+                        <div class="space-y-3" id="topTournamentsList">
+                            <!-- Will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Recent Activity & Quick Actions -->
+                <div class="space-y-6">
+                    <!-- Quick Actions -->
+                    <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="switchTab('tournaments')" class="w-full gradient-bg text-white px-4 py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                <span>New Tournament</span>
+                            </button>
+                            <button onclick="switchTab('players')" class="w-full bg-white border-2 border-purple-600 text-purple-600 px-4 py-3 rounded-xl font-semibold hover:bg-purple-50 transition-all flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                                <span>Add Player</span>
+                            </button>
+                            <button onclick="switchTab('tournaments')" class="w-full bg-white border-2 border-gray-300 text-gray-700 px-4 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <span>Capture Hand</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
+                        <div class="space-y-3" id="recentActivityList">
+                            <!-- Will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Active Tournaments Widget -->
+                    <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Active Tournaments</h3>
+                        <div class="space-y-3" id="activeTournamentsList">
+                            <!-- Will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOURNAMENTS TAB -->
+        <div id="tournaments" class="tab-content">
+            <!-- Breadcrumb -->
+            <div id="tournamentBreadcrumb" class="breadcrumb" style="display: none;">
+                <span class="breadcrumb-item cursor-pointer" onclick="showTournamentList()">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    All Tournaments
+                </span>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item active" id="currentTournamentName">WSOP 2024 Main Event</span>
+            </div>
+            
+            <!-- Tournament List View -->
+            <div id="tournamentListView">
+                <div class="mb-8 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Tournaments</h2>
+                        <p class="text-gray-600">Manage 500+ poker tournament records</p>
+                    </div>
+                    <button class="gradient-bg text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        <span>Create Tournament</span>
+                    </button>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex-1 min-w-64">
+                            <div class="relative">
+                                <input type="text" id="tournamentSearch" placeholder="Search tournaments..." class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" onkeyup="filterTournaments()">
+                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        <select id="statusFilter" class="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" onchange="filterTournaments()">
+                            <option value="">All Statuses</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        
+                        <select id="yearFilter" class="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" onchange="filterTournaments()">
+                            <option value="">All Years</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                        </select>
+                        
+                        <div class="view-toggle ml-auto">
+                            <button class="active" onclick="setTournamentView('table')">
+                                <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                Table
+                            </button>
+                            <button onclick="setTournamentView('grid')">
+                                <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                                Cards
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table View -->
+                <div id="tournamentTableView" class="glass rounded-2xl p-6 border border-white/50 shadow-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                        <tr>
+                            <th>Tournament</th>
+                            <th>Status</th>
+                            <th>Buy-in</th>
+                            <th>Hands</th>
+                            <th>Duration</th>
+                            <th>Date</th>
+                            <th>Analyst Assignment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                            <tbody id="tournamentTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination">
+                        <button onclick="changePage('prev')" id="prevBtn">
+                            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            Previous
+                        </button>
+                        <span class="text-sm font-semibold text-gray-700">Page <span id="currentPage">1</span> of <span id="totalPages">21</span></span>
+                        <button onclick="changePage('next')" id="nextBtn">
+                            Next
+                            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grid View -->
+                <div id="tournamentGridView" style="display: none;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tournamentGridContainer"></div>
+                    <div class="pagination mt-6">
+                        <button onclick="changePage('prev')">
+                            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            Previous
+                        </button>
+                        <span class="text-sm font-semibold text-gray-700">Page <span id="currentPageGrid">1</span> of <span id="totalPagesGrid">21</span></span>
+                        <button onclick="changePage('next')">
+                            Next
+                            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hand History View -->
+            <div id="handHistoryView" style="display: none;">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2" id="handHistoryTitle">Tournament - Hand History</h2>
+                    <p class="text-gray-600">Complete record of <span id="handCount">347</span> hands played</p>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex-1 min-w-64">
+                            <div class="relative">
+                                <input type="text" id="handSearch" placeholder="Search by hand #, player name, or board cards..." class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" onkeyup="filterHands()">
+                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl">
+                    <div id="handHistoryList"></div>
+                    
+                    <div class="pagination mt-6">
+                        <button onclick="changeHandPage('prev')" id="prevHandBtn">
+                            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            Previous
+                        </button>
+                        <span class="text-sm font-semibold text-gray-700">Showing <span id="handStart">1</span>-<span id="handEnd">20</span> of <span id="totalHands">347</span></span>
+                        <button onclick="changeHandPage('next')" id="nextHandBtn">
+                            Next
+                            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLAYERS TAB -->
+        <div id="players" class="tab-content">
+            <div class="mb-8 flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Players Database</h2>
+                    <p class="text-gray-600">Manage 3,000+ professional player profiles</p>
+                </div>
+                <button class="gradient-bg text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span>Add Player</span>
+                </button>
+            </div>
+
+            <div class="filter-bar">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex-1 min-w-64">
+                        <div class="relative">
+                            <input type="text" id="playerSearch" placeholder="Search players by name, nickname, or country..." class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" onkeyup="filterPlayers()">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <select id="countryFilter" class="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" onchange="filterPlayers()">
+                        <option value="">All Countries</option>
+                        <option value="USA">🇺🇸 USA</option>
+                        <option value="Canada">🇨🇦 Canada</option>
+                        <option value="UK">🇬🇧 UK</option>
+                        <option value="Germany">🇩🇪 Germany</option>
+                    </select>
+                    
+                    <select id="categoryFilter" class="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" onchange="filterPlayers()">
+                        <option value="">All Categories</option>
+                        <option value="professional">Professional</option>
+                        <option value="hof">Hall of Fame</option>
+                        <option value="amateur">Amateur</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortPlayers('name')">Player Name ⇅</th>
+                                <th onclick="sortPlayers('nickname')">Nickname ⇅</th>
+                                <th onclick="sortPlayers('country')">Country ⇅</th>
+                                <th onclick="sortPlayers('hands')">Appearances ⇅</th>
+                                <th onclick="sortPlayers('winnings')">Total Winnings ⇅</th>
+                                <th>Categories</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playerTableBody"></tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button onclick="changePlayerPage('prev')" id="prevPlayerBtn">
+                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        Previous
+                    </button>
+                    <span class="text-sm font-semibold text-gray-700">Page <span id="currentPlayerPage">1</span> of <span id="totalPlayerPages">150</span></span>
+                    <button onclick="changePlayerPage('next')" id="nextPlayerBtn">
+                        Next
+                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+        <!-- ANALYSTS TAB -->
+        <div id="analysts" class="tab-content">
+            <div class="mb-8 flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Analyst Management</h2>
+                    <p class="text-gray-600">Manage tournament analysts and their assignments</p>
+                </div>
+                <button onclick="alert('Add Analyst functionality - Ready for backend integration')" class="gradient-bg text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Add Analyst</span>
+                </button>
+            </div>
+
+            <!-- Analyst Filters -->
+            <div class="filter-bar">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex-1 min-w-64">
+                        <div class="relative">
+                            <input type="text" id="analystSearch" placeholder="Search analysts..." class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" onkeyup="filterAnalysts()">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <select id="analystStatusFilter" class="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold" onchange="filterAnalysts()">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    
+                    <select id="analystExpertiseFilter" class="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold" onchange="filterAnalysts()">
+                        <option value="">All Expertise</option>
+                        <option value="Tournament">Tournament</option>
+                        <option value="Cash Game">Cash Game</option>
+                        <option value="Both">Both</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Analysts Table -->
+            <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortAnalysts('name')">Analyst Name ⇅</th>
+                                <th onclick="sortAnalysts('email')">Email ⇅</th>
+                                <th onclick="sortAnalysts('phone')">Phone ⇅</th>
+                                <th onclick="sortAnalysts('assignedTournaments')">Tournaments ⇅</th>
+                                <th onclick="sortAnalysts('totalHands')">Total Hands ⇅</th>
+                                <th onclick="sortAnalysts('expertise')">Expertise ⇅</th>
+                                <th onclick="sortAnalysts('status')">Status ⇅</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analystTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button onclick="changeAnalystPage('prev')" id="prevAnalystBtn">
+                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Previous
+                    </button>
+                    <span class="text-sm font-semibold text-gray-700">Page <span id="currentAnalystPage">1</span> of <span id="totalAnalystPages">2</span></span>
+                    <button onclick="changeAnalystPage('next')" id="nextAnalystBtn">
+                        Next
+                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ADMINISTRATORS TAB -->
+        <div id="administrators" class="tab-content">
+            <div class="mb-8 flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Administrator Management</h2>
+                    <p class="text-gray-600">Manage system administrators and their permissions</p>
+                </div>
+                <button onclick="alert('Add Administrator functionality - Ready for backend integration')" class="gradient-bg text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Add Administrator</span>
+                </button>
+            </div>
+
+            <!-- Admin Filters -->
+            <div class="filter-bar">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex-1 min-w-64">
+                        <div class="relative">
+                            <input type="text" id="adminSearch" placeholder="Search administrators..." class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" onkeyup="filterAdmins()">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <select id="adminRoleFilter" class="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold" onchange="filterAdmins()">
+                        <option value="">All Roles</option>
+                        <option value="Super Admin">Super Admin</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Manager">Manager</option>
+                    </select>
+                    
+                    <select id="adminStatusFilter" class="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold" onchange="filterAdmins()">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Administrators Table -->
+            <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortAdmins('name')">Administrator Name ⇅</th>
+                                <th onclick="sortAdmins('email')">Email ⇅</th>
+                                <th onclick="sortAdmins('role')">Role ⇅</th>
+                                <th onclick="sortAdmins('permissions')">Permissions ⇅</th>
+                                <th onclick="sortAdmins('lastLogin')">Last Login ⇅</th>
+                                <th onclick="sortAdmins('status')">Status ⇅</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button onclick="changeAdminPage('prev')" id="prevAdminBtn">
+                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Previous
+                    </button>
+                    <span class="text-sm font-semibold text-gray-700">Page <span id="currentAdminPage">1</span> of <span id="totalAdminPages">1</span></span>
+                    <button onclick="changeAdminPage('next')" id="nextAdminBtn">
+                        Next
+                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    <!-- Hand Detail Modal -->
+    <div id="handDetailModal" class="modal">
+        <div class="modal-content glass rounded-2xl p-8 border border-white/50 shadow-2xl w-full max-w-6xl">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900" id="modalHandTitle">Hand #247 - Detailed Action</h3>
+                    <p class="text-gray-600 mt-1" id="modalHandSubtitle">WSOP 2024 Main Event • July 15, 2024</p>
+                </div>
+                <button onclick="closeHandModal()" class="text-gray-500 hover:text-gray-700 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <div id="pokerHandCollectorEmbed" class="bg-white rounded-xl p-6 border-2 border-gray-200 min-h-96">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mb-4"></div>
+                    <p class="text-gray-600 font-semibold">Loading hand details...</p>
+                    <p class="text-sm text-gray-500 mt-2">This will open the PokerHandCollector app with full hand history</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center mt-6 pt-6 border-t border-gray-200">
+                <button onclick="openInNewWindow()" class="gradient-bg text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    <span>Open in Full Screen</span>
+                </button>
+                <button onclick="closeHandModal()" class="px-6 py-3 border-2 border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// ============================================================================
+// POKER TOURNAMENT PRO - COMPLETE JAVASCRIPT WITH DASHBOARD
+// ============================================================================
+
+// Sample Data Generation
+const sampleTournaments = [];
+const tournamentNames = [
+    "WSOP Main Event", "EPT Barcelona", "WPT Five Diamond", "Triton High Roller", 
+    "APPT Championship", "partypoker MILLIONS", "Super High Roller Bowl", "PokerStars Caribbean Adventure",
+    "Aussie Millions", "European Poker Tour", "World Poker Tour", "WSOP Europe"
+];
+const locations = ["Las Vegas", "Barcelona", "Monte Carlo", "London", "Prague", "Macau", "Cyprus"];
+const statuses = ["in-progress", "completed", "pending"];
+
+for (let i = 1; i <= 500; i++) {
+    const name = tournamentNames[Math.floor(Math.random() * tournamentNames.length)];
+    const year = 2022 + Math.floor(Math.random() * 3);
+    sampleTournaments.push({
+        id: i,
+        name: `${name} ${year}`,
+        status: statuses[Math.floor(Math.random() * statuses.length)],
+        buyin: [1000, 2500, 5000, 10000, 25000][Math.floor(Math.random() * 5)],
+        hands: Math.floor(Math.random() * 500) + 50,
+        duration: Math.floor(Math.random() * 150) + 20,
+        date: `${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Math.floor(Math.random()*12)]} ${Math.floor(Math.random()*28)+1}, ${year}`,
+        location: locations[Math.floor(Math.random() * locations.length)],
+        year: year
+    });
+}
+
+// Sample Players
+const samplePlayers = [];
+const firstNames = ["Phil", "Daniel", "Vanessa", "Justin", "Maria", "Sam", "Alex", "Jordan", "Taylor", "Morgan"];
+const lastNames = ["Ivey", "Negreanu", "Selbst", "Bonomo", "Ho", "Farha", "Foxen", "Young", "Smith", "Jones"];
+const countries = ["USA", "Canada", "UK", "Germany", "France", "Australia", "China"];
+const nicknames = ["The Tiger", "Kid Poker", "The Professor", "The Boss", "King", "Ace", "Maverick", "Shark"];
+
+for (let i = 1; i <= 3000; i++) {
+    samplePlayers.push({
+        id: i,
+        name: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
+        nickname: nicknames[Math.floor(Math.random() * nicknames.length)],
+        country: countries[Math.floor(Math.random() * countries.length)],
+        hands: Math.floor(Math.random() * 200) + 10,
+        winnings: Math.floor(Math.random() * 10000000) + 50000,
+        categories: ["Professional", "Amateur", "Hall of Fame"][Math.floor(Math.random() * 3)]
+    });
+}
+
+// Sample Hands Data
+
+
+// ============================================================================
+// ANALYST DATA (NEW - v3.0)
+// ============================================================================
+const sampleAnalysts = [];
+const analystNames = [
+    "John Smith", "Sarah Johnson", "Michael Chen", "Emily Rodriguez",
+    "David Kim", "Lisa Anderson", "James Wilson", "Maria Garcia",
+    "Robert Taylor", "Jennifer Martinez"
+];
+
+for (let i = 1; i <= 10; i++) {
+    sampleAnalysts.push({
+        id: i,
+        name: analystNames[i - 1],
+        email: `${analystNames[i - 1].toLowerCase().replace(/ /g, '.')}@pokerpro.com`,
+        phone: `+1 (555) ${String(Math.floor(Math.random() * 900) + 100)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+        assignedTournaments: Math.floor(Math.random() * 20) + 1,
+        totalHands: Math.floor(Math.random() * 5000) + 500,
+        status: ['active', 'inactive'][Math.floor(Math.random() * 2)],
+        joinedDate: `${['Jan','Feb','Mar','Apr','May','Jun'][Math.floor(Math.random()*6)]} ${Math.floor(Math.random()*28)+1}, 2024`,
+        expertise: ['Tournament', 'Cash Game', 'Both'][Math.floor(Math.random() * 3)]
+    });
+}
+
+// ============================================================================
+// ADMINISTRATOR DATA (NEW - v3.0)
+// ============================================================================
+const sampleAdministrators = [];
+const adminNames = [
+    "Ravee Kumar", "Alex Thompson", "Jordan Lee", "Taylor Morgan",
+    "Cameron Davis"
+];
+const adminRoles = ['Super Admin', 'Admin', 'Manager'];
+const adminPermissions = ['Full Access', 'Read/Write', 'Read Only', 'Tournament Management', 'User Management'];
+
+for (let i = 1; i <= 5; i++) {
+    const role = adminRoles[i <= 1 ? 0 : (i <= 3 ? 1 : 2)]; // 1 Super Admin, 2 Admins, 2 Managers
+    sampleAdministrators.push({
+        id: i,
+        name: adminNames[i - 1],
+        email: `${adminNames[i - 1].toLowerCase().replace(/ /g, '.')}@pokerpro.com`,
+        phone: `+1 (555) ${String(Math.floor(Math.random() * 900) + 100)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+        role: role,
+        permissions: adminPermissions[Math.floor(Math.random() * adminPermissions.length)],
+        lastLogin: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1, Math.floor(Math.random() * 24), Math.floor(Math.random() * 60)),
+        status: i <= 4 ? 'active' : 'inactive',
+        createdDate: `${['Jan','Feb','Mar'][Math.floor(Math.random()*3)]} ${Math.floor(Math.random()*28)+1}, 2024`
+    });
+}
+
+// Update tournament data to include analyst assignments
+// Leave 10% of tournaments unassigned for testing assignment feature
+sampleTournaments.forEach((tournament, index) => {
+    // 90% of tournaments get assigned analysts, 10% remain unassigned
+    if (Math.random() > 0.1) {
+        const analyst = sampleAnalysts[index % sampleAnalysts.length];
+        const startDate = new Date(tournament.year, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1);
+        const endDate = new Date(startDate.getTime() + tournament.duration * 60 * 60 * 1000);
+        
+        tournament.analyst = {
+            id: analyst.id,
+            name: analyst.name,
+            email: analyst.email,
+            startDate: startDate.toLocaleString(),
+            endDate: tournament.status === 'completed' ? endDate.toLocaleString() : 'In Progress',
+            duration: `${tournament.duration}h`,
+            status: tournament.status === 'completed' ? 'completed' : 'active'
+        };
+    } else {
+        tournament.analyst = null; // No analyst assigned yet
+    }
+});
+
+const sampleHands = [];
+const playerNames = ["Phil Ivey", "Daniel Negreanu", "Vanessa Selbst", "Justin Bonomo", "Maria Ho"];
+const hands = ["AA", "KK", "QQ", "JJ", "AKs", "AKo", "AQs", "KQs"];
+const boards = [
+    ["A♠", "K♥", "Q♦", "J♣", "10♠"],
+    ["9♣", "9♦", "9♥", "2♠", "7♣"],
+    ["K♠", "K♣", "8♥", "5♦", "3♠"],
+    ["A♦", "K♦", "Q♦", "J♦", "10♦"],
+    ["7♥", "7♠", "2♣", "3♦", "4♥"]
+];
+
+for (let i = 1; i <= 347; i++) {
+    const winner = playerNames[Math.floor(Math.random() * playerNames.length)];
+    const board = boards[Math.floor(Math.random() * boards.length)];
+    sampleHands.push({
+        id: i,
+        handNo: i,
+        winner: winner,
+        winningHand: hands[Math.floor(Math.random() * hands.length)],
+        board: board,
+        pot: Math.floor(Math.random() * 500000) + 10000,
+        players: Math.floor(Math.random() * 5) + 3,
+        street: ["Preflop", "Flop", "Turn", "River"][Math.floor(Math.random() * 4)]
+    });
+}
+
+// State Management
+let currentView = 'table';
+let currentPage = 1;
+let currentPlayerPage = 1;
+let currentHandPage = 1;
+let currentTournamentId = null;
+const itemsPerPage = 25;
+const handsPerPage = 20;
+let filteredTournaments = [...sampleTournaments];
+let filteredPlayers = [...samplePlayers];
+let filteredHands = [...sampleHands];
+let sortColumn = null;
+let sortDirection = 1;
+
+// ============================================================================
+// DASHBOARD FUNCTIONS
+// ============================================================================
+
+function updateDashboardStats() {
+    // Update tournament counts
+    document.getElementById('totalTournaments').textContent = sampleTournaments.length.toLocaleString();
+    document.getElementById('totalPlayers').textContent = samplePlayers.length.toLocaleString();
+    document.getElementById('totalHands').textContent = (sampleTournaments.length * 347).toLocaleString();
+    
+    // Count by status
+    const statusCounts = {
+        'in-progress': 0,
+        'completed': 0,
+        'pending': 0
+    };
+    sampleTournaments.forEach(t => statusCounts[t.status]++);
+    
+    document.getElementById('activeTournaments').textContent = statusCounts['in-progress'];
+    document.getElementById('inProgressCount').textContent = statusCounts['in-progress'];
+    document.getElementById('completedCount').textContent = statusCounts['completed'];
+    document.getElementById('pendingCount').textContent = statusCounts['pending'];
+    
+    // Update status bars
+    const total = sampleTournaments.length;
+    document.getElementById('inProgressBar').style.width = `${(statusCounts['in-progress']/total)*100}%`;
+    document.getElementById('completedBar').style.width = `${(statusCounts['completed']/total)*100}%`;
+    document.getElementById('pendingBar').style.width = `${(statusCounts['pending']/total)*100}%`;
+    
+    // Count by year
+    const yearCounts = { 2022: 0, 2023: 0, 2024: 0 };
+    sampleTournaments.forEach(t => yearCounts[t.year]++);
+    
+    const maxYear = Math.max(...Object.values(yearCounts));
+    document.getElementById('year2022Count').textContent = yearCounts[2022];
+    document.getElementById('year2023Count').textContent = yearCounts[2023];
+    document.getElementById('year2024Count').textContent = yearCounts[2024];
+    document.getElementById('year2022Bar').style.height = `${(yearCounts[2022]/maxYear)*100}%`;
+    document.getElementById('year2023Bar').style.height = `${(yearCounts[2023]/maxYear)*100}%`;
+    document.getElementById('year2024Bar').style.height = `${(yearCounts[2024]/maxYear)*100}%`;
+    
+    // Top tournaments by hands
+    const topTournaments = [...sampleTournaments]
+        .sort((a, b) => b.hands - a.hands)
+        .slice(0, 5);
+    
+    const topList = document.getElementById('topTournamentsList');
+    topList.innerHTML = topTournaments.map((t, idx) => `
+        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-purple-50 transition-all cursor-pointer" onclick="viewHandHistory(${t.id})">
+            <div class="flex items-center space-x-3">
+                <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 text-white font-bold text-sm">${idx + 1}</span>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900">${t.name}</p>
+                    <p class="text-xs text-gray-500">${t.location}</p>
+                </div>
+            </div>
+            <span class="text-lg font-bold text-purple-600">${t.hands}</span>
+        </div>
+    `).join('');
+    
+    // Recent activity
+    const recentList = document.getElementById('recentActivityList');
+    const activities = [
+        { icon: '📊', color: 'gradient-orange', text: `Hand #${Math.floor(Math.random()*100)+1} analyzed`, time: '2 min ago' },
+        { icon: '👤', color: 'gradient-blue', text: `${samplePlayers[Math.floor(Math.random()*10)].name} profile updated`, time: '15 min ago' },
+        { icon: '🏆', color: 'gradient-green', text: `${topTournaments[0].name} completed`, time: '1 hour ago' },
+        { icon: '📝', color: 'gradient-purple', text: `New tournament created`, time: '3 hours ago' }
+    ];
+    
+    recentList.innerHTML = activities.map(a => `
+        <div class="activity-item">
+            <div class="flex items-center space-x-3">
+                <div class="activity-icon ${a.color}">
+                    <span class="text-xl">${a.icon}</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-gray-900">${a.text}</p>
+                    <p class="text-xs text-gray-500 mt-1">${a.time}</p>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Active tournaments
+    const activeTournaments = sampleTournaments
+        .filter(t => t.status === 'in-progress')
+        .slice(0, 3);
+    
+    const activeList = document.getElementById('activeTournamentsList');
+    activeList.innerHTML = activeTournaments.map(t => `
+        <div class="flex items-center justify-between p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-200 hover:shadow-md transition-all cursor-pointer" onclick="viewHandHistory(${t.id})">
+            <div>
+                <p class="text-sm font-semibold text-gray-900">${t.name}</p>
+                <p class="text-xs text-gray-600">${t.hands} hands</p>
+            </div>
+            <span class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
+        </div>
+    `).join('');
+}
+
+// ============================================================================
+// TAB SWITCHING
+// ============================================================================
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    document.getElementById(tabName).classList.add('active');
+    event.target.closest('.nav-item').classList.add('active');
+    
+    if (tabName === 'dashboard') {
+        updateDashboardStats();
+    }
+}
+
+// ============================================================================
+// TOURNAMENT MANAGEMENT
+// ============================================================================
+
+function setTournamentView(view) {
+    currentView = view;
+    const tableView = document.getElementById('tournamentTableView');
+    const gridView = document.getElementById('tournamentGridView');
+    const buttons = document.querySelectorAll('.view-toggle button');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    if (view === 'table') {
+        tableView.style.display = 'block';
+        gridView.style.display = 'none';
+        renderTournamentTable();
+    } else {
+        tableView.style.display = 'none';
+        gridView.style.display = 'block';
+        renderTournamentGrid();
+    }
+}
+
+function renderTournamentTable() {
+    const tbody = document.getElementById('tournamentTableBody');
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageData = filteredTournaments.slice(start, end);
+    
+    tbody.innerHTML = pageData.map(t => `
+        <tr>
+            <td>
+                <div class="font-semibold text-gray-900">${t.name}</div>
+                <div class="text-xs text-gray-500">${t.location}</div>
+            </td>
+            <td><span class="badge badge-${t.status}">${t.status.toUpperCase().replace('-', ' ')}</span></td>
+            <td class="font-semibold text-gray-900">$${t.buyin.toLocaleString()}</td>
+            <td><span class="font-bold text-purple-600">${t.hands}</span></td>
+            <td class="text-gray-700">${t.duration}h</td>
+            <td class="text-gray-700">${t.date}</td>
+            <td>
+                ${t.analyst ? `
+                    <div class="text-sm">
+                        <div class="font-semibold text-gray-900 mb-1">${t.analyst.name}</div>
+                        <div class="text-xs text-gray-600">
+                            <div>Start: ${new Date(t.analyst.startDate).toLocaleDateString()}</div>
+                            <div>${t.analyst.status === 'completed' ? 'End: ' + new Date(t.analyst.endDate).toLocaleDateString() : '<span class="text-orange-600 font-medium">In Progress</span>'}</div>
+                            <div class="font-medium text-purple-600">Duration: ${t.analyst.duration}</div>
+                        </div>
+                    </div>
+                ` : `
+                    <button onclick="openAssignAnalystModal(${t.id})" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>Assign Analyst</span>
+                    </button>
+                `}
+            </td>
+            <td>
+                <button onclick="viewHandHistory(${t.id})" class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
+                    View Hands →
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    
+    updatePagination();
+}
+
+function renderTournamentGrid() {
+    const container = document.getElementById('tournamentGridContainer');
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageData = filteredTournaments.slice(start, end);
+    
+    container.innerHTML = pageData.map(t => `
+        <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl hover:shadow-2xl transition-all cursor-pointer">
+            <div class="flex items-center justify-between mb-4">
+                <span class="badge badge-${t.status}">${t.status.toUpperCase().replace('-', ' ')}</span>
+                <span class="text-2xl font-bold text-purple-600">${t.hands}</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">${t.name}</h3>
+            <p class="text-sm text-gray-600 mb-4">${t.location} • ${t.date}</p>
+            <div class="flex items-center justify-between text-sm mb-4">
+                <span class="text-gray-600">Buy-in: <span class="font-bold text-gray-900">$${t.buyin.toLocaleString()}</span></span>
+                <span class="text-gray-600">${t.duration}h</span>
+            </div>
+            
+            ${t.analyst ? `
+                <div class="bg-blue-50 rounded-lg p-3 mb-4 border border-blue-200">
+                    <div class="text-xs text-gray-500 mb-1">Analyst Assignment</div>
+                    <div class="font-semibold text-gray-900 mb-2">${t.analyst.name}</div>
+                    <div class="text-xs text-gray-600 space-y-1">
+                        <div>Start: ${new Date(t.analyst.startDate).toLocaleDateString()}</div>
+                        <div>${t.analyst.status === 'completed' ? 'End: ' + new Date(t.analyst.endDate).toLocaleDateString() : '<span class="text-orange-600 font-medium">In Progress</span>'}</div>
+                        <div class="font-medium text-purple-600">Duration: ${t.analyst.duration}</div>
+                    </div>
+                </div>
+            ` : `
+                <div class="bg-orange-50 rounded-lg p-3 mb-4 border border-orange-200">
+                    <div class="text-xs text-gray-500 mb-2">No Analyst Assigned</div>
+                    <button onclick="openAssignAnalystModal(${t.id})" class="w-full bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-semibold text-sm transition-all">
+                        Assign Analyst
+                    </button>
+                </div>
+            `}
+            
+            <button onclick="viewHandHistory(${t.id})" class="w-full gradient-bg text-white py-2 rounded-xl font-semibold hover:shadow-lg transition-all">
+                View Hand History
+            </button>
+        </div>
+    `).join('');
+    
+    updatePagination();
+}
+
+function filterTournaments() {
+    const searchTerm = document.getElementById('tournamentSearch').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter').value;
+    const yearFilter = document.getElementById('yearFilter').value;
+    
+    filteredTournaments = sampleTournaments.filter(t => {
+        const matchesSearch = t.name.toLowerCase().includes(searchTerm) || 
+                             t.location.toLowerCase().includes(searchTerm);
+        const matchesStatus = !statusFilter || t.status === statusFilter;
+        const matchesYear = !yearFilter || t.year.toString() === yearFilter;
+        return matchesSearch && matchesStatus && matchesYear;
+    });
+    
+    currentPage = 1;
+    if (currentView === 'table') {
+        renderTournamentTable();
+    } else {
+        renderTournamentGrid();
+    }
+}
+
+function sortTable(column) {
+    if (sortColumn === column) {
+        sortDirection *= -1;
+    } else {
+        sortColumn = column;
+        sortDirection = 1;
+    }
+    
+    filteredTournaments.sort((a, b) => {
+        let valA = a[column];
+        let valB = b[column];
+        
+        if (typeof valA === 'string') {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+        }
+        
+        if (valA < valB) return -1 * sortDirection;
+        if (valA > valB) return 1 * sortDirection;
+        return 0;
+    });
+    
+    renderTournamentTable();
+}
+
+function updatePagination() {
+    const totalPages = Math.ceil(filteredTournaments.length / itemsPerPage);
+    document.getElementById('currentPage').textContent = currentPage;
+    document.getElementById('totalPages').textContent = totalPages;
+    document.getElementById('currentPageGrid').textContent = currentPage;
+    document.getElementById('totalPagesGrid').textContent = totalPages;
+    document.getElementById('prevBtn').disabled = currentPage === 1;
+    document.getElementById('nextBtn').disabled = currentPage === totalPages;
+}
+
+function changePage(direction) {
+    if (direction === 'prev' && currentPage > 1) {
+        currentPage--;
+    } else if (direction === 'next') {
+        const totalPages = Math.ceil(filteredTournaments.length / itemsPerPage);
+        if (currentPage < totalPages) currentPage++;
+    }
+    
+    if (currentView === 'table') {
+        renderTournamentTable();
+    } else {
+        renderTournamentGrid();
+    }
+}
+
+// ============================================================================
+// HAND HISTORY MANAGEMENT
+// ============================================================================
+
+function viewHandHistory(tournamentId) {
+    currentTournamentId = tournamentId;
+    const tournament = sampleTournaments.find(t => t.id === tournamentId);
+    
+    document.getElementById('tournamentListView').style.display = 'none';
+    document.getElementById('handHistoryView').style.display = 'block';
+    document.getElementById('tournamentBreadcrumb').style.display = 'flex';
+    document.getElementById('currentTournamentName').textContent = tournament.name;
+    document.getElementById('handHistoryTitle').textContent = `${tournament.name} - Hand History`;
+    document.getElementById('handCount').textContent = tournament.hands;
+    
+    currentHandPage = 1;
+    filteredHands = [...sampleHands];
+    renderHandHistory();
+}
+
+function showTournamentList() {
+    document.getElementById('tournamentListView').style.display = 'block';
+    document.getElementById('handHistoryView').style.display = 'none';
+    document.getElementById('tournamentBreadcrumb').style.display = 'none';
+    currentTournamentId = null;
+}
+
+function renderHandHistory() {
+    const container = document.getElementById('handHistoryList');
+    const start = (currentHandPage - 1) * handsPerPage;
+    const end = start + handsPerPage;
+    const pageData = filteredHands.slice(start, end);
+    
+    container.innerHTML = pageData.map(h => `
+        <div class="hand-card" onclick="openHandDetail(${h.id})">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-4 mb-3">
+                        <span class="text-xl font-bold text-gray-900">Hand #${h.handNo}</span>
+                        <span class="badge badge-completed">${h.street}</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                            <p class="text-gray-500 mb-1">Winner</p>
+                            <p class="font-semibold text-gray-900">${h.winner}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 mb-1">Winning Hand</p>
+                            <p class="font-bold text-purple-600">${h.winningHand}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 mb-1">Board</p>
+                            <p class="card-suit">${h.board.slice(0, 3).join(' ')}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 mb-1">Pot Size</p>
+                            <p class="font-semibold text-green-600">$${h.pot.toLocaleString()}</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="gradient-bg text-white px-4 py-2 rounded-xl font-semibold hover:shadow-lg transition-all text-sm">
+                    View Actions →
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    updateHandPagination();
+}
+
+function filterHands() {
+    const searchTerm = document.getElementById('handSearch').value.toLowerCase();
+    
+    filteredHands = sampleHands.filter(h => {
+        return h.handNo.toString().includes(searchTerm) ||
+               h.winner.toLowerCase().includes(searchTerm) ||
+               h.board.join('').toLowerCase().includes(searchTerm);
+    });
+    
+    currentHandPage = 1;
+    renderHandHistory();
+}
+
+function updateHandPagination() {
+    const start = (currentHandPage - 1) * handsPerPage + 1;
+    const end = Math.min(start + handsPerPage - 1, filteredHands.length);
+    document.getElementById('handStart').textContent = start;
+    document.getElementById('handEnd').textContent = end;
+    document.getElementById('totalHands').textContent = filteredHands.length;
+    document.getElementById('prevHandBtn').disabled = currentHandPage === 1;
+    document.getElementById('nextHandBtn').disabled = end >= filteredHands.length;
+}
+
+function changeHandPage(direction) {
+    if (direction === 'prev' && currentHandPage > 1) {
+        currentHandPage--;
+    } else if (direction === 'next') {
+        const totalPages = Math.ceil(filteredHands.length / handsPerPage);
+        if (currentHandPage < totalPages) currentHandPage++;
+    }
+    renderHandHistory();
+}
+
+// ============================================================================
+// HAND DETAIL MODAL
+// ============================================================================
+
+function openHandDetail(handId) {
+    const hand = sampleHands.find(h => h.id === handId);
+    document.getElementById('modalHandTitle').textContent = `Hand #${hand.handNo} - Detailed Action`;
+    document.getElementById('handDetailModal').classList.add('active');
+    
+    setTimeout(() => {
+        document.getElementById('pokerHandCollectorEmbed').innerHTML = `
+            <div class="space-y-4">
+                <div class="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-2 border-purple-200">
+                    <h4 class="text-lg font-bold text-gray-900 mb-4">Hand Summary</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div><span class="text-gray-600">Winner:</span> <span class="font-bold">${hand.winner}</span></div>
+                        <div><span class="text-gray-600">Hand:</span> <span class="font-bold text-purple-600">${hand.winningHand}</span></div>
+                        <div><span class="text-gray-600">Pot:</span> <span class="font-bold text-green-600">$${hand.pot.toLocaleString()}</span></div>
+                        <div><span class="text-gray-600">Players:</span> <span class="font-bold">${hand.players}</span></div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl border-2 border-gray-200">
+                    <h4 class="text-lg font-bold text-gray-900 mb-4">Board Cards</h4>
+                    <div class="flex space-x-2 text-2xl font-bold">
+                        ${hand.board.map(card => `<span class="card-suit px-4 py-2 bg-gray-50 rounded-lg border-2 border-gray-300">${card}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl border-2 border-gray-200">
+                    <h4 class="text-lg font-bold text-gray-900 mb-4">Action Breakdown</h4>
+                    <p class="text-gray-600 mb-4">This will show the complete PokerHandCollector interface with:</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li>Player positions and starting stacks</li>
+                        <li>Preflop, Flop, Turn, River betting actions</li>
+                        <li>Pot calculations and side pots</li>
+                        <li>Stack updates after each action</li>
+                        <li>Hand replayer integration</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border-2 border-blue-200">
+                    <p class="text-sm text-gray-700">
+                        <strong>Integration Note:</strong> This modal will embed your actual PokerHandCollector.tsx component with all its functionality.
+                    </p>
+                </div>
+            </div>
+        `;
+    }, 500);
+}
+
+function closeHandModal() {
+    document.getElementById('handDetailModal').classList.remove('active');
+}
+
+function openInNewWindow() {
+    window.open(`/poker-hand-collector?hand=${currentHandId}&tournament=${currentTournamentId}`, '_blank');
+}
+
+// ============================================================================
+// PLAYER MANAGEMENT
+// ============================================================================
+
+function renderPlayerTable() {
+    const tbody = document.getElementById('playerTableBody');
+    const start = (currentPlayerPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageData = filteredPlayers.slice(start, end);
+    
+    tbody.innerHTML = pageData.map(p => `
+        <tr>
+            <td>
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                        ${p.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <span class="font-semibold text-gray-900">${p.name}</span>
+                </div>
+            </td>
+            <td class="text-gray-700">${p.nickname}</td>
+            <td class="text-gray-700">${p.country}</td>
+            <td><span class="font-bold text-purple-600">${p.hands}</span></td>
+            <td class="font-semibold text-green-600">$${p.winnings.toLocaleString()}</td>
+            <td><span class="badge badge-completed text-xs">${p.categories}</span></td>
+            <td>
+                <button class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
+                    View Profile →
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    
+    updatePlayerPagination();
+}
+
+function updatePlayerPagination() {
+    const totalPages = Math.ceil(filteredPlayers.length / itemsPerPage);
+    document.getElementById('currentPlayerPage').textContent = currentPlayerPage;
+    document.getElementById('totalPlayerPages').textContent = totalPages;
+    document.getElementById('prevPlayerBtn').disabled = currentPlayerPage === 1;
+    document.getElementById('nextPlayerBtn').disabled = currentPlayerPage === totalPages;
+}
+
+function changePlayerPage(direction) {
+    if (direction === 'prev' && currentPlayerPage > 1) {
+        currentPlayerPage--;
+    } else if (direction === 'next') {
+        const totalPages = Math.ceil(filteredPlayers.length / itemsPerPage);
+        if (currentPlayerPage < totalPages) currentPlayerPage++;
+    }
+    renderPlayerTable();
+}
+
+function filterPlayers() {
+    const searchTerm = document.getElementById('playerSearch').value.toLowerCase();
+    const countryFilter = document.getElementById('countryFilter').value;
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    
+    filteredPlayers = samplePlayers.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(searchTerm) || 
+                             p.nickname.toLowerCase().includes(searchTerm) ||
+                             p.country.toLowerCase().includes(searchTerm);
+        const matchesCountry = !countryFilter || p.country === countryFilter;
+        const matchesCategory = !categoryFilter || p.categories.toLowerCase() === categoryFilter.toLowerCase();
+        return matchesSearch && matchesCountry && matchesCategory;
+    });
+    
+    currentPlayerPage = 1;
+    renderPlayerTable();
+}
+
+function sortPlayers(column) {
+    // Implement player sorting similar to tournament sorting
+    filteredPlayers.sort((a, b) => {
+        let valA = a[column];
+        let valB = b[column];
+        
+        if (typeof valA === 'string') {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+        }
+        
+        if (valA < valB) return -1;
+        if (valA > valB) return 1;
+        return 0;
+    });
+    
+    renderPlayerTable();
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateDashboardStats();
+    renderTournamentTable();
+    renderPlayerTable();
+});
+
+    
+
+// ============================================================================
+// ANALYST MANAGEMENT FUNCTIONS (NEW - v3.0)
+// ============================================================================
+let filteredAnalysts = [...sampleAnalysts];
+let currentAnalystPage = 1;
+let analystSortColumn = 'name';
+let analystSortDirection = 'asc';
+
+function renderAnalystTable() {
+    const tbody = document.getElementById('analystTableBody');
+    if (!tbody) return;
+    
+    const start = (currentAnalystPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageData = filteredAnalysts.slice(start, end);
+    
+    tbody.innerHTML = pageData.map(a => `
+        <tr>
+            <td>
+                <div class="flex items-center space-x-3">
+                    <div class="user-avatar gradient-blue">
+                        ${a.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <span class="font-semibold text-gray-900">${a.name}</span>
+                </div>
+            </td>
+            <td class="text-gray-700">${a.email}</td>
+            <td class="text-gray-700">${a.phone}</td>
+            <td><span class="font-bold text-purple-600">${a.assignedTournaments}</span></td>
+            <td><span class="font-semibold text-gray-900">${a.totalHands.toLocaleString()}</span></td>
+            <td><span class="badge badge-completed text-xs">${a.expertise}</span></td>
+            <td>
+                <span class="badge ${a.status === 'active' ? 'badge-completed' : 'badge-pending'}">
+                    ${a.status.toUpperCase()}
+                </span>
+            </td>
+            <td>
+                <div class="flex space-x-2">
+                    <button onclick="alert('Edit analyst ${a.name}')" class="text-blue-600 hover:text-blue-700 font-semibold text-sm">
+                        Edit
+                    </button>
+                    <button onclick="alert('View details for ${a.name}')" class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
+                        View
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    
+    updateAnalystPagination();
+}
+
+function filterAnalysts() {
+    const searchTerm = document.getElementById('analystSearch')?.value.toLowerCase() || '';
+    const statusFilter = document.getElementById('analystStatusFilter')?.value || '';
+    const expertiseFilter = document.getElementById('analystExpertiseFilter')?.value || '';
+    
+    filteredAnalysts = sampleAnalysts.filter(a => {
+        const matchesSearch = a.name.toLowerCase().includes(searchTerm) || 
+                            a.email.toLowerCase().includes(searchTerm);
+        const matchesStatus = !statusFilter || a.status === statusFilter;
+        const matchesExpertise = !expertiseFilter || a.expertise === expertiseFilter;
+        return matchesSearch && matchesStatus && matchesExpertise;
+    });
+    
+    currentAnalystPage = 1;
+    renderAnalystTable();
+}
+
+function sortAnalysts(column) {
+    if (analystSortColumn === column) {
+        analystSortDirection = analystSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        analystSortColumn = column;
+        analystSortDirection = 'asc';
+    }
+    
+    filteredAnalysts.sort((a, b) => {
+        let aVal = a[column];
+        let bVal = b[column];
+        
+        if (typeof aVal === 'string') {
+            aVal = aVal.toLowerCase();
+            bVal = bVal.toLowerCase();
+        }
+        
+        if (analystSortDirection === 'asc') {
+            return aVal > bVal ? 1 : -1;
+        } else {
+            return aVal < bVal ? 1 : -1;
+        }
+    });
+    
+    renderAnalystTable();
+}
+
+function changeAnalystPage(direction) {
+    const totalPages = Math.ceil(filteredAnalysts.length / itemsPerPage);
+    if (direction === 'next' && currentAnalystPage < totalPages) {
+        currentAnalystPage++;
+    } else if (direction === 'prev' && currentAnalystPage > 1) {
+        currentAnalystPage--;
+    }
+    renderAnalystTable();
+}
+
+function updateAnalystPagination() {
+    const totalPages = Math.ceil(filteredAnalysts.length / itemsPerPage);
+    const currentPageSpan = document.getElementById('currentAnalystPage');
+    const totalPagesSpan = document.getElementById('totalAnalystPages');
+    const prevBtn = document.getElementById('prevAnalystBtn');
+    const nextBtn = document.getElementById('nextAnalystBtn');
+    
+    if (currentPageSpan) currentPageSpan.textContent = currentAnalystPage;
+    if (totalPagesSpan) totalPagesSpan.textContent = totalPages;
+    if (prevBtn) prevBtn.disabled = currentAnalystPage === 1;
+    if (nextBtn) nextBtn.disabled = currentAnalystPage === totalPages;
+}
+
+// ============================================================================
+// ADMINISTRATOR MANAGEMENT FUNCTIONS (NEW - v3.0)
+// ============================================================================
+let filteredAdmins = [...sampleAdministrators];
+let currentAdminPage = 1;
+let adminSortColumn = 'name';
+let adminSortDirection = 'asc';
+
+function renderAdminTable() {
+    const tbody = document.getElementById('adminTableBody');
+    if (!tbody) return;
+    
+    const start = (currentAdminPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageData = filteredAdmins.slice(start, end);
+    
+    tbody.innerHTML = pageData.map(a => `
+        <tr>
+            <td>
+                <div class="flex items-center space-x-3">
+                    <div class="user-avatar gradient-orange">
+                        ${a.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                        <div class="font-semibold text-gray-900">${a.name}</div>
+                        <div class="text-xs text-gray-500">ID: ${a.id}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="text-gray-700">${a.email}</td>
+            <td>
+                <span class="badge ${
+                    a.role === 'Super Admin' ? 'badge-in-progress' : 
+                    a.role === 'Admin' ? 'badge-completed' : 'badge-pending'
+                }">
+                    ${a.role}
+                </span>
+            </td>
+            <td class="text-gray-700">${a.permissions}</td>
+            <td class="text-sm text-gray-600">${a.lastLogin.toLocaleString()}</td>
+            <td>
+                <span class="badge ${a.status === 'active' ? 'badge-completed' : 'badge-pending'}">
+                    ${a.status.toUpperCase()}
+                </span>
+            </td>
+            <td>
+                <div class="flex space-x-2">
+                    <button onclick="alert('Edit administrator ${a.name}')" class="text-blue-600 hover:text-blue-700 font-semibold text-sm">
+                        Edit
+                    </button>
+                    <button onclick="alert('View details for ${a.name}')" class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
+                        View
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    
+    updateAdminPagination();
+}
+
+function filterAdmins() {
+    const searchTerm = document.getElementById('adminSearch')?.value.toLowerCase() || '';
+    const roleFilter = document.getElementById('adminRoleFilter')?.value || '';
+    const statusFilter = document.getElementById('adminStatusFilter')?.value || '';
+    
+    filteredAdmins = sampleAdministrators.filter(a => {
+        const matchesSearch = a.name.toLowerCase().includes(searchTerm) || 
+                            a.email.toLowerCase().includes(searchTerm);
+        const matchesRole = !roleFilter || a.role === roleFilter;
+        const matchesStatus = !statusFilter || a.status === statusFilter;
+        return matchesSearch && matchesRole && matchesStatus;
+    });
+    
+    currentAdminPage = 1;
+    renderAdminTable();
+}
+
+function sortAdmins(column) {
+    if (adminSortColumn === column) {
+        adminSortDirection = adminSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        adminSortColumn = column;
+        adminSortDirection = 'asc';
+    }
+    
+    filteredAdmins.sort((a, b) => {
+        let aVal = a[column];
+        let bVal = b[column];
+        
+        if (column === 'lastLogin') {
+            aVal = aVal.getTime();
+            bVal = bVal.getTime();
+        } else if (typeof aVal === 'string') {
+            aVal = aVal.toLowerCase();
+            bVal = bVal.toLowerCase();
+        }
+        
+        if (adminSortDirection === 'asc') {
+            return aVal > bVal ? 1 : -1;
+        } else {
+            return aVal < bVal ? 1 : -1;
+        }
+    });
+    
+    renderAdminTable();
+}
+
+function changeAdminPage(direction) {
+    const totalPages = Math.ceil(filteredAdmins.length / itemsPerPage);
+    if (direction === 'next' && currentAdminPage < totalPages) {
+        currentAdminPage++;
+    } else if (direction === 'prev' && currentAdminPage > 1) {
+        currentAdminPage--;
+    }
+    renderAdminTable();
+}
+
+function updateAdminPagination() {
+    const totalPages = Math.ceil(filteredAdmins.length / itemsPerPage);
+    const currentPageSpan = document.getElementById('currentAdminPage');
+    const totalPagesSpan = document.getElementById('totalAdminPages');
+    const prevBtn = document.getElementById('prevAdminBtn');
+    const nextBtn = document.getElementById('nextAdminBtn');
+    
+    if (currentPageSpan) currentPageSpan.textContent = currentAdminPage;
+    if (totalPagesSpan) totalPagesSpan.textContent = totalPages;
+    if (prevBtn) prevBtn.disabled = currentAdminPage === 1;
+    if (nextBtn) nextBtn.disabled = currentAdminPage === totalPages;
+}
+
+// Update switchTab function to handle new tabs
+const originalSwitchTab = switchTab;
+switchTab = function(tabName) {
+    originalSwitchTab(tabName);
+    
+    // Render analyst table when switching to analysts tab
+    if (tabName === 'analysts') {
+        setTimeout(() => renderAnalystTable(), 10);
+    }
+    // Render admin table when switching to administrators tab
+    else if (tabName === 'administrators') {
+        setTimeout(() => renderAdminTable(), 10);
+    }
+};
+
+console.log('✅ Analyst Management System Loaded - ' + sampleAnalysts.length + ' analysts');
+console.log('✅ Administrator Management System Loaded - ' + sampleAdministrators.length + ' administrators');
+console.log('✅ Enhanced Prototype v3.0 Ready!');
+
+
+
+// ============================================================================
+// ANALYST ASSIGNMENT FUNCTIONS (NEW)
+// ============================================================================
+let currentAssignTournamentId = null;
+
+function openAssignAnalystModal(tournamentId) {
+    currentAssignTournamentId = tournamentId;
+    const tournament = sampleTournaments.find(t => t.id === tournamentId);
+    
+    // Update modal title with tournament name
+    document.getElementById('assignTournamentName').textContent = 
+        `Assign an analyst to: ${tournament.name}`;
+    
+    // Render analyst list
+    renderAnalystListForAssignment();
+    
+    // Show modal
+    document.getElementById('assignAnalystModal').classList.add('active');
+}
+
+function closeAssignAnalystModal() {
+    document.getElementById('assignAnalystModal').classList.remove('active');
+    currentAssignTournamentId = null;
+    document.getElementById('modalAnalystSearch').value = '';
+}
+
+function renderAnalystListForAssignment() {
+    const container = document.getElementById('analystListContainer');
+    const searchTerm = document.getElementById('modalAnalystSearch').value.toLowerCase();
+    
+    // Filter analysts - only show active ones
+    const availableAnalysts = sampleAnalysts.filter(a => 
+        a.status === 'active' && 
+        (a.name.toLowerCase().includes(searchTerm) || 
+         a.email.toLowerCase().includes(searchTerm))
+    );
+    
+    if (availableAnalysts.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4">No analysts found</p>';
+        return;
+    }
+    
+    container.innerHTML = availableAnalysts.map(analyst => `
+        <div class="analyst-item border-2 border-gray-200 rounded-lg p-4 hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer"
+             onclick="assignAnalystToTournament(${analyst.id})">
+            <div class="flex items-center space-x-3">
+                <div class="user-avatar gradient-blue">
+                    ${analyst.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold text-gray-900">${analyst.name}</div>
+                    <div class="text-xs text-gray-500">${analyst.email}</div>
+                    <div class="text-xs text-gray-600 mt-1">
+                        <span class="badge badge-completed text-xs">${analyst.expertise}</span>
+                        <span class="ml-2">${analyst.assignedTournaments} tournaments</span>
+                    </div>
+                </div>
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterModalAnalysts() {
+    renderAnalystListForAssignment();
+}
+
+function assignAnalystToTournament(analystId) {
+    // Find the tournament and analyst
+    const tournament = sampleTournaments.find(t => t.id === currentAssignTournamentId);
+    const analyst = sampleAnalysts.find(a => a.id === analystId);
+    
+    if (!tournament || !analyst) {
+        alert('Error: Tournament or Analyst not found');
+        return;
+    }
+    
+    // Create assignment with current date as start date
+    const startDate = new Date();
+    
+    tournament.analyst = {
+        id: analyst.id,
+        name: analyst.name,
+        email: analyst.email,
+        startDate: startDate.toLocaleString(),
+        endDate: 'In Progress',
+        duration: '0h', // Will be calculated based on tournament progress
+        status: 'active'
+    };
+    
+    // Update analyst's assigned tournament count
+    analyst.assignedTournaments++;
+    
+    // Close modal
+    closeAssignAnalystModal();
+    
+    // Refresh the tournament table/grid
+    if (document.getElementById('tournamentTableBody').style.display !== 'none') {
+        renderTournamentTable();
+    } else {
+        renderTournamentGrid();
+    }
+    
+    // Show success message
+    showSuccessMessage(`${analyst.name} has been assigned to ${tournament.name}`);
+}
+
+function showSuccessMessage(message) {
+    // Create a temporary success notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slideIn';
+    notification.innerHTML = `
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span class="font-semibold">${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.3s';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Add CSS for notification animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    .animate-slideIn {
+        animation: slideIn 0.3s ease-out;
+    }
+`;
+document.head.appendChild(style);
+
+console.log('✅ Analyst Assignment System Ready');
+
+</script>
+
+    <!-- Assign Analyst Modal -->
+    <div id="assignAnalystModal" class="modal">
+        <div class="modal-content bg-white rounded-2xl p-6 w-full max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Assign Analyst</h3>
+                <button onclick="closeAssignAnalystModal()" class="text-gray-500 hover:text-gray-700 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-gray-600 mb-4" id="assignTournamentName">Select an analyst to assign to this tournament:</p>
+            </div>
+            
+            <!-- Search Analysts -->
+            <div class="mb-4">
+                <input type="text" id="modalAnalystSearch" placeholder="Search analysts..." 
+                    class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    onkeyup="filterModalAnalysts()">
+            </div>
+            
+            <!-- Analyst List -->
+            <div id="analystListContainer" class="space-y-2 max-h-96 overflow-y-auto mb-6">
+                <!-- Populated by JavaScript -->
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeAssignAnalystModal()" 
+                    class="px-6 py-2 border-2 border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
