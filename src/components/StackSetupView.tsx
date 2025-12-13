@@ -531,7 +531,7 @@ export function StackSetupView({
   const urlParamsProcessed = useRef(false);
 
   /**
-   * Auto-load hand data from URL params
+   * Load hand data from URL params
    * Used for prototyping integration with tpro.html
    */
   useEffect(() => {
@@ -540,7 +540,6 @@ export function StackSetupView({
 
     const urlParams = new URLSearchParams(window.location.search);
     const handData = urlParams.get('handData');
-    const autoSetup = urlParams.get('autoSetup');
 
     if (handData) {
       console.log('🔗 [URL Params] Found handData in URL');
@@ -550,23 +549,8 @@ export function StackSetupView({
       const decodedData = decodeURIComponent(handData);
       console.log('🔗 [URL Params] Decoded hand data:', decodedData);
 
-      // Set the raw input
+      // Set the raw input (user will manually click Setup Players)
       actions.setStackData({ ...state.stackData, rawInput: decodedData });
-
-      // If autoSetup is true, trigger setup after a short delay to allow state to update
-      if (autoSetup === 'true') {
-        console.log('🔗 [URL Params] Auto-setup enabled, will trigger Setup Players');
-        setTimeout(() => {
-          // Find and click the Setup Players button
-          const setupButton = document.querySelector('[data-testid="setup-players-btn"]') as HTMLButtonElement;
-          if (setupButton) {
-            console.log('🔗 [URL Params] Clicking Setup Players button');
-            setupButton.click();
-          } else {
-            console.warn('🔗 [URL Params] Setup Players button not found');
-          }
-        }, 500);
-      }
 
       // Clear URL params to prevent re-loading on refresh
       window.history.replaceState({}, document.title, window.location.pathname);

@@ -1448,8 +1448,8 @@ function viewActionsInApp(handId) {
     // Encode the hand data for URL
     const encodedData = encodeURIComponent(handData);
 
-    // Open the app with the hand data
-    const appUrl = `http://127.0.0.1:3001?handData=${encodedData}&autoSetup=true`;
+    // Open the app with the hand data (user will manually click Setup Players)
+    const appUrl = `http://127.0.0.1:3001?handData=${encodedData}`;
     window.open(appUrl, '_blank');
 }
 
