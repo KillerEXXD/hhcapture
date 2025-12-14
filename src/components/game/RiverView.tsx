@@ -32,6 +32,8 @@ interface RiverViewProps {
   onExport: () => void;
   cardManagement: UseCardManagementReturn;
   potCalculation: UsePotCalculationReturn;
+  /** Optional callback for "Back to Tournament" navigation (for embedded use) */
+  onBackToTournament?: () => void;
 }
 
 export const RiverView: React.FC<RiverViewProps> = ({
@@ -42,6 +44,7 @@ export const RiverView: React.FC<RiverViewProps> = ({
   onExport,
   cardManagement,
   potCalculation,
+  onBackToTournament,
 }) => {
   const {
     players,
@@ -1167,19 +1170,23 @@ export const RiverView: React.FC<RiverViewProps> = ({
   return (
     <div className="p-2 max-w-full mx-auto bg-gray-50 min-h-screen">
       <div className="bg-white rounded-lg shadow-lg p-3">
-        {/* BACK TO HAND HISTORY */}
+        {/* BACK TO HAND HISTORY / TOURNAMENT */}
         <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-100">
           <button
             onClick={() => {
-              const tournamentId = localStorage.getItem('lastTournamentId') || '1';
-              window.open(`/tpro.html?view=handHistory&tournamentId=${tournamentId}`, '_blank');
+              if (onBackToTournament) {
+                onBackToTournament();
+              } else {
+                const tournamentId = localStorage.getItem('lastTournamentId') || '1';
+                window.open(`/tpro.html?view=handHistory&tournamentId=${tournamentId}`, '_blank');
+              }
             }}
             className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>Back to Hand History</span>
+            <span>{onBackToTournament ? 'Back to Tournament' : 'Back to Hand History'}</span>
           </button>
         </div>
 

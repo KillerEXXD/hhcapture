@@ -15,94 +15,66 @@ const processes = [];
 
 // Cleanup function
 async function cleanup() {
-  console.log('\n\n[DEBUG] cleanup() called');
-  console.log('[DEBUG] Number of processes to stop:', processes.length);
+  console.log('\nStopping all services...');
 
   // Kill all child processes
   for (const proc of processes) {
     try {
       if (!proc.killed) {
-        console.log(`[DEBUG] Stopping PID ${proc.pid}...`);
-
         // Try to kill the process gracefully first
         try {
           proc.kill('SIGTERM');
-          console.log(`[DEBUG] Sent SIGTERM to PID ${proc.pid}`);
         } catch (killErr) {
           // If that fails, try with system kill
-          console.log(`[DEBUG] SIGTERM failed, trying process.kill...`);
           process.kill(proc.pid, 'SIGTERM');
-          console.log(`[DEBUG] Sent system SIGTERM to PID ${proc.pid}`);
         }
-      } else {
-        console.log(`[DEBUG] PID ${proc.pid} already killed`);
       }
     } catch (err) {
-      console.log(`[DEBUG] Error killing PID ${proc.pid}:`, err.message);
+      // Ignore errors during cleanup
     }
   }
 
   // Wait a moment for graceful shutdown
-  console.log('[DEBUG] Waiting 1000ms for graceful shutdown...');
   await new Promise(resolve => setTimeout(resolve, 1000));
 
-  console.log('[DEBUG] Running kill-ports for cleanup...');
+  // Clean up ports
   try {
-    const result = await execAsync('npm run kill-ports', { cwd: projectRoot });
-    console.log('[DEBUG] kill-ports completed');
+    await execAsync('npm run kill-ports', { cwd: projectRoot });
   } catch (err) {
-    console.log('[DEBUG] kill-ports error:', err.message);
+    // Ignore errors
   }
 
-  console.log('[DEBUG] All services stopped.\n');
+  console.log('All services stopped.\n');
 }
 
 // Register cleanup handlers
-console.log('[DEBUG] Registering signal handlers...');
-
 process.on('SIGINT', async () => {
-  console.log('\n[DEBUG] ========== SIGINT (Ctrl+C) detected! ==========');
   try {
     await cleanup();
-    console.log('[DEBUG] Cleanup completed, exiting with code 0');
     process.exit(0);
   } catch (err) {
-    console.log('[DEBUG] Error during cleanup:', err);
+    console.error('Error during cleanup:', err.message);
     process.exit(1);
   }
 });
 
 process.on('SIGTERM', async () => {
-  console.log('\n[DEBUG] ========== SIGTERM detected! ==========');
   try {
     await cleanup();
-    console.log('[DEBUG] Cleanup completed, exiting with code 0');
     process.exit(0);
   } catch (err) {
-    console.log('[DEBUG] Error during cleanup:', err);
+    console.error('Error during cleanup:', err.message);
     process.exit(1);
   }
 });
 
-process.on('beforeExit', (code) => {
-  console.log('[DEBUG] beforeExit event, code:', code);
-});
-
-process.on('exit', (code) => {
-  console.log('[DEBUG] exit event, code:', code);
-});
-
 // Main function
 async function main() {
-  console.log('[DEBUG] main() started');
-  console.log('[DEBUG] Project root:', projectRoot);
-
   console.log('Cleaning up ports...');
   try {
-    const result = await execAsync('npm run kill-ports', { cwd: projectRoot });
-    console.log('[DEBUG] Initial cleanup done');
+    await execAsync('npm run kill-ports', { cwd: projectRoot });
   } catch (err) {
-    console.error('[DEBUG] Error cleaning ports:', err.message);
+    console.error('Error cleaning ports:', err.message);
   }
 
   console.log('\nStarting all development services...');
@@ -117,7 +89,6 @@ async function main() {
   });
   processes.push(viteProcess);
   console.log(`[APP] Started (PID: ${viteProcess.pid})`);
-  console.log('[DEBUG] Vite process added to tracking');
 
   // Start log server
   console.log('[LOGS] Starting log server...');
@@ -128,8 +99,6 @@ async function main() {
   });
   processes.push(logProcess);
   console.log(`[LOGS] Started (PID: ${logProcess.pid})`);
-  console.log('[DEBUG] Log server process added to tracking');
-  console.log('[DEBUG] Total processes tracked:', processes.length);
 
   console.log('\nAll services are running!');
   console.log('Waiting for dev server to be ready...');
@@ -161,32 +130,21 @@ async function main() {
   }
 
   console.log('\nServices running. Press Ctrl+C to stop...\n');
-  console.log('[DEBUG] Entering wait loop...');
 
   // Wait for processes to exit
-  viteProcess.on('exit', (code, signal) => {
-    console.log(`[DEBUG] Vite process exited with code ${code}, signal ${signal}`);
-  });
-
-  logProcess.on('exit', (code, signal) => {
-    console.log(`[DEBUG] Log server process exited with code ${code}, signal ${signal}`);
-  });
-
   await Promise.race([
     new Promise(resolve => viteProcess.on('exit', resolve)),
     new Promise(resolve => logProcess.on('exit', resolve))
   ]);
 
-  console.log('[DEBUG] A service exited unexpectedly, running cleanup...');
+  console.log('\nA service exited unexpectedly.');
   await cleanup();
-  console.log('[DEBUG] Exiting with code 1');
   process.exit(1);
 }
 
 // Run main
-console.log('[DEBUG] Starting application...');
 main().catch(async (err) => {
-  console.error('[DEBUG] Unhandled error in main():', err);
+  console.error('Error:', err.message);
   await cleanup();
   process.exit(1);
 });

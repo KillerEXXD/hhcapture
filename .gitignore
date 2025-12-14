@@ -50,3 +50,7 @@ lerna-debug.log*
 # Screenshots (local development only)
 screenshots/
 !screenshots/.gitkeep
+
+# Windows reserved names (can be accidentally created)
+nul
+NUL

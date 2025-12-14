@@ -1,0 +1,72 @@
+/*
+ * HHTool-specific gradient overrides for Tailwind v3/v4 compatibility
+ * These ensure gradients work even when loaded alongside Tailwind v4 apps
+ * Using direct color values since CSS variables may conflict between versions
+ */
+
+/* Total Pot - Green gradient */
+.bg-gradient-to-br.from-green-500.to-green-600 {
+  background-image: linear-gradient(to bottom right, #22c55e, #16a34a) !important;
+}
+
+/* Main Pot - Yellow gradient */
+.bg-gradient-to-br.from-yellow-400.to-yellow-500 {
+  background-image: linear-gradient(to bottom right, #facc15, #eab308) !important;
+}
+
+/* Side Pot 1 - Blue gradient */
+.bg-gradient-to-br.from-blue-400.to-blue-500 {
+  background-image: linear-gradient(to bottom right, #60a5fa, #3b82f6) !important;
+}
+
+/* Side Pot 2+ - Purple gradient */
+.bg-gradient-to-br.from-purple-400.to-purple-500 {
+  background-image: linear-gradient(to bottom right, #c084fc, #a855f7) !important;
+}
+
+/* Additional gradient combinations used in HHTool */
+.bg-gradient-to-r.from-blue-500.to-blue-600 {
+  background-image: linear-gradient(to right, #3b82f6, #2563eb) !important;
+}
+
+.bg-gradient-to-r.from-green-500.to-green-600 {
+  background-image: linear-gradient(to right, #22c55e, #16a34a) !important;
+}
+
+.bg-gradient-to-r.from-purple-500.to-purple-600 {
+  background-image: linear-gradient(to right, #a855f7, #9333ea) !important;
+}
+
+.bg-gradient-to-r.from-red-600.to-red-700 {
+  background-image: linear-gradient(to right, #dc2626, #b91c1c) !important;
+}
+
+.bg-gradient-to-r.from-yellow-500.to-yellow-600 {
+  background-image: linear-gradient(to right, #eab308, #ca8a04) !important;
+}
+
+.bg-gradient-to-r.from-blue-600.to-indigo-600 {
+  background-image: linear-gradient(to right, #2563eb, #4f46e5) !important;
+}
+
+.bg-gradient-to-r.from-blue-600.to-indigo-700 {
+  background-image: linear-gradient(to right, #2563eb, #4338ca) !important;
+}
+
+/* Pot Distribution Header - Purple/Indigo gradient */
+.bg-gradient-to-r.from-purple-600.to-indigo-600 {
+  background-image: linear-gradient(to right, #9333ea, #4f46e5) !important;
+}
+
+/* Additional gradients used in HHTool views */
+.bg-gradient-to-r.from-green-600.to-green-700 {
+  background-image: linear-gradient(to right, #16a34a, #15803d) !important;
+}
+
+.bg-gradient-to-r.from-orange-500.to-orange-600 {
+  background-image: linear-gradient(to right, #f97316, #ea580c) !important;
+}
+
+.bg-gradient-to-br.from-purple-500.to-indigo-600 {
+  background-image: linear-gradient(to bottom right, #a855f7, #4f46e5) !important;
+}

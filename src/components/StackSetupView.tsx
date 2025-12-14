@@ -21,6 +21,8 @@ interface StackSetupViewProps {
   onClearAll: () => void;
   onExport: () => void;
   formatStack: (amount: number) => string;
+  /** Optional callback for "Back to Tournament" navigation (for embedded use) */
+  onBackToTournament?: () => void;
 }
 
 interface ParsedPlayer {
@@ -102,7 +104,8 @@ export function StackSetupView({
   cardManagement,
   onClearAll,
   onExport,
-  formatStack
+  formatStack,
+  onBackToTournament
 }: StackSetupViewProps): React.ReactElement {
 
   /**
@@ -600,16 +603,22 @@ export function StackSetupView({
   return (
     <div className="p-2 max-w-full mx-auto bg-gray-50 min-h-screen">
       <div className="bg-white rounded-lg shadow-lg p-3">
-        {/* BACK TO HAND HISTORY */}
+        {/* BACK TO HAND HISTORY / TOURNAMENT */}
         <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-100">
           <button
-            onClick={() => window.open(getBackToHandHistoryUrl(), '_blank')}
+            onClick={() => {
+              if (onBackToTournament) {
+                onBackToTournament();
+              } else {
+                window.open(getBackToHandHistoryUrl(), '_blank');
+              }
+            }}
             className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>Back to Hand History</span>
+            <span>{onBackToTournament ? 'Back to Tournament' : 'Back to Hand History'}</span>
           </button>
         </div>
 
@@ -878,9 +887,20 @@ export function StackSetupView({
           <div className="flex gap-2">
             <button
               onClick={setupPlayers}
-              className="w-full px-4 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
+              className="w-full px-4 py-3 bg-green-600 text-white rounded text-sm font-bold hover:bg-green-700 transition-colors"
+              style={{
+                backgroundColor: '#16a34a',
+                color: 'white',
+                padding: '12px 16px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
             >
-              Setup Players
+              🎯 Enter Hand Details
             </button>
           </div>
 
