@@ -10,6 +10,12 @@ Extended Action Rules:
 - Extended Action 1: Second betting round (can raise/call/fold)
 - Extended Action 2: Third betting round (ONLY call/fold, no raises)
 - Maximum 2 extended actions per street
+
+CRITICAL All-In Rule:
+- An all-in for LESS than a full raise does NOT reopen betting
+- The last aggressor who was called does NOT get another action
+- Extended Action 2 only occurs if Extended Action 1 contains a FULL raise
+  (not just an all-in for less that doesn't meet the minimum raise increment)
 """
 
 import sys
@@ -150,6 +156,10 @@ class ExtendedActionGenerator(TestCaseGenerator):
                 new_raise = current_bet + (self.bb * random.randint(3, 6))
                 action, actual_new_raise = self.process_action(raiser, ActionType.RAISE, new_raise)
                 actions_more1.append(action)
+
+                # Check if this was a FULL raise (actual_new_raise >= target)
+                # or an all-in for less (player went all-in but for less than requested)
+                is_full_raise = (actual_new_raise >= new_raise)
                 current_bet = actual_new_raise  # Use actual amount
 
                 # Other players respond
@@ -162,9 +172,11 @@ class ExtendedActionGenerator(TestCaseGenerator):
                         action, _ = self.process_action(player, ActionType.FOLD)
                     actions_more1.append(action)
 
-                # EXTENDED ACTION 2: Only call/fold allowed
+                # EXTENDED ACTION 2: Only occurs if Extended Action 1 had a FULL raise
+                # CRITICAL RULE: An all-in for less than a full raise does NOT reopen betting
+                # The last aggressor who was called does NOT get another action
                 active_players = [p for p in self.players if not p.folded]
-                if len(active_players) >= 2:
+                if len(active_players) >= 2 and is_full_raise:
                     # First player to act can only call or fold
                     responder = active_players[0]
                     if random.random() < 0.8:  # 80% call
@@ -185,6 +197,7 @@ class ExtendedActionGenerator(TestCaseGenerator):
                         else:
                             action, _ = self.process_action(player, ActionType.FOLD)
                         actions_more2.append(action)
+                # If is_full_raise is False (all-in for less), no Extended Action 2 is generated
             else:
                 # Original raiser just calls
                 action, _ = self.process_action(raiser, ActionType.CALL, current_bet)
@@ -256,8 +269,14 @@ class ExtendedActionGenerator(TestCaseGenerator):
         if len(active_players) >= 2:
             if random.random() < 0.4:  # 40% re-raise
                 new_raise = current_bet + int(self.bb * random.randint(5, 10))
+                # Track the previous bet to determine if this is a full raise
+                previous_bet = current_bet
                 action, actual_new_raise = self.process_action(bettor, ActionType.RAISE, new_raise)
                 actions_more1.append(action)
+
+                # Check if this was a FULL raise (actual_new_raise >= target)
+                # or an all-in for less (player went all-in but for less than requested)
+                is_full_raise = (actual_new_raise >= new_raise)
                 current_bet = actual_new_raise  # Use actual amount
 
                 # Other players respond
@@ -270,9 +289,11 @@ class ExtendedActionGenerator(TestCaseGenerator):
                         action, _ = self.process_action(player, ActionType.FOLD)
                     actions_more1.append(action)
 
-                # EXTENDED ACTION 2: Only call/fold
+                # EXTENDED ACTION 2: Only occurs if Extended Action 1 had a FULL raise
+                # CRITICAL RULE: An all-in for less than a full raise does NOT reopen betting
+                # The last aggressor who was called does NOT get another action
                 active_players = [p for p in self.players if not p.folded and p.current_stack > 0]
-                if len(active_players) >= 2:
+                if len(active_players) >= 2 and is_full_raise:
                     # Get correct action order for extended action 2
                     action_order_ext2 = self.get_postflop_action_order(active_players)
                     responder = action_order_ext2[0]
@@ -281,6 +302,7 @@ class ExtendedActionGenerator(TestCaseGenerator):
                     else:
                         action, _ = self.process_action(responder, ActionType.FOLD)
                     actions_more2.append(action)
+                # If is_full_raise is False (all-in for less), no Extended Action 2 is generated
             else:
                 # Original bettor calls
                 action, _ = self.process_action(bettor, ActionType.CALL, current_bet)
